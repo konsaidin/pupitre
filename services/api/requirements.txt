@@ -1,0 +1,13 @@
+fastapi>=0.115
+uvicorn[standard]>=0.32
+python-multipart>=0.0.12
+mutagen>=1.47
+numpy>=1.26
+scipy>=1.13
+librosa>=0.10.2
+soundfile>=0.12
+# Разделение стемов (тяжёлые, ставятся последними; без них пайплайн
+# деградирует до pYIN по полному миксу)
+torch>=2.6
+torchaudio>=2.6
+demucs>=4.0.1
