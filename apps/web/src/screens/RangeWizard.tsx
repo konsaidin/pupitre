@@ -7,6 +7,7 @@ import { ensureMic, stopMic } from '../audio/audioSession';
 import { LiveKeyboard } from '../components/LiveKeyboard';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { classifyRange, midiToName, type VocalRange } from '../lib/music';
+import { micOptions } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 
 type Step = 'intro' | 'comfort' | 'low' | 'high' | 'done';
@@ -50,7 +51,7 @@ export function RangeWizard() {
     let cancelled = false;
     (async () => {
       try {
-        const tracker = await ensureMic(profile.micDeviceId);
+        const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
         if (cancelled) return;
         unsub = tracker.onFrame((f) => {
           liveMidiRef.current = f.voiced ? f.midi : NaN;

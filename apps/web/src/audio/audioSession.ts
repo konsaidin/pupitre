@@ -1,6 +1,6 @@
 // Единственный AudioContext и PitchTracker на всё приложение.
 
-import { PitchTracker } from './PitchTracker';
+import { PitchTracker, type MicOptions } from './PitchTracker';
 
 let ctx: AudioContext | null = null;
 let tracker: PitchTracker | null = null;
@@ -16,10 +16,10 @@ export function getTracker(): PitchTracker {
 }
 
 /** Запустить микрофон (запросит разрешение при первом вызове). */
-export async function ensureMic(deviceId?: string | null): Promise<PitchTracker> {
+export async function ensureMic(deviceId?: string | null, opts?: MicOptions): Promise<PitchTracker> {
   const t = getTracker();
   await getAudioContext().resume();
-  await t.start(deviceId);
+  await t.start(deviceId, opts);
   return t;
 }
 

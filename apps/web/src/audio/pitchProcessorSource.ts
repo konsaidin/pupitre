@@ -48,7 +48,8 @@ class PitchProcessor extends AudioWorkletProcessor {
     let rms = 0;
     for (let i = 0; i < win; i++) rms += buf[i] * buf[i];
     rms = Math.sqrt(rms / win);
-    if (rms < 0.004) {
+    // жёсткий пол ниже минимального гейта UI: сам гейт настраивается в PitchTracker
+    if (rms < 0.002) {
       this.emit(0, 0, rms);
       return;
     }

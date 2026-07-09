@@ -1,5 +1,6 @@
 // Профиль пользователя в localStorage: диапазон голоса, настройки, результаты.
 
+import { DEFAULT_MIC, type MicOptions } from '../audio/PitchTracker';
 import type { VocalRange } from './music';
 import type { Difficulty } from './songMap';
 
@@ -20,6 +21,12 @@ export interface Profile {
   /** задержка вывода звука в мс, вычитается из времени голоса при скоринге */
   latencyMs: number;
   micDeviceId: string | null;
+  /** браузерная обработка микрофона + нойзгейт детектора */
+  micNoiseSuppression: boolean;
+  micEchoCancellation: boolean;
+  micAutoGain: boolean;
+  micGateRms: number;
+  micGateClarity: number;
   guideNotes: boolean;
   metronome: boolean;
   headphonesWarned: boolean;
@@ -33,6 +40,11 @@ const DEFAULTS: Profile = {
   difficulty: 'beginner',
   latencyMs: 0,
   micDeviceId: null,
+  micNoiseSuppression: DEFAULT_MIC.noiseSuppression,
+  micEchoCancellation: DEFAULT_MIC.echoCancellation,
+  micAutoGain: DEFAULT_MIC.autoGain,
+  micGateRms: DEFAULT_MIC.gateRms,
+  micGateClarity: DEFAULT_MIC.gateClarity,
   guideNotes: true,
   metronome: true,
   headphonesWarned: false,
@@ -58,6 +70,17 @@ export function addScore(p: Profile, rec: ScoreRecord): Profile {
   const next = { ...p, scores };
   saveProfile(next);
   return next;
+}
+
+/** Настройки микрофона из профиля — для PitchTracker.start. */
+export function micOptions(p: Profile): MicOptions {
+  return {
+    noiseSuppression: p.micNoiseSuppression,
+    echoCancellation: p.micEchoCancellation,
+    autoGain: p.micAutoGain,
+    gateRms: p.micGateRms,
+    gateClarity: p.micGateClarity,
+  };
 }
 
 export function bestScore(p: Profile, mapId: string): ScoreRecord | null {

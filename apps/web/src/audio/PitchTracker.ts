@@ -18,9 +18,28 @@ export interface PitchFrame {
 
 export type PitchListener = (frame: PitchFrame) => void;
 
-const CLARITY_ENTER = 0.6; // порог входа в «голос есть»
-const CLARITY_HOLD = 0.48; // удержание: гистерезис против мерцания на границе
-const MIN_RMS = 0.006;
+/** Настройки микрофона: браузерная обработка + нойзгейт детектора. */
+export interface MicOptions {
+  /** шумоподавление браузера (глушит фон, может резать тихий вокал) */
+  noiseSuppression: boolean;
+  /** эхоподавление: полезно, если аккомпанемент играет из колонок */
+  echoCancellation: boolean;
+  /** автоусиление: браузер сам крутит громкость (обычно мешает гейту) */
+  autoGain: boolean;
+  /** нойзгейт: RMS ниже порога = тишина (0.002..0.03) */
+  gateRms: number;
+  /** порог чистоты тона для входа в «голос есть» (0.4..0.9) */
+  gateClarity: number;
+}
+
+export const DEFAULT_MIC: MicOptions = {
+  noiseSuppression: false,
+  echoCancellation: false,
+  autoGain: false,
+  gateRms: 0.006,
+  gateClarity: 0.6,
+};
+
 const MEDIAN_WINDOW = 5;
 const EMA_ALPHA = 0.45; // догладка после медианы: гасит дрожь в десятки центов
 // октавный срыв: скачок ≥ ниже, который свёрткой на ±12 попадает близко к медиане
@@ -38,14 +57,31 @@ export class PitchTracker {
   private wasVoiced = false;
   private smoothed = NaN;
   private foldStreak = 0;
+  private gateRms = DEFAULT_MIC.gateRms;
+  private clarityEnter = DEFAULT_MIC.gateClarity;
+  private clarityHold = DEFAULT_MIC.gateClarity - 0.12;
+  /** ключ констрейнтов getUserMedia — смена требует перезапуска потока */
+  private constraintsKey = '';
   private static workletLoaded = new WeakSet<AudioContext>();
 
   constructor(ctx: AudioContext) {
     this.ctx = ctx;
   }
 
-  async start(deviceId?: string | null): Promise<void> {
-    if (this.node) return;
+  /** Пороги гейта применяются на лету, без перезапуска потока. */
+  setGate(gateRms: number, gateClarity: number): void {
+    this.gateRms = gateRms;
+    this.clarityEnter = gateClarity;
+    this.clarityHold = Math.max(0.3, gateClarity - 0.12);
+  }
+
+  async start(deviceId?: string | null, opts: MicOptions = DEFAULT_MIC): Promise<void> {
+    this.setGate(opts.gateRms, opts.gateClarity);
+    const key = JSON.stringify([deviceId ?? null, opts.noiseSuppression, opts.echoCancellation, opts.autoGain]);
+    if (this.node) {
+      if (this.constraintsKey === key) return;
+      this.stop(); // констрейнты изменились — нужен новый поток
+    }
     if (!PitchTracker.workletLoaded.has(this.ctx)) {
       const blob = new Blob([PITCH_PROCESSOR_SOURCE], { type: 'application/javascript' });
       const url = URL.createObjectURL(blob);
@@ -59,12 +95,13 @@ export class PitchTracker {
     this.stream = await navigator.mediaDevices.getUserMedia({
       audio: {
         deviceId: deviceId ? { exact: deviceId } : undefined,
-        echoCancellation: false,
-        noiseSuppression: false,
-        autoGainControl: false,
+        echoCancellation: opts.echoCancellation,
+        noiseSuppression: opts.noiseSuppression,
+        autoGainControl: opts.autoGain,
         channelCount: 1,
       },
     });
+    this.constraintsKey = key;
     this.source = this.ctx.createMediaStreamSource(this.stream);
     this.node = new AudioWorkletNode(this.ctx, 'pitch-processor', {
       numberOfInputs: 1,
@@ -85,6 +122,7 @@ export class PitchTracker {
     this.smoothed = NaN;
     this.foldStreak = 0;
     this.wasVoiced = false;
+    this.constraintsKey = '';
   }
 
   onFrame(fn: PitchListener): () => void {
@@ -94,8 +132,8 @@ export class PitchTracker {
 
   private onRaw(raw: { t: number; freq: number; clarity: number; rms: number }): void {
     // гистерезис: войти в voiced сложнее, чем удержаться — кружок не мерцает
-    const clarityMin = this.wasVoiced ? CLARITY_HOLD : CLARITY_ENTER;
-    const voicedRaw = raw.freq > 0 && raw.clarity >= clarityMin && raw.rms >= MIN_RMS;
+    const clarityMin = this.wasVoiced ? this.clarityHold : this.clarityEnter;
+    const voicedRaw = raw.freq > 0 && raw.clarity >= clarityMin && raw.rms >= this.gateRms;
     this.wasVoiced = voicedRaw;
     let midi = NaN;
     if (voicedRaw) {

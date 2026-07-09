@@ -678,3 +678,30 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   pointer-events: none;
   z-index: 5;
 }
+
+/* индикатор уровня микрофона с меткой порога гейта */
+.mic-meter {
+  position: relative;
+  height: 16px;
+  margin-top: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.mic-meter-fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.06s linear;
+}
+.mic-meter-gate {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--yellow);
+  box-shadow: 0 0 6px rgba(251, 191, 36, 0.7);
+}
+.mic-meter-state { min-height: 1.4em; margin-top: 0.3rem; }
+.check .dim { margin-left: 0.3rem; }

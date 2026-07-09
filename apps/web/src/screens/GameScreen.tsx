@@ -15,6 +15,7 @@ import { comfortZone } from '../lib/music';
 import { contourSegments } from '../lib/pitchline';
 import { DIFFICULTY_META, type Difficulty, type MapNote, type SongMap } from '../lib/songMap';
 import type { GameSummary } from '../game/scoring';
+import { micOptions } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 
 export interface PlayState {
@@ -131,7 +132,7 @@ export function GameScreen() {
     setError(null);
     try {
       const ctx = getAudioContext();
-      const tracker = await ensureMic(profile.micDeviceId);
+      const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
       if (engineMap.backing.kind === 'url' && backingBufferRef.current?.url !== engineMap.backing.url) {
         const resp = await fetch(engineMap.backing.url);
         if (!resp.ok) throw new Error(`Не удалось загрузить аккомпанемент (${resp.status})`);

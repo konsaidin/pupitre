@@ -3,8 +3,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
+import { DEFAULT_MIC } from '../audio/PitchTracker';
 import { Synth } from '../audio/synth';
+import { RangeSlider } from '../components/fx/RangeSlider';
+import { midiToName } from '../lib/music';
 import { DIFFICULTY_META, type Difficulty } from '../lib/songMap';
+import { micOptions } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 import { ScreenHeader } from '../components/ScreenHeader';
 
@@ -17,7 +21,55 @@ export function SettingsScreen() {
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [calibrating, setCalibrating] = useState(false);
   const [calStatus, setCalStatus] = useState<string | null>(null);
+  const [monitoring, setMonitoring] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
   const cancelRef = useRef(false);
+  const meterFillRef = useRef<HTMLDivElement>(null);
+  const meterStateRef = useRef<HTMLSpanElement>(null);
+
+  // живой монитор уровня: показывает громкость, порог гейта и «голос пойман»
+  useEffect(() => {
+    if (!monitoring) return;
+    let unsub: (() => void) | null = null;
+    let cancelled = false;
+    (async () => {
+      try {
+        setMicError(null);
+        const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
+        if (cancelled) return;
+        unsub = tracker.onFrame((f) => {
+          const fill = meterFillRef.current;
+          const state = meterStateRef.current;
+          if (!fill || !state) return;
+          // шкала -60..-10 дБFS
+          const db = 20 * Math.log10(Math.max(1e-5, f.rms));
+          const pct = Math.min(100, Math.max(0, ((db + 60) / 50) * 100));
+          fill.style.width = `${pct}%`;
+          fill.style.background = f.voiced ? 'var(--green)' : 'var(--accent)';
+          state.textContent = f.voiced
+            ? `голос: ${midiToName(Math.round(f.midi))} · чистота ${(f.clarity * 100).toFixed(0)}%`
+            : f.rms >= profile.micGateRms
+              ? 'звук есть, но не похож на ноту (чистота ниже порога)'
+              : 'тишина (ниже гейта)';
+        });
+      } catch (e) {
+        setMicError(e instanceof Error ? e.message : 'Не удалось открыть микрофон');
+        setMonitoring(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+      unsub?.();
+    };
+    // при смене устройства/обработки поток перезапустится, пороги обновятся на лету
+  }, [monitoring, profile]);
+
+  useEffect(() => {
+    if (!monitoring) stopMic();
+  }, [monitoring]);
+
+  const gateDb = Math.round(20 * Math.log10(profile.micGateRms));
+  const gatePct = Math.min(100, Math.max(0, ((gateDb + 60) / 50) * 100));
 
   useEffect(() => {
     navigator.mediaDevices
@@ -36,7 +88,7 @@ export function SettingsScreen() {
     cancelRef.current = false;
     try {
       const ctx = getAudioContext();
-      const tracker = await ensureMic(profile.micDeviceId);
+      const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
       const synth = new Synth(ctx, 0.6);
       const t0 = ctx.currentTime + 1;
       const clickTimes: number[] = [];
@@ -97,7 +149,95 @@ export function SettingsScreen() {
             <option key={d.deviceId} value={d.deviceId}>{d.label || `Микрофон ${d.deviceId.slice(0, 6)}`}</option>
           ))}
         </select>
-        <p className="dim small">Если названия пустые — дай доступ к микрофону (кнопка калибровки ниже) и вернись сюда.</p>
+        <p className="dim small">Если названия пустые — дай доступ к микрофону (кнопка «Проверить» ниже) и вернись сюда.</p>
+
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={profile.micNoiseSuppression}
+            onChange={(e) => update({ micNoiseSuppression: e.target.checked })}
+          />
+          Шумоподавление браузера
+          <span className="dim small">глушит фон (вентилятор, улицу), но может резать тихий вокал</span>
+        </label>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={profile.micEchoCancellation}
+            onChange={(e) => update({ micEchoCancellation: e.target.checked })}
+          />
+          Эхоподавление
+          <span className="dim small">режет звук из колонок/наушников, попадающий в микрофон</span>
+        </label>
+        <label className="check">
+          <input
+            type="checkbox"
+            checked={profile.micAutoGain}
+            onChange={(e) => update({ micAutoGain: e.target.checked })}
+          />
+          Автоусиление
+          <span className="dim small">браузер сам крутит громкость — обычно мешает нойзгейту</span>
+        </label>
+
+        <RangeSlider
+          min={2}
+          max={30}
+          step={0.5}
+          value={profile.micGateRms * 1000}
+          onChange={(v) => update({ micGateRms: v / 1000 })}
+          label={
+            <span>
+              Нойзгейт — порог громкости <b className="mono">{gateDb} дБ</b>{' '}
+              <span className="dim small">всё тише порога считается тишиной; подними, если кружок дёргается от шума</span>
+            </span>
+          }
+        />
+        <RangeSlider
+          min={0.4}
+          max={0.9}
+          step={0.01}
+          value={profile.micGateClarity}
+          onChange={(v) => update({ micGateClarity: v })}
+          label={
+            <span>
+              Порог чистоты тона <b className="mono">{(profile.micGateClarity * 100).toFixed(0)}%</b>{' '}
+              <span className="dim small">выше — меньше ложных нот от шума, но шёпот/хрип не ловится</span>
+            </span>
+          }
+        />
+
+        <div className="mic-meter" aria-hidden="true">
+          <div className="mic-meter-fill" ref={meterFillRef} />
+          <div className="mic-meter-gate" style={{ left: `${gatePct}%` }} title="порог гейта" />
+        </div>
+        <p className="dim small mic-meter-state">
+          <span ref={meterStateRef}>{monitoring ? '…' : 'нажми «Проверить», чтобы увидеть уровень вживую'}</span>
+        </p>
+
+        <div className="btn-row tight">
+          <button className="btn" onClick={() => setMonitoring((m) => !m)}>
+            {monitoring ? '■ Остановить' : '🎤 Проверить микрофон'}
+          </button>
+          <button
+            className="btn ghost"
+            onClick={() =>
+              update({
+                micNoiseSuppression: DEFAULT_MIC.noiseSuppression,
+                micEchoCancellation: DEFAULT_MIC.echoCancellation,
+                micAutoGain: DEFAULT_MIC.autoGain,
+                micGateRms: DEFAULT_MIC.gateRms,
+                micGateClarity: DEFAULT_MIC.gateClarity,
+              })
+            }
+          >
+            Сбросить
+          </button>
+        </div>
+        {micError && <p className="error">⚠️ {micError}</p>}
+        <p className="dim small">
+          Как настроить: помолчи — полоска должна быть <b>левее</b> метки порога; скажи «а-а-а» — полоска
+          зеленеет и уходит правее. Если шум наушников «поёт» сам — подними гейт или включи шумоподавление.
+        </p>
       </section>
 
       <section className="settings-block">
