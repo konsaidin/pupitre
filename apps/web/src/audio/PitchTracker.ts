@@ -18,9 +18,15 @@ export interface PitchFrame {
 
 export type PitchListener = (frame: PitchFrame) => void;
 
-const MIN_CLARITY = 0.55;
+const CLARITY_ENTER = 0.6; // порог входа в «голос есть»
+const CLARITY_HOLD = 0.48; // удержание: гистерезис против мерцания на границе
 const MIN_RMS = 0.006;
 const MEDIAN_WINDOW = 5;
+const EMA_ALPHA = 0.45; // догладка после медианы: гасит дрожь в десятки центов
+// октавный срыв: скачок ≥ ниже, который свёрткой на ±12 попадает близко к медиане
+const OCTAVE_JUMP_SEMIS = 7;
+const OCTAVE_NEAR_SEMIS = 3;
+const OCTAVE_ACCEPT_FRAMES = 8; // ~85 мс подряд — считаем сменой октавы, а не срывом
 
 export class PitchTracker {
   private ctx: AudioContext;
@@ -29,6 +35,9 @@ export class PitchTracker {
   private source: MediaStreamAudioSourceNode | null = null;
   private listeners = new Set<PitchListener>();
   private recentMidis: number[] = [];
+  private wasVoiced = false;
+  private smoothed = NaN;
+  private foldStreak = 0;
   private static workletLoaded = new WeakSet<AudioContext>();
 
   constructor(ctx: AudioContext) {
@@ -73,6 +82,9 @@ export class PitchTracker {
     this.stream?.getTracks().forEach((tr) => tr.stop());
     this.stream = null;
     this.recentMidis = [];
+    this.smoothed = NaN;
+    this.foldStreak = 0;
+    this.wasVoiced = false;
   }
 
   onFrame(fn: PitchListener): () => void {
@@ -81,16 +93,43 @@ export class PitchTracker {
   }
 
   private onRaw(raw: { t: number; freq: number; clarity: number; rms: number }): void {
-    const voicedRaw = raw.freq > 0 && raw.clarity >= MIN_CLARITY && raw.rms >= MIN_RMS;
+    // гистерезис: войти в voiced сложнее, чем удержаться — кружок не мерцает
+    const clarityMin = this.wasVoiced ? CLARITY_HOLD : CLARITY_ENTER;
+    const voicedRaw = raw.freq > 0 && raw.clarity >= clarityMin && raw.rms >= MIN_RMS;
+    this.wasVoiced = voicedRaw;
     let midi = NaN;
     if (voicedRaw) {
-      this.recentMidis.push(hzToMidi(raw.freq));
+      let m = hzToMidi(raw.freq);
+      // подавление октавных срывов: скачок, который свёрткой на ±12 ложится
+      // рядом с недавней медианой — глюк детектора. Если «глюк» держится
+      // ~85 мс подряд — это настоящая смена октавы, принимаем её.
+      if (this.recentMidis.length >= 3) {
+        const sorted = [...this.recentMidis].sort((a, b) => a - b);
+        const med = sorted[sorted.length >> 1];
+        const folded = m - 12 * Math.round((m - med) / 12);
+        if (Math.abs(m - med) >= OCTAVE_JUMP_SEMIS && Math.abs(folded - med) <= OCTAVE_NEAR_SEMIS) {
+          this.foldStreak++;
+          if (this.foldStreak <= OCTAVE_ACCEPT_FRAMES) m = folded;
+          else {
+            this.recentMidis = [];
+            this.smoothed = NaN;
+            this.foldStreak = 0;
+          }
+        } else {
+          this.foldStreak = 0;
+        }
+      }
+      this.recentMidis.push(m);
       if (this.recentMidis.length > MEDIAN_WINDOW) this.recentMidis.shift();
-      // медиана гасит одиночные октавные срывы детектора
+      // медиана гасит одиночные выбросы, EMA — мелкую дрожь
       const sorted = [...this.recentMidis].sort((a, b) => a - b);
-      midi = sorted[Math.floor(sorted.length / 2)];
+      const med = sorted[Math.floor(sorted.length / 2)];
+      this.smoothed = Number.isNaN(this.smoothed) ? med : this.smoothed + EMA_ALPHA * (med - this.smoothed);
+      midi = this.smoothed;
     } else {
       this.recentMidis = [];
+      this.smoothed = NaN;
+      this.foldStreak = 0;
     }
     const frame: PitchFrame = {
       t: raw.t,

@@ -57,6 +57,46 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
     let H = 0;
     let dpr = 1;
 
+    const semis = win.highMidi - win.lowMidi + 1;
+    const midiToY = (midi: number) => {
+      const rowH = H / semis;
+      return H - (midi - win.lowMidi + 0.5) * rowH;
+    };
+
+    // статичный слой (строки + клавиатура) рисуется один раз на resize:
+    // перерисовывать текст/строки каждый кадр — дорого и не нужно
+    const staticLayer = document.createElement('canvas');
+    const renderStatic = () => {
+      staticLayer.width = canvas.width;
+      staticLayer.height = canvas.height;
+      const s = staticLayer.getContext('2d')!;
+      s.setTransform(dpr, 0, 0, dpr, 0, 0);
+      s.fillStyle = C.bg;
+      s.fillRect(0, 0, W, H);
+      const rowH = H / semis;
+      for (let m = win.lowMidi; m <= win.highMidi; m++) {
+        const y = midiToY(m) - rowH / 2;
+        if (!isBlackKey(m)) {
+          s.fillStyle = C.rowWhite;
+          s.fillRect(KEYBOARD_W, y, W - KEYBOARD_W, rowH);
+        }
+        s.strokeStyle = m % 12 === 0 ? C.octaveLine : C.rowLine;
+        s.beginPath();
+        s.moveTo(KEYBOARD_W, y + rowH);
+        s.lineTo(W, y + rowH);
+        s.stroke();
+        // клавиша
+        s.fillStyle = isBlackKey(m) ? '#1a1f2b' : '#e8eaf0';
+        s.fillRect(0, y + 0.5, KEYBOARD_W - 6, rowH - 1);
+        if (m % 12 === 0 || rowH > 16) {
+          s.fillStyle = isBlackKey(m) ? C.textDim : '#333a4d';
+          s.font = `${Math.min(11, rowH - 3)}px system-ui, sans-serif`;
+          s.textBaseline = 'middle';
+          s.fillText(midiToName(m), 4, y + rowH / 2 + 0.5);
+        }
+      }
+    };
+
     const resize = () => {
       dpr = Math.min(window.devicePixelRatio || 1, 2);
       W = wrap.clientWidth;
@@ -65,16 +105,11 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       canvas.height = Math.round(H * dpr);
       canvas.style.width = `${W}px`;
       canvas.style.height = `${H}px`;
+      renderStatic();
     };
     resize();
     const ro = new ResizeObserver(resize);
     ro.observe(wrap);
-
-    const semis = win.highMidi - win.lowMidi + 1;
-    const midiToY = (midi: number) => {
-      const rowH = H / semis;
-      return H - (midi - win.lowMidi + 0.5) * rowH;
-    };
 
     const draw = () => {
       raf = requestAnimationFrame(draw);
@@ -85,32 +120,9 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       const pxPerMs = (W - nowX) / lookaheadMs;
       const msToX = (ms: number) => nowX + (ms - songMs) * pxPerMs;
 
+      ctx2d.setTransform(1, 0, 0, 1, 0, 0);
+      ctx2d.drawImage(staticLayer, 0, 0);
       ctx2d.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx2d.fillStyle = C.bg;
-      ctx2d.fillRect(0, 0, W, H);
-
-      // фон строк и клавиатура
-      for (let m = win.lowMidi; m <= win.highMidi; m++) {
-        const y = midiToY(m) - rowH / 2;
-        if (!isBlackKey(m)) {
-          ctx2d.fillStyle = C.rowWhite;
-          ctx2d.fillRect(KEYBOARD_W, y, W - KEYBOARD_W, rowH);
-        }
-        ctx2d.strokeStyle = m % 12 === 0 ? C.octaveLine : C.rowLine;
-        ctx2d.beginPath();
-        ctx2d.moveTo(KEYBOARD_W, y + rowH);
-        ctx2d.lineTo(W, y + rowH);
-        ctx2d.stroke();
-        // клавиша
-        ctx2d.fillStyle = isBlackKey(m) ? '#1a1f2b' : '#e8eaf0';
-        ctx2d.fillRect(0, y + 0.5, KEYBOARD_W - 6, rowH - 1);
-        if (m % 12 === 0 || rowH > 16) {
-          ctx2d.fillStyle = isBlackKey(m) ? C.textDim : '#333a4d';
-          ctx2d.font = `${Math.min(11, rowH - 3)}px system-ui, sans-serif`;
-          ctx2d.textBaseline = 'middle';
-          ctx2d.fillText(midiToName(m), 4, y + rowH / 2 + 0.5);
-        }
-      }
 
       // призрачные плашки (что играет синт в упражнениях на слух)
       if (engine.map.guideEvents) {
@@ -177,13 +189,9 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         const rightMs = songMs + lookaheadMs;
         const i0 = Math.max(0, Math.floor(leftMs / line.hopMs) - 1);
         const i1 = Math.min(line.midi.length - 1, Math.ceil(rightMs / line.hopMs) + 1);
-        ctx2d.lineWidth = 2.5;
-        ctx2d.lineCap = 'round';
-        ctx2d.lineJoin = 'round';
-        ctx2d.strokeStyle = C.pitch;
-        ctx2d.shadowColor = C.pitch;
-        ctx2d.shadowBlur = 6;
-        ctx2d.beginPath();
+        // «свечение» — вторым широким полупрозрачным штрихом того же пути:
+        // canvas shadowBlur на длинной ломаной роняет fps в разы
+        const path = new Path2D();
         let pen = false;
         for (let i = i0; i <= i1; i++) {
           const m = line.midi[i];
@@ -194,14 +202,20 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
           const x = msToX(i * line.hopMs);
           const y = midiToY(m);
           if (!pen) {
-            ctx2d.moveTo(x, y);
+            path.moveTo(x, y);
             pen = true;
           } else {
-            ctx2d.lineTo(x, y);
+            path.lineTo(x, y);
           }
         }
-        ctx2d.stroke();
-        ctx2d.shadowBlur = 0;
+        ctx2d.lineCap = 'round';
+        ctx2d.lineJoin = 'round';
+        ctx2d.strokeStyle = C.pitchDim;
+        ctx2d.lineWidth = 6;
+        ctx2d.stroke(path);
+        ctx2d.strokeStyle = C.pitch;
+        ctx2d.lineWidth = 2;
+        ctx2d.stroke(path);
         ctx2d.lineWidth = 1;
 
         // шарик-ориентир на линии «сейчас»
@@ -209,37 +223,50 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         if (cm !== null) {
           const y = midiToY(cm);
           if (y >= -4 && y <= H + 4) {
+            ctx2d.fillStyle = C.pitchDim;
+            ctx2d.beginPath();
+            ctx2d.arc(nowX, y, 9, 0, Math.PI * 2);
+            ctx2d.fill();
             ctx2d.fillStyle = C.pitch;
-            ctx2d.shadowColor = C.pitch;
-            ctx2d.shadowBlur = 12;
             ctx2d.beginPath();
             ctx2d.arc(nowX, y, 5, 0, Math.PI * 2);
             ctx2d.fill();
-            ctx2d.shadowBlur = 0;
           }
         }
       }
 
-      // линия голоса (хвост)
+      // линия голоса (хвост): сегменты группируются в 8 путей
+      // (цвет × 4 ступени затухания) — по stroke() на путь, а не на сегмент
       const trail = engine.trail;
-      ctx2d.lineWidth = 2.5;
-      ctx2d.lineCap = 'round';
-      let prev: { x: number; y: number; hit: boolean } | null = null;
+      const trailPaths: (Path2D | undefined)[] = [];
+      let prevX = 0;
+      let prevY = 0;
+      let hasPrev = false;
       for (let i = trail.length - 1; i >= 0; i--) {
         const p = trail[i];
-        if (songMs - p.songMs > TRAIL_MS) break;
+        const age = songMs - p.songMs;
+        if (age > TRAIL_MS) break;
         const x = msToX(p.songMs);
         if (x < KEYBOARD_W) break;
         const y = midiToY(p.midi);
-        if (prev && Math.abs(prev.x - x) < 40) {
-          ctx2d.strokeStyle = p.inTolerance ? C.trailHit : C.trailMiss;
-          ctx2d.globalAlpha = Math.max(0.15, 1 - (songMs - p.songMs) / TRAIL_MS);
-          ctx2d.beginPath();
-          ctx2d.moveTo(prev.x, prev.y);
-          ctx2d.lineTo(x, y);
-          ctx2d.stroke();
+        if (hasPrev && Math.abs(prevX - x) < 40) {
+          const bucket = Math.min(3, Math.floor((age / TRAIL_MS) * 4)) + (p.inTolerance ? 4 : 0);
+          const path = (trailPaths[bucket] ??= new Path2D());
+          path.moveTo(prevX, prevY);
+          path.lineTo(x, y);
         }
-        prev = { x, y, hit: p.inTolerance };
+        prevX = x;
+        prevY = y;
+        hasPrev = true;
+      }
+      ctx2d.lineWidth = 2.5;
+      ctx2d.lineCap = 'round';
+      for (let b = 0; b < 8; b++) {
+        const path = trailPaths[b];
+        if (!path) continue;
+        ctx2d.strokeStyle = b >= 4 ? C.trailHit : C.trailMiss;
+        ctx2d.globalAlpha = 1 - (b % 4) * 0.28;
+        ctx2d.stroke(path);
       }
       ctx2d.globalAlpha = 1;
       ctx2d.lineWidth = 1;
@@ -266,8 +293,10 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         }
       }
 
-      // всплывающие вердикты
-      for (const j of engine.judgements.slice(-6)) {
+      // всплывающие вердикты (без slice — аллокаций в кадре быть не должно)
+      const js = engine.judgements;
+      for (let k = Math.max(0, js.length - 6); k < js.length; k++) {
+        const j = js[k];
         const age = songMs - j.atMs;
         if (age < 0 || age > 800) continue;
         const n = notes[j.noteIndex];

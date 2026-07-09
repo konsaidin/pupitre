@@ -19,6 +19,9 @@ class PitchProcessor extends AudioWorkletProcessor {
     this.diff = new Float32Array(this.maxTau + 1);
     this.cmndf = new Float32Array(this.maxTau + 1);
     this.threshold = 0.15;
+    // короче периода ~1100 Гц голос не поём: поиск ниже tauMin ловит
+    // только обертоны и даёт октавные срывы вверх
+    this.tauMin = Math.max(4, Math.round(sampleRate / 1100));
   }
 
   process(inputs) {
@@ -66,7 +69,7 @@ class PitchProcessor extends AudioWorkletProcessor {
     }
     // первый локальный минимум ниже порога
     let tauEst = -1;
-    for (let tau = 2; tau < maxTau; tau++) {
+    for (let tau = this.tauMin; tau < maxTau; tau++) {
       if (cmndf[tau] < this.threshold) {
         while (tau + 1 < maxTau && cmndf[tau + 1] < cmndf[tau]) tau++;
         tauEst = tau;
@@ -75,13 +78,22 @@ class PitchProcessor extends AudioWorkletProcessor {
     }
     if (tauEst === -1) {
       // fallback: глобальный минимум, если он достаточно выражен
-      let best = 2;
-      for (let tau = 3; tau < maxTau; tau++) if (cmndf[tau] < cmndf[best]) best = tau;
+      let best = this.tauMin;
+      for (let tau = this.tauMin + 1; tau < maxTau; tau++) if (cmndf[tau] < cmndf[best]) best = tau;
       if (cmndf[best] < 0.35) tauEst = best;
     }
     if (tauEst === -1) {
       this.emit(0, 0, rms);
       return;
+    }
+    // анти-октава вверх: если минимум у двойного периода заметно глубже,
+    // мы поймали 2-ю гармонику — берём вдвое больший период
+    const tau2 = tauEst * 2;
+    if (tau2 + 1 <= maxTau) {
+      let t2 = tau2;
+      while (t2 + 1 < maxTau && cmndf[t2 + 1] < cmndf[t2]) t2++;
+      while (t2 - 1 > tauEst && cmndf[t2 - 1] < cmndf[t2]) t2--;
+      if (cmndf[t2] < cmndf[tauEst] - 0.07) tauEst = t2;
     }
     // параболическая интерполяция вокруг минимума
     let tau = tauEst;

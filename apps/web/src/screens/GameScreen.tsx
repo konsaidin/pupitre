@@ -6,6 +6,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
 import { ExtractionPanel } from '../components/ExtractionPanel';
 import { PianoRoll } from '../components/PianoRoll';
+import { SeekBar } from '../components/SeekBar';
 import { SongEditor } from '../components/SongEditor';
 import { GameEngine } from '../game/engine';
 import { chooseOctaveShift, rollWindow, shiftNotes, shiftPitchline } from '../game/octave';
@@ -192,6 +193,34 @@ export function GameScreen() {
     setEditing(true);
   };
 
+  // хоткеи: Space — старт/пауза, ←/→ — перемотка ±5 с, Esc — пауза → выход
+  useEffect(() => {
+    if (editing || tuning) return; // у редактора/панели свои клавиши
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code === 'Space') {
+        e.preventDefault();
+        (document.activeElement as HTMLElement | null)?.blur?.();
+        if (status === 'running') pause();
+        else if (status === 'paused') resume();
+        else if (status === 'setup') {
+          update({ headphonesWarned: true });
+          void start();
+        }
+      } else if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+        if (!engine || (status !== 'running' && status !== 'paused')) return;
+        e.preventDefault();
+        engine.seekTo(engine.songMs() + (e.code === 'ArrowRight' ? 5000 : -5000));
+      } else if (e.code === 'Escape') {
+        e.preventDefault();
+        if (status === 'running') pause();
+        else if (status === 'paused' || status === 'setup' || status === 'finished') quit();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, engine, editing, tuning]);
+
   /** Правка идёт в исходных координатах — движок пересобираем после закрытия. */
   const onEditorSave = async (notes: MapNote[]) => {
     await saveMap(songMap.id, notes);
@@ -347,6 +376,10 @@ export function GameScreen() {
           </div>
         )}
       </div>
+
+      {engine && (status === 'running' || status === 'paused') && (
+        <SeekBar engine={engine} window={window_} onSeek={(ms) => engine.seekTo(ms)} />
+      )}
     </div>
   );
 }

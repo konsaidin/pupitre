@@ -588,3 +588,38 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   max-width: 26rem;
 }
 .extract-panel .field { margin-bottom: 0.35rem; }
+
+/* полоска перемотки под роллом */
+.seekbar-wrap { position: relative; margin-top: 0.5rem; }
+.seekbar {
+  height: 14px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  overflow: hidden;
+  touch-action: none;
+}
+.seekbar-fill {
+  height: 100%;
+  width: 0;
+  border-radius: 7px;
+  background: linear-gradient(90deg, var(--accent, #5a79c9), #22d3ee);
+  pointer-events: none;
+}
+.seekbar-preview {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 6px 4px;
+  background: #12161f;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+  z-index: 5;
+}

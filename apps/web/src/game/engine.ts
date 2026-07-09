@@ -47,6 +47,7 @@ export interface EngineOptions {
 }
 
 const COUNTDOWN_SEC = 3;
+const SEEK_LEAD_SEC = 0.8; // короткий разгон после перемотки вместо полного отсчёта
 const MAX_FRAME_DT_MS = 40;
 
 export class GameEngine {
@@ -121,6 +122,46 @@ export class GameEngine {
     this.beginAt(this.pausedAtMs);
   }
 
+  /**
+   * Перемотка. Ноты впереди новой позиции переигрываются заново, не начатые
+   * позади — помечаются «пропущено» (results[i] = null, в итог не попадают).
+   * Счёт пересобирается из оставшихся вердиктов, комбо сбрасывается.
+   */
+  seekTo(ms: number): void {
+    if (this.phase === 'finished' || this.phase === 'idle') return;
+    const target = Math.max(0, Math.min(ms, this.map.durationMs - 1));
+    const wasPlaying = this.phase === 'playing' || this.phase === 'countdown';
+    if (wasPlaying) {
+      this.synth.cancelAll();
+      this.stopBacking();
+      this.unsubscribe?.();
+      this.unsubscribe = null;
+    }
+    const notes = this.map.notes;
+    for (let i = 0; i < notes.length; i++) {
+      const n = notes[i];
+      const st = this.noteStates[i];
+      if (n.startMs + n.durMs <= target) {
+        if (!st.finalized) {
+          st.finalized = true; // прощёлкнута перемоткой вперёд — не судим
+          this.results[i] = null;
+        }
+      } else {
+        st.finalized = false;
+        st.inTolMs = 0;
+        st.lastFrameT = null;
+        this.results[i] = null;
+      }
+    }
+    this.judgements = this.judgements.filter((j) => j.atMs <= target);
+    this.trail = this.trail.filter((p) => p.songMs <= target);
+    this.combo = 0;
+    this.score = this.results.reduce((s, r) => s + (r?.points ?? 0), 0);
+    this.pausedAtMs = target;
+    if (wasPlaying) this.beginAt(target, SEEK_LEAD_SEC);
+    // на паузе остаёмся на паузе: ролл перерисуется от pausedAtMs
+  }
+
   quit(): void {
     this.phase = 'finished';
     this.finished = true;
@@ -139,9 +180,9 @@ export class GameEngine {
     if (ms >= this.map.durationMs + 300) this.finish();
   }
 
-  private beginAt(fromMs: number): void {
+  private beginAt(fromMs: number, leadSec: number = COUNTDOWN_SEC): void {
     const ctx = this.opts.ctx;
-    this.startCtxTime = ctx.currentTime + COUNTDOWN_SEC - fromMs / 1000;
+    this.startCtxTime = ctx.currentTime + leadSec - fromMs / 1000;
     this.phase = 'countdown';
     this.scheduleBacking(fromMs);
     this.unsubscribe = this.opts.tracker.onFrame((f) => this.onPitchFrame(f));
@@ -157,7 +198,7 @@ export class GameEngine {
       gain.gain.value = 0.9;
       src.connect(gain).connect(ctx.destination);
       if (fromMs <= 0) src.start(startAt, 0);
-      else src.start(ctx.currentTime + COUNTDOWN_SEC, fromMs / 1000);
+      else src.start(startAt + fromMs / 1000, fromMs / 1000);
       this.backingSource = src;
     }
     if (map.backing.kind === 'synth') {
