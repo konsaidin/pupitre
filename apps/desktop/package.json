@@ -47,7 +47,8 @@
     },
     "win": {
       "target": ["nsis", "portable"],
-      "artifactName": "Slopsician-${version}-win-${arch}.${ext}"
+      "artifactName": "Slopsician-${version}-win-${arch}.${ext}",
+      "signAndEditExecutable": false
     },
     "nsis": {
       "oneClick": true,
