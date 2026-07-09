@@ -719,3 +719,34 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+/* плашка развёртывания встроенного бэкенда (десктоп) */
+.backend-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 1rem;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  max-width: min(92vw, 40rem);
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, var(--panel), var(--panel-hover));
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  font-size: 0.9rem;
+}
+.backend-banner.error { border-color: var(--red); }
+.backend-banner-text { flex: 1; min-width: 0; }
+.backend-spinner {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-glow);
+  border-top-color: var(--accent-bright);
+  animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

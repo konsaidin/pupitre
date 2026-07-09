@@ -25,7 +25,20 @@
     },
     "files": [
       "main.js",
+      "backend.js",
+      "preload.js",
       "dist-web/**"
+    ],
+    "extraResources": [
+      {
+        "from": "../../services/api/app",
+        "to": "api/app",
+        "filter": ["**/*.py"]
+      },
+      {
+        "from": "../../services/api/requirements.txt",
+        "to": "api/requirements.txt"
+      }
     ],
     "linux": {
       "target": ["AppImage"],

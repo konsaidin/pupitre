@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import threading
 import time
@@ -13,7 +14,10 @@ import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-DATA_DIR = Path(__file__).resolve().parents[1] / "data" / "songs"
+# SLOPSICIAN_DATA задаёт корень данных (десктоп-приложение кладёт песни в
+# профиль пользователя); по умолчанию — рядом с кодом, как раньше
+_data_root = os.environ.get("SLOPSICIAN_DATA")
+DATA_DIR = (Path(_data_root) if _data_root else Path(__file__).resolve().parents[1] / "data") / "songs"
 
 # Этапы обработки в порядке следования; progress — сквозной 0..100
 STAGES = ("queued", "decode", "separate", "analyze", "done", "error")

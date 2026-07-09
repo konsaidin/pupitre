@@ -7,12 +7,20 @@
 import type { ExtractSettings, MapNote, Pitchline, SongMap } from './songMap';
 
 const API_BASE_KEY = 'slopsician.apiBase.v1';
-const IS_DESKTOP = location.protocol === 'file:';
+
+/** Мост из Electron-preload: адрес встроенного бэкенда и его статус. */
+interface DesktopBridge {
+  apiBase: string;
+  onBackendStatus(cb: (s: { stage: string; detail?: string; progress?: number }) => void): () => void;
+}
+export function desktopBridge(): DesktopBridge | null {
+  return (window as { desktop?: DesktopBridge }).desktop ?? null;
+}
 
 export function getApiBase(): string {
   const saved = localStorage.getItem(API_BASE_KEY);
   if (saved != null) return saved.replace(/\/+$/, '');
-  return IS_DESKTOP ? 'http://localhost:8000' : '';
+  return desktopBridge()?.apiBase ?? '';
 }
 
 /** Пустая строка = «как у сайта»; null/пусто в десктопе вернёт дефолт при чтении. */
