@@ -4,6 +4,7 @@
 // В десктопном приложении (file://) база по умолчанию http://localhost:8000,
 // и её можно сменить в настройках (см. getApiBase/setApiBase).
 
+import { t } from './i18n';
 import type { ExtractSettings, MapNote, Pitchline, SongMap } from './songMap';
 
 const API_BASE_KEY = 'slopsician.apiBase.v1';
@@ -120,7 +121,7 @@ export async function getPitchline(id: string): Promise<Pitchline | null> {
  */
 export async function loadSongMap(id: string): Promise<SongMap> {
   const detail = await getSong(id);
-  if (!detail.map) throw new Error('Карта нот ещё не готова');
+  if (!detail.map) throw new Error(t('Map is not ready yet'));
   const pitchline = detail.map.hasPitchline ? await getPitchline(id).catch(() => null) : null;
   return {
     ...detail.map,

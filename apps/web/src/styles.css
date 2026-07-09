@@ -750,3 +750,8 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   animation: spin 0.9s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* выбор языка при первом старте */
+.lang-picker { max-width: 24rem; text-align: center; padding-top: 14vh; }
+.lang-picker .lead { margin: 0.6rem 0 2rem; }
+.lang-options { display: flex; flex-direction: column; gap: 0.9rem; }

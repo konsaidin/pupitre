@@ -1,5 +1,6 @@
 // Генераторы распевок и упражнений: строят SongMap под диапазон пользователя.
 
+import { currentLang, t as tr } from '../lib/i18n';
 import { comfortZone, midiToName, type VocalRange } from '../lib/music';
 import type { MapNote, SongMap } from '../lib/songMap';
 
@@ -15,17 +16,19 @@ export interface ExerciseDef {
   title: string;
   description: string;
   icon: string;
-  category: 'Распевки' | 'Гаммы' | 'Слух';
+  category: 'Warm-ups' | 'Scales' | 'Ear training';
   defaultBpm: number;
   defaultRepeats: number;
   maxRepeats: number;
   build: (range: VocalRange, opts: ExerciseOptions) => SongMap;
 }
 
-const SOLFEGE = ['до', 'до#', 'ре', 'ре#', 'ми', 'фа', 'фа#', 'соль', 'соль#', 'ля', 'ля#', 'си'];
+const SOLFEGE_RU = ['до', 'до#', 'ре', 'ре#', 'ми', 'фа', 'фа#', 'соль', 'соль#', 'ля', 'ля#', 'си'];
+const SOLFEGE_EN = ['do', 'do#', 're', 're#', 'mi', 'fa', 'fa#', 'sol', 'sol#', 'la', 'la#', 'ti'];
 
 function solfege(degreeSemitones: number): string {
-  return SOLFEGE[((degreeSemitones % 12) + 12) % 12];
+  const tbl = currentLang() === 'ru' ? SOLFEGE_RU : SOLFEGE_EN;
+  return tbl[((degreeSemitones % 12) + 12) % 12];
 }
 
 interface PatternStep {
@@ -76,7 +79,7 @@ function buildRising(
   return {
     id: `${id}@${opts.bpm}x${made}r${root}`,
     title,
-    subtitle: `от ${midiToName(root)}, ${opts.bpm} BPM`,
+    subtitle: `${midiToName(root)} · ${opts.bpm} BPM`,
     durationMs,
     notes: shifted,
     backing: { kind: 'synth', guideNotes: true },
@@ -104,11 +107,11 @@ function buildIntervals(range: VocalRange, opts: ExerciseOptions): SongMap {
   const beatMs = 60000 / opts.bpm;
   const root = opts.rootMidi ?? zone.lowMidi;
   const intervals = [
-    { s: 3, name: 'м3' },
-    { s: 4, name: 'б3' },
-    { s: 5, name: 'ч4' },
-    { s: 7, name: 'ч5' },
-    { s: 12, name: 'октава' },
+    { s: 3, name: tr('m3') },
+    { s: 4, name: tr('M3') },
+    { s: 5, name: tr('P4') },
+    { s: 7, name: tr('P5') },
+    { s: 12, name: tr('octave') },
   ];
   const notes: MapNote[] = [];
   let t = 0;
@@ -121,7 +124,7 @@ function buildIntervals(range: VocalRange, opts: ExerciseOptions): SongMap {
     const fitting = intervals.filter((iv) => root + iv.s <= zone.highMidi);
     if (fitting.length === 0) break;
     const iv = fitting[Math.floor(rnd() * fitting.length)];
-    notes.push({ startMs: Math.round(t), durMs: Math.round(2 * beatMs * 0.92), midi: root, lyric: 'опора' });
+    notes.push({ startMs: Math.round(t), durMs: Math.round(2 * beatMs * 0.92), midi: root, lyric: tr('root') });
     t += 2 * beatMs;
     notes.push({ startMs: Math.round(t), durMs: Math.round(2 * beatMs * 0.92), midi: root + iv.s, lyric: iv.name });
     t += 2 * beatMs + 2 * beatMs; // пауза перед следующей парой
@@ -130,12 +133,12 @@ function buildIntervals(range: VocalRange, opts: ExerciseOptions): SongMap {
   const shifted = notes.map((n) => ({ ...n, startMs: n.startMs + leadInMs }));
   return {
     id: `intervals@${opts.bpm}x${opts.repeats}r${root}`,
-    title: 'Интервалы',
-    subtitle: `от ${midiToName(root)}, ${opts.bpm} BPM`,
+    title: 'Intervals',
+    subtitle: `${midiToName(root)} · ${opts.bpm} BPM`,
     durationMs: (shifted.at(-1)?.startMs ?? 0) + (shifted.at(-1)?.durMs ?? 0) + Math.round(2 * beatMs),
     notes: shifted,
     // синт играет только опорные ноты — целевую надо спеть по слуху
-    guideEvents: shifted.filter((n) => n.lyric === 'опора'),
+    guideEvents: shifted.filter((n) => n.lyric === tr('root')),
     backing: { kind: 'synth', guideNotes: true },
     bpm: opts.bpm,
     leadInMs,
@@ -150,11 +153,11 @@ function buildSiren(range: VocalRange, opts: ExerciseOptions): SongMap {
   let t = 0;
   for (let rep = 0; rep < opts.repeats; rep++) {
     for (let m = zone.lowMidi; m <= zone.highMidi; m++) {
-      notes.push({ startMs: Math.round(t), durMs: Math.round(stepMs), midi: m, lyric: 'у' });
+      notes.push({ startMs: Math.round(t), durMs: Math.round(stepMs), midi: m, lyric: 'u' });
       t += stepMs;
     }
     for (let m = zone.highMidi - 1; m >= zone.lowMidi; m--) {
-      notes.push({ startMs: Math.round(t), durMs: Math.round(stepMs), midi: m, lyric: 'у' });
+      notes.push({ startMs: Math.round(t), durMs: Math.round(stepMs), midi: m, lyric: 'u' });
       t += stepMs;
     }
     t += stepMs * 4;
@@ -163,7 +166,7 @@ function buildSiren(range: VocalRange, opts: ExerciseOptions): SongMap {
   const shifted = notes.map((n) => ({ ...n, startMs: n.startMs + leadInMs }));
   return {
     id: `siren@${opts.bpm}x${opts.repeats}`,
-    title: 'Сирена',
+    title: 'Siren',
     subtitle: `${midiToName(zone.lowMidi)}–${midiToName(zone.highMidi)}`,
     durationMs: (shifted.at(-1)?.startMs ?? 0) + (shifted.at(-1)?.durMs ?? 0) + 1000,
     notes: shifted,
@@ -175,17 +178,17 @@ function buildSiren(range: VocalRange, opts: ExerciseOptions): SongMap {
 
 /** Длинные ноты: удержание 4 доли на ступенях 1-3-5-3-1. */
 function buildLongTones(range: VocalRange, opts: ExerciseOptions): SongMap {
-  const pattern: PatternStep[] = [0, 4, 7, 4, 0].map((s) => ({ semitone: s, beats: 4, lyric: 'а—' }));
-  return buildRising('long-tones', 'Длинные ноты', pattern, range, opts, 2);
+  const pattern: PatternStep[] = [0, 4, 7, 4, 0].map((s) => ({ semitone: s, beats: 4, lyric: 'a—' }));
+  return buildRising('long-tones', 'Long tones', pattern, range, opts, 2);
 }
 
 export const EXERCISES: ExerciseDef[] = [
   {
     id: 'long-tones',
-    title: 'Длинные ноты',
-    description: 'Удерживай ноту 4 счёта ровно, без съезда. База контроля дыхания и опоры.',
+    title: 'Long tones',
+    description: 'Hold a note for 4 beats, steady and clean. The base of breath support.',
     icon: '🫁',
-    category: 'Распевки',
+    category: 'Warm-ups',
     defaultBpm: 70,
     defaultRepeats: 3,
     maxRepeats: 8,
@@ -193,10 +196,10 @@ export const EXERCISES: ExerciseDef[] = [
   },
   {
     id: 'siren',
-    title: 'Сирена',
-    description: 'Плавное глиссандо от низа диапазона до верха и обратно. Разогрев связок.',
+    title: 'Siren',
+    description: 'Smooth glissando from the bottom of your range to the top and back. Warms up the cords.',
     icon: '🚨',
-    category: 'Распевки',
+    category: 'Warm-ups',
     defaultBpm: 90,
     defaultRepeats: 2,
     maxRepeats: 6,
@@ -204,54 +207,54 @@ export const EXERCISES: ExerciseDef[] = [
   },
   {
     id: 'five-note',
-    title: 'Пятиступенная распевка',
-    description: 'До-ре-ми-фа-соль-фа-ми-ре-до, каждый повтор на полтона выше.',
+    title: 'Five-note pattern',
+    description: 'Do-re-mi-fa-sol-fa-mi-re-do, each repeat a semitone higher.',
     icon: '🎵',
-    category: 'Распевки',
+    category: 'Warm-ups',
     defaultBpm: 100,
     defaultRepeats: 12,
     maxRepeats: 24,
-    build: (r, o) => buildRising('five-note', 'Пятиступенная распевка', MAJOR_FIVE, r, o),
+    build: (r, o) => buildRising('five-note', 'Five-note pattern', MAJOR_FIVE, r, o),
   },
   {
     id: 'major-scale',
-    title: 'Мажорная гамма',
-    description: 'Полная гамма вверх и вниз. Точность каждой ступени.',
+    title: 'Major scale',
+    description: 'Full scale up and down. Accuracy on every degree.',
     icon: '🎼',
-    category: 'Гаммы',
+    category: 'Scales',
     defaultBpm: 90,
     defaultRepeats: 4,
     maxRepeats: 12,
-    build: (r, o) => buildRising('major-scale', 'Мажорная гамма', scalePattern(MAJOR_SCALE), r, o),
+    build: (r, o) => buildRising('major-scale', 'Major scale', scalePattern(MAJOR_SCALE), r, o),
   },
   {
     id: 'minor-scale',
-    title: 'Минорная гамма',
-    description: 'Натуральный минор вверх и вниз.',
+    title: 'Minor scale',
+    description: 'Natural minor up and down.',
     icon: '🌙',
-    category: 'Гаммы',
+    category: 'Scales',
     defaultBpm: 90,
     defaultRepeats: 4,
     maxRepeats: 12,
-    build: (r, o) => buildRising('minor-scale', 'Минорная гамма', scalePattern(MINOR_SCALE), r, o),
+    build: (r, o) => buildRising('minor-scale', 'Minor scale', scalePattern(MINOR_SCALE), r, o),
   },
   {
     id: 'arpeggio',
-    title: 'Арпеджио',
-    description: 'Трезвучие с октавой: 1-3-5-8-5-3-1. Скачки без подъезда.',
+    title: 'Arpeggio',
+    description: 'Triad with the octave: 1-3-5-8-5-3-1. Clean jumps, no sliding.',
     icon: '🪜',
-    category: 'Гаммы',
+    category: 'Scales',
     defaultBpm: 80,
     defaultRepeats: 6,
     maxRepeats: 16,
-    build: (r, o) => buildRising('arpeggio', 'Арпеджио', scalePattern(ARPEGGIO), r, o),
+    build: (r, o) => buildRising('arpeggio', 'Arpeggio', scalePattern(ARPEGGIO), r, o),
   },
   {
     id: 'intervals',
-    title: 'Интервалы',
-    description: 'Слышишь опорную ноту — спой интервал от неё: терции, кварты, квинты, октавы.',
+    title: 'Intervals',
+    description: 'Hear the reference note, then sing the interval: thirds, fourths, fifths, octaves.',
     icon: '👂',
-    category: 'Слух',
+    category: 'Ear training',
     defaultBpm: 80,
     defaultRepeats: 4,
     maxRepeats: 10,

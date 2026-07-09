@@ -36,12 +36,13 @@ export function foldToOctaveOf(midi: number, targetMidi: number): number {
 /** Человекочитаемое имя диапазона: примерная классификация голоса. */
 export function classifyRange(lowMidi: number, highMidi: number): string {
   const center = (lowMidi + highMidi) / 2;
-  if (center < 48) return 'бас';
-  if (center < 53) return 'баритон';
-  if (center < 58) return 'тенор';
-  if (center < 63) return 'альт';
-  if (center < 68) return 'меццо-сопрано';
-  return 'сопрано';
+  // английские ключи — при показе оборачиваются в t()
+  if (center < 48) return 'bass';
+  if (center < 53) return 'baritone';
+  if (center < 58) return 'tenor';
+  if (center < 63) return 'alto';
+  if (center < 68) return 'mezzo-soprano';
+  return 'soprano';
 }
 
 export interface VocalRange {

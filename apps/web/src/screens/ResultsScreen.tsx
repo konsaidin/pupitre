@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { t } from '../lib/i18n';
 import type { GameSummary } from '../game/scoring';
 import type { TrailPoint } from '../game/engine';
 import type { SongMap, Difficulty } from '../lib/songMap';
@@ -26,8 +27,8 @@ export function ResultsScreen() {
   if (!st) {
     return (
       <div className="screen">
-        <p>Нет результата.</p>
-        <button className="btn" onClick={() => navigate('/')}>В меню</button>
+        <p>{t('No result.')}</p>
+        <button className="btn" onClick={() => navigate('/')}>{t('To menu')}</button>
       </div>
     );
   }
@@ -35,15 +36,15 @@ export function ResultsScreen() {
   const { summary: s } = st;
   return (
     <div className="screen results">
-      <h1>{st.title}</h1>
-      <p className="dim">{DIFFICULTY_META[st.difficulty].label}</p>
+      <h1>{t(st.title)}</h1>
+      <p className="dim">{t(DIFFICULTY_META[st.difficulty].label)}</p>
       <div className="stars">{[1, 2, 3].map((i) => (
         <span key={i} className={i <= s.stars ? 'star on' : 'star'}>★</span>
       ))}</div>
       <div className="results-grid">
-        <div className="stat"><span className="stat-num">{s.score}</span><span className="dim">очки</span></div>
-        <div className="stat"><span className="stat-num">{Math.round(s.accuracy * 100)}%</span><span className="dim">точность</span></div>
-        <div className="stat"><span className="stat-num">×{s.maxCombo}</span><span className="dim">макс. комбо</span></div>
+        <div className="stat"><span className="stat-num">{s.score}</span><span className="dim">{t('points')}</span></div>
+        <div className="stat"><span className="stat-num">{Math.round(s.accuracy * 100)}%</span><span className="dim">{t('accuracy')}</span></div>
+        <div className="stat"><span className="stat-num">×{s.maxCombo}</span><span className="dim">{t('max combo')}</span></div>
       </div>
       <div className="verdicts">
         <span className="v perfect">Perfect {s.perfect}</span>
@@ -52,11 +53,11 @@ export function ResultsScreen() {
       </div>
       <ResultGraph st={st} />
       <div className="btn-row">
-        <button className="btn primary" onClick={() => navigate('/play', { state: st.playState })}>Ещё раз</button>
+        <button className="btn primary" onClick={() => navigate('/play', { state: st.playState })}>{t('Try again')}</button>
         <button className="btn" onClick={() => navigate(st.playState.kind === 'exercise' ? '/exercises' : '/songs')}>
-          К списку
+          {t('To the list')}
         </button>
-        <button className="btn ghost" onClick={() => navigate('/')}>В меню</button>
+        <button className="btn ghost" onClick={() => navigate('/')}>{t('To menu')}</button>
       </div>
     </div>
   );

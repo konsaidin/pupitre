@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from 'react';
 import { desktopBridge } from '../lib/api';
+import { t } from '../lib/i18n';
 
 interface Status {
   stage: string;
@@ -11,12 +12,12 @@ interface Status {
 }
 
 const STAGE_LABEL: Record<string, string> = {
-  starting: 'Запускаю сервер обработки песен…',
-  'download-uv': 'Скачиваю менеджер окружения…',
-  'install-python': 'Устанавливаю Python…',
-  'install-deps': 'Устанавливаю зависимости (около 2.5 ГБ, один раз)…',
-  'download-ffmpeg': 'Скачиваю ffmpeg…',
-  error: 'Не удалось развернуть сервер обработки',
+  starting: 'Starting the song processing server…',
+  'download-uv': 'Downloading the environment manager…',
+  'install-python': 'Installing Python…',
+  'install-deps': 'Installing dependencies (~2.5 GB, one time)…',
+  'download-ffmpeg': 'Downloading ffmpeg…',
+  error: 'Could not set up the processing server',
 };
 
 export function BackendSetupBanner() {
@@ -31,11 +32,11 @@ export function BackendSetupBanner() {
     <div className={isError ? 'backend-banner error' : 'backend-banner'}>
       {!isError && <span className="backend-spinner" aria-hidden="true" />}
       <span className="backend-banner-text">
-        {STAGE_LABEL[status.stage] ?? status.stage}
+        {t(STAGE_LABEL[status.stage] ?? status.stage)}
         {status.progress != null && ` ${status.progress}%`}
         {status.detail && <span className="dim small"> · {status.detail}</span>}
       </span>
-      <span className="dim small">Распевки и упражнения уже работают</span>
+      <span className="dim small">{t('Warm-ups and exercises already work')}</span>
     </div>
   );
 }

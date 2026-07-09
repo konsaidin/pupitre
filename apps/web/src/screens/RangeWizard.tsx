@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ensureMic, stopMic } from '../audio/audioSession';
 import { LiveKeyboard } from '../components/LiveKeyboard';
 import { ScreenHeader } from '../components/ScreenHeader';
+import { t } from '../lib/i18n';
 import { classifyRange, midiToName, type VocalRange } from '../lib/music';
 import { micOptions } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
@@ -82,7 +83,7 @@ export function RangeWizard() {
           }
         });
       } catch (e) {
-        setMicError(e instanceof Error ? e.message : 'Не удалось получить доступ к микрофону');
+        setMicError(e instanceof Error ? e.message : t('Microphone access failed'));
       }
     })();
     return () => {
@@ -102,37 +103,37 @@ export function RangeWizard() {
   };
 
   const stepInfo: Record<Step, { title: string; hint: string }> = {
-    intro: { title: 'Определим твой диапазон', hint: '' },
+    intro: { title: t('Let’s find your range'), hint: '' },
     comfort: {
-      title: 'Шаг 1 · Удобная нота',
-      hint: 'Спой любую ноту, на которой тебе комфортно («а-а-а»), и удержи её, пока кольцо не замкнётся.',
+      title: t('Step 1 · A comfortable note'),
+      hint: t('Sing any note that feels comfortable (“aaah”) and hold it until the ring closes.'),
     },
     low: {
-      title: 'Шаг 2 · Вниз до предела',
-      hint: 'Веди голос ступеньками вниз. На каждой нижней ноте задержись — жёлтая линия сдвинется. Хрип и скрип не считаются :)',
+      title: t('Step 2 · Down to the limit'),
+      hint: t('Walk your voice down in steps. Pause on each low note — the yellow line will move. Creaks don’t count :)'),
     },
     high: {
-      title: 'Шаг 3 · Вверх до предела',
-      hint: 'Теперь вверх. Задерживайся на верхних нотах — зелёная линия сдвинется. Без крика: только чистый звук.',
+      title: t('Step 3 · Up to the limit'),
+      hint: t('Now up. Hold the top notes — the green line will move. No shouting: clean sound only.'),
     },
-    done: { title: 'Готово!', hint: '' },
+    done: { title: t('Ready'), hint: '' },
   };
 
   if (step === 'intro') {
     return (
       <div className="screen wizard">
         <ScreenHeader
-          title="Определим твой диапазон"
-          subtitle="Приложение подстраивает упражнения и песни под твой голос: показывает только твою полосу нот и переносит мелодии в твою октаву. Для этого нужно один раз измерить диапазон — займёт минуту."
+          title={t('Let’s find your range')}
+          subtitle={t('The app adapts exercises and songs to your voice: it shows only your band of notes and moves melodies into your octave. Measure your range once — it takes a minute.')}
         />
         <ul className="tips">
-          <li>🎧 Надень наушники, если рядом играет музыка</li>
-          <li>🤫 Найди тихое место</li>
-          <li>🎤 Разреши доступ к микрофону</li>
+          <li>{t('🎧 Put on headphones if music is playing nearby')}</li>
+          <li>{t('🤫 Find a quiet spot')}</li>
+          <li>{t('🎤 Allow microphone access')}</li>
         </ul>
         {micError && <p className="error">⚠️ {micError}</p>}
         <button className="btn primary big" onClick={() => setStep('comfort')}>
-          Начать
+          {t('Start')}
         </button>
       </div>
     );
@@ -141,20 +142,20 @@ export function RangeWizard() {
   if (step === 'done' && low != null && high != null) {
     return (
       <div className="screen wizard">
-        <ScreenHeader title="Твой диапазон" />
+        <ScreenHeader title={t('Your range')} />
         <div className="range-result">
           <span className="range-notes">
             {midiToName(low)} – {midiToName(high)}
           </span>
-          <span className="range-class">{classifyRange(low, high)} · {high - low} полутонов</span>
+          <span className="range-class">{t(classifyRange(low, high))} · {t('{n} semitones', { n: high - low })}</span>
         </div>
-        <p className="lead">Все упражнения и песни теперь будут подстроены под эту зону. Перемерить можно в любой момент.</p>
+        <p className="lead">{t('Exercises and songs are now tuned to this zone. You can remeasure anytime.')}</p>
         <div className="btn-row">
           <button className="btn" onClick={() => { setLow(null); setHigh(null); setComfort(null); setStep('comfort'); }}>
-            Перемерить
+            {t('Remeasure')}
           </button>
           <button className="btn primary" onClick={save}>
-            Сохранить
+            {t('Save')}
           </button>
         </div>
       </div>
@@ -170,9 +171,9 @@ export function RangeWizard() {
         <p className="lead">{stepInfo[step].hint}</p>
         {micError && <p className="error">⚠️ {micError}</p>}
         <div className="wizard-status">
-          {step === 'comfort' && comfort != null && <span>Удобная нота: <b>{midiToName(comfort)}</b> ✓</span>}
-          {step === 'low' && low != null && <span>Нижняя граница: <b>{midiToName(low)}</b></span>}
-          {step === 'high' && high != null && <span>Верхняя граница: <b>{midiToName(high)}</b></span>}
+          {step === 'comfort' && comfort != null && <span>{t('Comfort note: {note} ✓', { note: midiToName(comfort) })}</span>}
+          {step === 'low' && low != null && <span>{t('Low bound: {note}', { note: midiToName(low) })}</span>}
+          {step === 'high' && high != null && <span>{t('High bound: {note}', { note: midiToName(high) })}</span>}
         </div>
         <div className="btn-row">
           <button
@@ -180,7 +181,7 @@ export function RangeWizard() {
             disabled={!canNext}
             onClick={() => setStep(step === 'comfort' ? 'low' : step === 'low' ? 'high' : 'done')}
           >
-            {step === 'high' ? 'Готово' : 'Дальше'}
+            {step === 'high' ? t('Ready') : t('Next')}
           </button>
         </div>
       </div>

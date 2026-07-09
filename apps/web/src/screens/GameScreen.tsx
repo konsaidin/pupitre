@@ -11,6 +11,7 @@ import { SongEditor } from '../components/SongEditor';
 import { GameEngine } from '../game/engine';
 import { chooseOctaveShift, rollWindow, shiftNotes, shiftPitchline } from '../game/octave';
 import { mixUrl, saveMap, vocalUrl as vocalUrlFor } from '../lib/api';
+import { t } from '../lib/i18n';
 import { comfortZone } from '../lib/music';
 import { contourSegments } from '../lib/pitchline';
 import { DIFFICULTY_META, type Difficulty, type MapNote, type SongMap } from '../lib/songMap';
@@ -119,9 +120,9 @@ export function GameScreen() {
   if (!play || !songMap || !shiftedMap || !engineMap || !window_) {
     return (
       <div className="screen">
-        <p className="error">{!range ? 'Сначала определи диапазон голоса.' : 'Нет данных для игры.'}</p>
+        <p className="error">{!range ? t('Define your vocal range first.') : t('Nothing to play.')}</p>
         <button className="btn" onClick={() => navigate(range ? '/' : '/range')}>
-          {range ? 'В меню' : 'К визарду'}
+          {range ? t('To menu') : t('To the wizard')}
         </button>
       </div>
     );
@@ -135,7 +136,7 @@ export function GameScreen() {
       const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
       if (engineMap.backing.kind === 'url' && backingBufferRef.current?.url !== engineMap.backing.url) {
         const resp = await fetch(engineMap.backing.url);
-        if (!resp.ok) throw new Error(`Не удалось загрузить аккомпанемент (${resp.status})`);
+        if (!resp.ok) throw new Error(t('Could not load the backing track ({status})', { status: resp.status }));
         backingBufferRef.current = {
           url: engineMap.backing.url,
           buffer: await ctx.decodeAudioData(await resp.arrayBuffer()),
@@ -176,7 +177,7 @@ export function GameScreen() {
       setStatus('running');
       await eng.start();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Ошибка запуска');
+      setError(e instanceof Error ? e.message : t('Failed to start'));
       setStatus('error');
     }
   };
@@ -256,24 +257,24 @@ export function GameScreen() {
   return (
     <div className="screen game">
       <header className="game-header">
-        <button className="btn ghost" onClick={quit}>← Выйти</button>
+        <button className="btn ghost" onClick={quit}>{t('← Exit')}</button>
         <div className="game-title">
-          <b>{songMap.title}</b>
+          <b>{t(songMap.title)}</b>
           {songMap.subtitle && <span className="dim"> · {songMap.subtitle}</span>}
         </div>
         {play.kind === 'song' && (
-          <div className="octave-badge" title="Мелодия сдвинута в твою октаву">
+          <div className="octave-badge" title={t('Melody shifted into your octave')}>
             <button className="btn tiny" disabled={status === 'running'} onClick={() => { setOctaveShift(shift - 1); restart(); }}>−</button>
-            <span>{shift === 0 ? 'оригинал' : `${shift > 0 ? '+' : ''}${shift} окт.`}</span>
+            <span>{shift === 0 ? t('original') : t('{n} oct.', { n: `${shift > 0 ? '+' : ''}${shift}` })}</span>
             <button className="btn tiny" disabled={status === 'running'} onClick={() => { setOctaveShift(shift + 1); restart(); }}>+</button>
           </div>
         )}
         <div className="hud">
           <span className="hud-score">{hud.score}</span>
           {hud.combo > 1 && <span className="hud-combo">×{hud.combo}</span>}
-          <span className="hud-diff">{meta.label}</span>
+          <span className="hud-diff">{t(meta.label)}</span>
         </div>
-        {status === 'running' && <button className="btn ghost" onClick={pause}>⏸ Пауза</button>}
+        {status === 'running' && <button className="btn ghost" onClick={pause}>{t('⏸ Pause')}</button>}
       </header>
 
       <div className="game-progress"><div style={{ width: `${hud.progress * 100}%` }} /></div>
@@ -284,74 +285,74 @@ export function GameScreen() {
         {status === 'setup' && !editing && !tuning && (
           <div className="overlay">
             <div className="panel">
-              <h2>{songMap.title}</h2>
+              <h2>{t(songMap.title)}</h2>
               <label className="field">
-                Сложность
+                {t('Difficulty')}
                 <div className="seg">
                   {(Object.keys(DIFFICULTY_META) as Difficulty[]).map((d) => (
                     <button key={d} className={d === difficulty ? 'seg-btn active' : 'seg-btn'} onClick={() => setDifficulty(d)}>
-                      {DIFFICULTY_META[d].label}
+                      {t(DIFFICULTY_META[d].label)}
                     </button>
                   ))}
                 </div>
-                <span className="dim small">допуск ±{DIFFICULTY_META[difficulty].toleranceCents} центов{DIFFICULTY_META[difficulty].octaveAgnostic ? ', октава не важна' : ', октава важна'}</span>
+                <span className="dim small">{t('±{cents} cents tolerance{octave}', { cents: DIFFICULTY_META[difficulty].toleranceCents, octave: DIFFICULTY_META[difficulty].octaveAgnostic ? t(', octave ignored') : t(', octave matters') })}</span>
               </label>
               {play.kind === 'exercise' && (
                 <>
-                  <label className="check"><input type="checkbox" checked={guideNotes} onChange={(e) => setGuideNotes(e.target.checked)} /> Играть подсказки (опорные ноты)</label>
-                  <label className="check"><input type="checkbox" checked={metronome} onChange={(e) => setMetronome(e.target.checked)} /> Метроном</label>
+                  <label className="check"><input type="checkbox" checked={guideNotes} onChange={(e) => setGuideNotes(e.target.checked)} /> {t('Play guide notes')}</label>
+                  <label className="check"><input type="checkbox" checked={metronome} onChange={(e) => setMetronome(e.target.checked)} /> {t('Metronome')}</label>
                 </>
               )}
               {play.kind === 'song' && (
                 <label className="field">
-                  Исполнение
+                  {t('Playback')}
                   <div className="seg">
-                    <button className={backingVariant === 'minus' ? 'seg-btn active' : 'seg-btn'} onClick={() => setBackingVariant('minus')}>Без вокала</button>
-                    <button className={backingVariant === 'mix' ? 'seg-btn active' : 'seg-btn'} onClick={() => setBackingVariant('mix')}>С вокалом</button>
+                    <button className={backingVariant === 'minus' ? 'seg-btn active' : 'seg-btn'} onClick={() => setBackingVariant('minus')}>{t('No vocals')}</button>
+                    <button className={backingVariant === 'mix' ? 'seg-btn active' : 'seg-btn'} onClick={() => setBackingVariant('mix')}>{t('With vocals')}</button>
                     <button
                       className={backingVariant === 'vocal' ? 'seg-btn active' : 'seg-btn'}
                       disabled={!songMap.hasVocal}
-                      title={songMap.hasVocal ? undefined : 'вокал не отделён для этого трека'}
+                      title={songMap.hasVocal ? undefined : t('vocals not separated for this track')}
                       onClick={() => setBackingVariant('vocal')}
                     >
-                      Только вокал
+                      {t('Vocals only')}
                     </button>
                   </div>
                   <span className="dim small">
-                    {backingVariant === 'minus' && 'инструментал — вокал поёшь ты'}
-                    {backingVariant === 'mix' && 'оригинал целиком — пой вместе с исполнителем (лучше в наушниках)'}
-                    {backingVariant === 'vocal' && 'только извлечённый вокал — как ориентир (лучше в наушниках)'}
+                    {backingVariant === 'minus' && t('instrumental — you sing the vocals')}
+                    {backingVariant === 'mix' && t('the full original — sing along (headphones recommended)')}
+                    {backingVariant === 'vocal' && t('extracted vocals only — as a guide (headphones recommended)')}
                   </span>
                 </label>
               )}
               {canLineMode && (
                 <label className="field">
-                  Цель
+                  {t('Target')}
                   <div className="seg">
-                    <button className={lineMode ? 'seg-btn' : 'seg-btn active'} onClick={() => setLineMode(false)}>Ноты</button>
-                    <button className={lineMode ? 'seg-btn active' : 'seg-btn'} onClick={() => setLineMode(true)}>Линия 🧪</button>
+                    <button className={lineMode ? 'seg-btn' : 'seg-btn active'} onClick={() => setLineMode(false)}>{t('Notes')}</button>
+                    <button className={lineMode ? 'seg-btn active' : 'seg-btn'} onClick={() => setLineMode(true)}>{t('Line 🧪')}</button>
                   </div>
                   <span className="dim small">
                     {lineMode
-                      ? 'экспериментально: пой по контуру-дорожке, очки — за близость к линии'
-                      : 'классика: попадай голосом в плашки-ноты'}
+                      ? t('experimental: sing along the contour line, points for staying close')
+                      : t('classic: hit the note bars with your voice')}
                   </span>
                 </label>
               )}
               {play.kind === 'song' && (
-                <p className="dim small">Октава: {shift === 0 ? 'как в оригинале' : `сдвиг ${shift > 0 ? '+' : ''}${shift} — мелодия перенесена в твой диапазон`}. Изменить можно кнопками ± сверху.</p>
+                <p className="dim small">{t('Octave: {mode}. Use the ± buttons up top to change.', { mode: shift === 0 ? t('as in the original') : t('shift {shift} — melody moved into your range', { shift: `${shift > 0 ? '+' : ''}${shift}` }) })}</p>
               )}
               {!profile.headphonesWarned && (
-                <p className="hint">🎧 Надень наушники — иначе микрофон услышит аккомпанемент и линия голоса будет прыгать.</p>
+                <p className="hint">{t('🎧 Put on headphones — otherwise the mic hears the backing track and your line jumps around.')}</p>
               )}
               {error && <p className="error">⚠️ {error}</p>}
               <button className="btn primary big" onClick={() => { update({ headphonesWarned: true }); void start(); }}>
-                Поехали
+                {t('Let’s go')}
               </button>
               {play.kind === 'song' && (
                 <div className="btn-row tight">
-                  <button className="btn ghost" onClick={openEditor}>✎ Редактировать ноты</button>
-                  <button className="btn ghost" onClick={() => setTuning(true)}>⚙ Извлечение</button>
+                  <button className="btn ghost" onClick={openEditor}>{t('✎ Edit notes')}</button>
+                  <button className="btn ghost" onClick={() => setTuning(true)}>{t('⚙ Extraction')}</button>
                 </div>
               )}
             </div>
@@ -359,7 +360,7 @@ export function GameScreen() {
         )}
 
         {status === 'loading' && (
-          <div className="overlay"><div className="panel"><p>Готовим микрофон и аудио…</p></div></div>
+          <div className="overlay"><div className="panel"><p>{t('Getting mic and audio ready…')}</p></div></div>
         )}
 
         {status === 'running' && hud.countdown > 0.05 && (
@@ -369,14 +370,14 @@ export function GameScreen() {
         {status === 'paused' && !editing && (
           <div className="overlay">
             <div className="panel">
-              <h2>Пауза</h2>
+              <h2>{t('Pause')}</h2>
               <div className="btn-col">
-                <button className="btn primary" onClick={resume}>Продолжить</button>
+                <button className="btn primary" onClick={resume}>{t('Resume')}</button>
                 {play.kind === 'song' && (
-                  <button className="btn" onClick={openEditor}>✎ Редактировать ноты</button>
+                  <button className="btn" onClick={openEditor}>{t('✎ Edit notes')}</button>
                 )}
-                <button className="btn" onClick={restart}>Заново</button>
-                <button className="btn" onClick={quit}>Выйти</button>
+                <button className="btn" onClick={restart}>{t('Restart')}</button>
+                <button className="btn" onClick={quit}>{t('Exit')}</button>
               </div>
             </div>
           </div>
@@ -408,7 +409,7 @@ export function GameScreen() {
           <div className="overlay">
             <div className="panel">
               <p className="error">⚠️ {error}</p>
-              <button className="btn" onClick={() => setStatus('setup')}>Назад</button>
+              <button className="btn" onClick={() => setStatus('setup')}>{t('Back')}</button>
             </div>
           </div>
         )}

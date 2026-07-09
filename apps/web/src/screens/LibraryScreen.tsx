@@ -11,6 +11,7 @@ import {
   type SongInfo,
   type SongStage,
 } from '../lib/api';
+import { t } from '../lib/i18n';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -18,12 +19,12 @@ import { SpotlightCard } from '../components/fx/SpotlightCard';
 import type { PlayState } from './GameScreen';
 
 const STAGE_LABEL: Record<SongStage, string> = {
-  queued: 'В очереди…',
-  decode: 'Декодирую…',
-  separate: 'Отделяю вокал…',
-  analyze: 'Снимаю мелодию…',
-  done: 'Готово',
-  error: 'Ошибка',
+  queued: 'Queued…',
+  decode: 'Decoding…',
+  separate: 'Separating vocals…',
+  analyze: 'Extracting melody…',
+  done: 'Done',
+  error: 'Error',
 };
 
 export function LibraryScreen() {
@@ -39,7 +40,7 @@ export function LibraryScreen() {
       setSongs(await listSongs());
       setError(null);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Бэкенд недоступен');
+      setError(e instanceof Error ? e.message : t('Backend unavailable'));
     }
   }, []);
 
@@ -60,7 +61,7 @@ export function LibraryScreen() {
       for (const f of Array.from(files)) await uploadSong(f);
       await refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Ошибка загрузки');
+      setError(e instanceof Error ? e.message : t('Upload failed'));
     }
   };
 
@@ -69,13 +70,13 @@ export function LibraryScreen() {
       const state: PlayState = { map: await loadSongMap(s.id), kind: 'song' };
       navigate('/play', { state });
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Не удалось открыть песню');
+      setError(e instanceof Error ? e.message : t('Could not open the song'));
     }
   };
 
   return (
     <div className="screen">
-      <ScreenHeader title="Песни" />
+      <ScreenHeader title={t('Songs')} />
       <div
         className={dragOver ? 'dropzone over' : 'dropzone'}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
@@ -85,18 +86,18 @@ export function LibraryScreen() {
         role="button"
         tabIndex={0}
       >
-        <span>📥 Перетащи сюда mp3/wav/flac/m4a или нажми, чтобы выбрать файл</span>
-        <span className="dim small">Трек обработается на сервере: вокал отделится, мелодия станет нотами</span>
+        <span>📥 {t('Drop mp3/wav/flac/m4a here or click to pick a file')}</span>
+        <span className="dim small">{t('The track is processed on the server: vocals get separated, the melody becomes notes')}</span>
         <input ref={fileRef} type="file" accept="audio/*" multiple hidden onChange={(e) => void onFiles(e.target.files)} />
       </div>
 
       {error && (
         <p className="error">
-          ⚠️ {error}. Проверь, что бэкенд запущен: <code>uvicorn app.main:app --port 8000</code> в services/api.
+          ⚠️ {error}. {t('Check that the backend is running:')} <code>uvicorn app.main:app --port 8000</code>
         </p>
       )}
 
-      {songs && songs.length === 0 && !error && <p className="dim">Пока пусто — загрузи первый трек.</p>}
+      {songs && songs.length === 0 && !error && <p className="dim">{t('Nothing here yet — upload your first track.')}</p>}
 
       <div className="card-list">
         {songs?.map((s) => {
@@ -109,10 +110,10 @@ export function LibraryScreen() {
                 <span className="card-title">
                   <b>{s.artist ? `${s.artist} — ${s.title}` : s.title}</b>
                   <span className="dim small">
-                    {STAGE_LABEL[s.stage]}
+                    {t(STAGE_LABEL[s.stage])}
                     {s.error ? ` — ${s.error}` : ''}
-                    {s.status === 'done' && s.durationMs ? ` · ${formatDur(s.durationMs)} · ${s.noteCount} нот` : ''}
-                    {s.status === 'done' && !s.separated ? ' · вокал не отделён (играет полный микс)' : ''}
+                    {s.status === 'done' && s.durationMs ? ` · ${formatDur(s.durationMs)} · ${t('{n} notes', { n: s.noteCount })}` : ''}
+                    {s.status === 'done' && !s.separated ? ` · ${t('vocals not separated (full mix plays)')}` : ''}
                   </span>
                   {busy && (
                     <span className="mini-progress"><span style={{ width: `${Math.round(s.progress)}%` }} /></span>
@@ -121,14 +122,14 @@ export function LibraryScreen() {
                 {best && <span className="card-best">{'★'.repeat(best.stars)}<span className="dim"> {best.score}</span></span>}
                 <div className="btn-row tight">
                   {s.status === 'done' && (
-                    <button className="btn primary" onClick={() => void playSong(s)}>Петь</button>
+                    <button className="btn primary" onClick={() => void playSong(s)}>{t('Sing')}</button>
                   )}
                   {s.status === 'error' && (
-                    <button className="btn" onClick={() => void retrySong(s.id).then(refresh)}>Повторить</button>
+                    <button className="btn" onClick={() => void retrySong(s.id).then(refresh)}>{t('Retry')}</button>
                   )}
                   <button
                     className="btn ghost"
-                    onClick={() => { if (confirm(`Удалить «${s.title}»?`)) void deleteSong(s.id).then(refresh); }}
+                    onClick={() => { if (confirm(t('Delete “{title}”?', { title: s.title }))) void deleteSong(s.id).then(refresh); }}
                   >
                     🗑
                   </button>

@@ -3,6 +3,7 @@
 
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { t } from '../lib/i18n';
 
 interface ScreenHeaderProps {
   title: ReactNode;
@@ -18,7 +19,7 @@ export function ScreenHeader({ title, backTo = '/', subtitle, action }: ScreenHe
   return (
     <header className="screen-head">
       <div className="screen-head-row">
-        <button className="back-btn" aria-label="Назад" onClick={() => navigate(backTo)}>
+        <button className="back-btn" aria-label={t('Back')} onClick={() => navigate(backTo)}>
           ←
         </button>
         <h1>{title}</h1>

@@ -9,6 +9,7 @@ import { RangeSlider } from '../components/fx/RangeSlider';
 import { getApiBase, setApiBase } from '../lib/api';
 import { midiToName } from '../lib/music';
 import { DIFFICULTY_META, type Difficulty } from '../lib/songMap';
+import { currentLang, setLang, t, type Lang } from '../lib/i18n';
 import { micOptions } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 import { ScreenHeader } from '../components/ScreenHeader';
@@ -49,13 +50,13 @@ export function SettingsScreen() {
           fill.style.width = `${pct}%`;
           fill.style.background = f.voiced ? 'var(--green)' : 'var(--accent)';
           state.textContent = f.voiced
-            ? `голос: ${midiToName(Math.round(f.midi))} · чистота ${(f.clarity * 100).toFixed(0)}%`
+            ? t('voice: {note} · clarity {pct}%', { note: midiToName(Math.round(f.midi)), pct: (f.clarity * 100).toFixed(0) })
             : f.rms >= profile.micGateRms
-              ? 'звук есть, но не похож на ноту (чистота ниже порога)'
-              : 'тишина (ниже гейта)';
+              ? t('sound detected, but it’s not a clear note (below clarity threshold)')
+              : t('silence (below the gate)');
         });
       } catch (e) {
-        setMicError(e instanceof Error ? e.message : 'Не удалось открыть микрофон');
+        setMicError(e instanceof Error ? e.message : t('Could not open the microphone'));
         setMonitoring(false);
       }
     })();
@@ -86,7 +87,7 @@ export function SettingsScreen() {
 
   const calibrate = async () => {
     setCalibrating(true);
-    setCalStatus('Слушай клики и пой короткое «та» на каждый…');
+    setCalStatus(t('Listen to the clicks and sing a short “ta” on each…'));
     cancelRef.current = false;
     try {
       const ctx = getAudioContext();
@@ -120,16 +121,16 @@ export function SettingsScreen() {
         if (best !== null) offsets.push(best);
       }
       if (offsets.length < 4) {
-        setCalStatus(`Мало попаданий (${offsets.length}/${CLICKS}). Пой чётче и громче, попробуй ещё раз.`);
+        setCalStatus(t('Too few hits ({n}/{total}). Sing clearer and louder, try again.', { n: offsets.length, total: CLICKS }));
         return;
       }
       offsets.sort((a, b) => a - b);
       const median = offsets[Math.floor(offsets.length / 2)];
       const latencyMs = Math.max(0, Math.round(median));
       update({ latencyMs });
-      setCalStatus(`Готово: задержка ${latencyMs} мс (по ${offsets.length} попаданиям). Сохранено.`);
+      setCalStatus(t('Done: {ms} ms latency (from {n} hits). Saved.', { ms: latencyMs, n: offsets.length }));
     } catch (e) {
-      setCalStatus(e instanceof Error ? e.message : 'Ошибка калибровки');
+      setCalStatus(e instanceof Error ? e.message : t('Calibration failed'));
     } finally {
       setCalibrating(false);
       stopMic();
@@ -138,20 +139,20 @@ export function SettingsScreen() {
 
   return (
     <div className="screen">
-      <ScreenHeader title="Настройки" />
+      <ScreenHeader title={t('Settings')} />
 
       <section className="settings-block">
-        <h2 className="cat">Микрофон</h2>
+        <h2 className="cat">{t('Microphone')}</h2>
         <select
           value={profile.micDeviceId ?? ''}
           onChange={(e) => update({ micDeviceId: e.target.value || null })}
         >
-          <option value="">По умолчанию</option>
+          <option value="">{t('Default')}</option>
           {devices.map((d) => (
-            <option key={d.deviceId} value={d.deviceId}>{d.label || `Микрофон ${d.deviceId.slice(0, 6)}`}</option>
+            <option key={d.deviceId} value={d.deviceId}>{d.label || t('Microphone {id}', { id: d.deviceId.slice(0, 6) })}</option>
           ))}
         </select>
-        <p className="dim small">Если названия пустые — дай доступ к микрофону (кнопка «Проверить» ниже) и вернись сюда.</p>
+        <p className="dim small">{t('If the names are empty — grant mic access (the “Test” button below) and come back.')}</p>
 
         <label className="check">
           <input
@@ -159,8 +160,8 @@ export function SettingsScreen() {
             checked={profile.micNoiseSuppression}
             onChange={(e) => update({ micNoiseSuppression: e.target.checked })}
           />
-          Шумоподавление
-          <span className="dim small">глушит фон (вентилятор, улицу), но может резать тихий вокал</span>
+          {t('Noise suppression')}
+          <span className="dim small">{t('mutes background (fans, street), but can cut quiet vocals')}</span>
         </label>
         <label className="check">
           <input
@@ -168,8 +169,8 @@ export function SettingsScreen() {
             checked={profile.micEchoCancellation}
             onChange={(e) => update({ micEchoCancellation: e.target.checked })}
           />
-          Эхоподавление
-          <span className="dim small">режет звук из колонок/наушников, попадающий в микрофон</span>
+          {t('Echo cancellation')}
+          <span className="dim small">{t('cuts speaker/headphone sound leaking into the mic')}</span>
         </label>
         <label className="check">
           <input
@@ -177,8 +178,8 @@ export function SettingsScreen() {
             checked={profile.micAutoGain}
             onChange={(e) => update({ micAutoGain: e.target.checked })}
           />
-          Автоусиление
-          <span className="dim small">система сама крутит громкость — обычно мешает нойзгейту</span>
+          {t('Auto gain')}
+          <span className="dim small">{t('the system rides the volume — usually fights the noise gate')}</span>
         </label>
 
         <RangeSlider
@@ -189,8 +190,8 @@ export function SettingsScreen() {
           onChange={(v) => update({ micGateRms: v / 1000 })}
           label={
             <span>
-              Нойзгейт — порог громкости <b className="mono">{gateDb} дБ</b>{' '}
-              <span className="dim small">всё тише порога считается тишиной; подними, если кружок дёргается от шума</span>
+              {t('Noise gate — volume threshold')} <b className="mono">{gateDb} dB</b>{' '}
+              <span className="dim small">{t('anything below counts as silence; raise it if the dot twitches from noise')}</span>
             </span>
           }
         />
@@ -202,23 +203,23 @@ export function SettingsScreen() {
           onChange={(v) => update({ micGateClarity: v })}
           label={
             <span>
-              Порог чистоты тона <b className="mono">{(profile.micGateClarity * 100).toFixed(0)}%</b>{' '}
-              <span className="dim small">выше — меньше ложных нот от шума, но шёпот/хрип не ловится</span>
+              {t('Pitch clarity threshold')} <b className="mono">{(profile.micGateClarity * 100).toFixed(0)}%</b>{' '}
+              <span className="dim small">{t('higher — fewer false notes from noise, but whispers/rasp won’t register')}</span>
             </span>
           }
         />
 
         <div className="mic-meter" aria-hidden="true">
           <div className="mic-meter-fill" ref={meterFillRef} />
-          <div className="mic-meter-gate" style={{ left: `${gatePct}%` }} title="порог гейта" />
+          <div className="mic-meter-gate" style={{ left: `${gatePct}%` }} title={t('Noise gate — volume threshold')} />
         </div>
         <p className="dim small mic-meter-state">
-          <span ref={meterStateRef}>{monitoring ? '…' : 'нажми «Проверить», чтобы увидеть уровень вживую'}</span>
+          <span ref={meterStateRef}>{monitoring ? '…' : t('press “Test” to see the live level')}</span>
         </p>
 
         <div className="btn-row tight">
           <button className="btn" onClick={() => setMonitoring((m) => !m)}>
-            {monitoring ? '■ Остановить' : '🎤 Проверить микрофон'}
+            {monitoring ? t('■ Stop') : t('🎤 Test microphone')}
           </button>
           <button
             className="btn ghost"
@@ -232,30 +233,28 @@ export function SettingsScreen() {
               })
             }
           >
-            Сбросить
+            {t('Reset')}
           </button>
         </div>
         {micError && <p className="error">⚠️ {micError}</p>}
         <p className="dim small">
-          Как настроить: помолчи — полоска должна быть <b>левее</b> метки порога; скажи «а-а-а» — полоска
-          зеленеет и уходит правее. Если шум наушников «поёт» сам — подними гейт или включи шумоподавление.
+          {t('How to tune: stay silent — the bar should sit left of the threshold mark; say “aaah” — the bar turns green and moves right. If headphone noise “sings” on its own, raise the gate or enable noise suppression.')}
         </p>
       </section>
 
       <section className="settings-block">
-        <h2 className="cat">Калибровка задержки</h2>
+        <h2 className="cat">{t('Latency calibration')}</h2>
         <p className="dim">
-          Текущая поправка: <b>{profile.latencyMs} мс</b>. Прозвучит {CLICKS} кликов — пой короткое «та» точно
-          на каждый. Это компенсирует задержку наушников и звукового тракта при подсчёте очков.
+          {t('Current correction: {ms} ms. You’ll hear {n} clicks — sing a short “ta” exactly on each one. This compensates for audio latency when scoring.', { ms: profile.latencyMs, n: CLICKS })}
         </p>
         <button className="btn primary" disabled={calibrating} onClick={() => void calibrate()}>
-          {calibrating ? 'Слушаю…' : 'Калибровать'}
+          {calibrating ? t('Listening…') : t('Calibrate')}
         </button>
         {calStatus && <p className="hint">{calStatus}</p>}
       </section>
 
       <section className="settings-block">
-        <h2 className="cat">Сложность по умолчанию</h2>
+        <h2 className="cat">{t('Default difficulty')}</h2>
         <div className="seg">
           {(Object.keys(DIFFICULTY_META) as Difficulty[]).map((d) => (
             <button
@@ -263,22 +262,40 @@ export function SettingsScreen() {
               className={d === profile.difficulty ? 'seg-btn active' : 'seg-btn'}
               onClick={() => update({ difficulty: d })}
             >
-              {DIFFICULTY_META[d].label}
+              {t(DIFFICULTY_META[d].label)}
             </button>
           ))}
         </div>
       </section>
 
       <section className="settings-block">
-        <h2 className="cat">Голос</h2>
-        <button className="btn" onClick={() => navigate('/range')}>Перемерить диапазон</button>
+        <h2 className="cat">{t('Language')}</h2>
+        <div className="seg">
+          {(['en', 'ru'] as Lang[]).map((l) => (
+            <button
+              key={l}
+              className={l === currentLang() ? 'seg-btn active' : 'seg-btn'}
+              onClick={() => {
+                if (l === currentLang()) return;
+                setLang(l);
+                location.reload();
+              }}
+            >
+              {l === 'en' ? 'English' : 'Русский'}
+            </button>
+          ))}
+        </div>
       </section>
 
       <section className="settings-block">
-        <h2 className="cat">Сервер обработки песен</h2>
+        <h2 className="cat">{t('Voice')}</h2>
+        <button className="btn" onClick={() => navigate('/range')}>{t('Remeasure range')}</button>
+      </section>
+
+      <section className="settings-block">
+        <h2 className="cat">{t('Song processing server')}</h2>
         <p className="dim small">
-          Адрес бэкенда, который отделяет вокал и снимает мелодию (<code>uvicorn app.main:app --port 8000</code>{' '}
-          в <code>services/api</code>). Распевки и упражнения работают без него.
+          {t('The backend that separates vocals and extracts the melody. Warm-ups and exercises work without it.')}
         </p>
         <div className="btn-row tight">
           <input
@@ -295,17 +312,17 @@ export function SettingsScreen() {
               setServerUrl(getApiBase());
             }}
           >
-            Сохранить
+            {t('Save')}
           </button>
         </div>
       </section>
 
       <section className="settings-block">
-        <h2 className="cat">Данные</h2>
+        <h2 className="cat">{t('Data')}</h2>
         <button
           className="btn danger"
           onClick={() => {
-            if (confirm('Сбросить профиль, диапазон и всю историю результатов?')) {
+            if (confirm(t('Reset profile, range and all history?'))) {
               localStorage.clear();
               // работает и на file:// в десктопном приложении
               location.hash = '#/';
@@ -313,7 +330,7 @@ export function SettingsScreen() {
             }
           }}
         >
-          Сбросить всё
+          {t('Reset everything')}
         </button>
       </section>
     </div>

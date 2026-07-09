@@ -6,6 +6,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { isBlackKey, midiToName } from '../lib/music';
+import { t } from '../lib/i18n';
 import { contourMidiAt } from '../lib/pitchline';
 import type { MapNote, SongMap } from '../lib/songMap';
 
@@ -443,7 +444,7 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
       await onSave(notes);
       setDirty(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Не удалось сохранить');
+      setError(err instanceof Error ? err.message : t('Save failed'));
     } finally {
       setSaving(false);
     }
@@ -455,19 +456,19 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
     <div className="editor-overlay">
       <div className="editor">
         <header className="editor-head">
-          <b>Редактор нот · {map.title}</b>
-          <span className="dim small">{notesRef.current.length} нот</span>
+          <b>{t('Note editor')} · {t(map.title)}</b>
+          <span className="dim small">{t('{n} notes', { n: notesRef.current.length })}</span>
           <div className="editor-spacer" />
           {vocalOk && (
             <button className="btn tiny" onClick={togglePlay}>
-              {playing ? '⏸ Вокал' : '▶ Вокал'}
+              {playing ? '⏸' : '▶'} {t('Vocals')}
             </button>
           )}
           <button className="btn tiny danger" disabled={selected === null} onClick={deleteSelected}>
-            🗑 Удалить
+            🗑 {t('Delete note')}
           </button>
           <button className="btn tiny primary" disabled={!dirty || saving} onClick={() => void save()}>
-            {saving ? 'Сохраняю…' : 'Сохранить'}
+            {saving ? t('Saving…') : t('Save')}
           </button>
           <button className="btn tiny ghost" onClick={onClose}>✕</button>
         </header>
@@ -497,12 +498,10 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         </div>
 
         <p className="dim small editor-hint">
-          Перетащи ноту — сдвиг по времени и высоте · потяни за правый край — длительность ·
-          двойной клик по пустому месту — добавить · Delete — удалить · линейка сверху или
-          ползунок снизу — перемотка.
-          {selNote && ` · Выбрана: ${midiToName(selNote.midi)}, ${Math.round(selNote.durMs)} мс`}
+          {t('drag a note — move; drag its right edge — length; double-click — add; Delete — remove. Timeline on top seeks.')}
+          {selNote && ` · ${midiToName(selNote.midi)}, ${Math.round(selNote.durMs)} ms`}
         </p>
-        {!vocalOk && vocalUrl && <p className="hint small">Вокал недоступен — правь по контуру.</p>}
+        {!vocalOk && vocalUrl && <p className="hint small">{t('Vocals unavailable — edit along the contour.')}</p>}
         {error && <p className="error small">⚠️ {error}</p>}
 
         {vocalUrl && (

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EXERCISES, type ExerciseDef } from '../game/exercises';
+import { t } from '../lib/i18n';
 import { comfortZone, midiToName } from '../lib/music';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
@@ -20,10 +21,10 @@ export function ExercisesScreen() {
     return (
       <div className="screen">
         <ScreenHeader
-          title="Распевки и упражнения"
-          subtitle="Сначала измерим твой диапазон — упражнения генерируются под него."
+          title={t('Warm-ups & exercises')}
+          subtitle={t('First, let’s measure your range — exercises are generated from it.')}
         />
-        <button className="btn primary" onClick={() => navigate('/range')}>Определить диапазон</button>
+        <button className="btn primary" onClick={() => navigate('/range')}>{t('Measure my range')}</button>
       </div>
     );
   }
@@ -33,12 +34,12 @@ export function ExercisesScreen() {
   return (
     <div className="screen">
       <ScreenHeader
-        title="Распевки и упражнения"
-        subtitle={`Все упражнения построены под твой диапазон (${midiToName(profile.range.lowMidi)}–${midiToName(profile.range.highMidi)}).`}
+        title={t('Warm-ups & exercises')}
+        subtitle={t('All exercises are built for your range ({low}–{high}).', { low: midiToName(profile.range.lowMidi), high: midiToName(profile.range.highMidi) })}
       />
       {categories.map((cat) => (
         <section key={cat}>
-          <h2 className="cat">{cat}</h2>
+          <h2 className="cat">{t(cat)}</h2>
           <div className="card-list">
             {EXERCISES.filter((e) => e.category === cat).map((ex) => (
               <ExerciseCard
@@ -78,23 +79,23 @@ function ExerciseCard({ ex, open, onToggle }: { ex: ExerciseDef; open: boolean; 
       <button className="card-head" onClick={onToggle}>
         <span className="card-icon">{ex.icon}</span>
         <span className="card-title">
-          <b>{ex.title}</b>
-          <span className="dim small">{ex.description}</span>
+          <b>{t(ex.title)}</b>
+          <span className="dim small">{t(ex.description)}</span>
         </span>
         {best && <span className="card-best">{'★'.repeat(best.stars)}<span className="dim"> {best.score}</span></span>}
       </button>
       {open && (
         <div className="card-body">
-          <RangeSlider min={50} max={160} step={5} value={bpm} onChange={setBpm} label={<>Темп: <b>{bpm} BPM</b></>} />
-          <RangeSlider min={1} max={ex.maxRepeats} value={repeats} onChange={setRepeats} label={<>Повторы: <b>{repeats}</b></>} />
+          <RangeSlider min={50} max={160} step={5} value={bpm} onChange={setBpm} label={<>{t('Tempo')}: <b>{bpm} BPM</b></>} />
+          <RangeSlider min={1} max={ex.maxRepeats} value={repeats} onChange={setRepeats} label={<>{t('Repeats')}: <b>{repeats}</b></>} />
           <RangeSlider
             min={zone.lowMidi}
             max={Math.max(zone.lowMidi, zone.highMidi - 7)}
             value={rootMidi}
             onChange={setRootMidi}
-            label={<>От ноты: <b>{midiToName(rootMidi)}</b></>}
+            label={<>{t('Key (root note)')}: <b>{midiToName(rootMidi)}</b></>}
           />
-          <button className="btn primary" onClick={startPlay}>Петь</button>
+          <button className="btn primary" onClick={startPlay}>{t('Sing')}</button>
         </div>
       )}
     </SpotlightCard>

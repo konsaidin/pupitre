@@ -75,11 +75,12 @@ export interface SongMap {
 
 export type Difficulty = 'beginner' | 'medium' | 'pro';
 
+/** label — английский ключ, при показе оборачивается в t(). */
 export const DIFFICULTY_META: Record<
   Difficulty,
   { label: string; toleranceCents: number; octaveAgnostic: boolean }
 > = {
-  beginner: { label: 'Новичок', toleranceCents: 100, octaveAgnostic: true },
-  medium: { label: 'Средний', toleranceCents: 60, octaveAgnostic: true },
-  pro: { label: 'Про', toleranceCents: 35, octaveAgnostic: false },
+  beginner: { label: 'Beginner', toleranceCents: 100, octaveAgnostic: true },
+  medium: { label: 'Medium', toleranceCents: 60, octaveAgnostic: true },
+  pro: { label: 'Pro', toleranceCents: 35, octaveAgnostic: false },
 };
