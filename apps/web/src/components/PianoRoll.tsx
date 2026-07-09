@@ -14,6 +14,8 @@ interface Props {
   lookaheadMs?: number;
   /** показывать контур извлечённого вокала (дорожку + шарик-ориентир) */
   showPitchline?: boolean;
+  /** режим «петь по линии»: цель — контур, плашки нот не рисуются */
+  lineMode?: boolean;
 }
 
 const KEYBOARD_W = 56;
@@ -42,7 +44,7 @@ const C = {
   textDim: 'rgba(230,235,245,0.45)',
 };
 
-export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchline = true }: Props) {
+export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchline = true, lineMode = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -123,10 +125,11 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         }
       }
 
-      // ноты
+      // ноты (в режиме линии плашки не рисуем — цель показывает сам контур)
       const notes = engine.map.notes;
-      for (let i = 0; i < notes.length; i++) {
-        const n = notes[i];
+      const plates = lineMode ? [] : notes;
+      for (let i = 0; i < plates.length; i++) {
+        const n = plates[i];
         const x1 = msToX(n.startMs);
         const x2 = msToX(n.startMs + n.durMs);
         if (x2 < KEYBOARD_W || x1 > W) continue;
@@ -283,7 +286,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [engine, win.lowMidi, win.highMidi, lookaheadMs]);
+  }, [engine, win.lowMidi, win.highMidi, lookaheadMs, showPitchline, lineMode]);
 
   return (
     <div ref={wrapRef} className="pianoroll-wrap">

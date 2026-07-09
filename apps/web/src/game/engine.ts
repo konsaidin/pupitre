@@ -3,6 +3,7 @@
 
 import type { PitchFrame, PitchTracker } from '../audio/PitchTracker';
 import { Synth } from '../audio/synth';
+import { contourMidiAt } from '../lib/pitchline';
 import type { SongMap, Difficulty } from '../lib/songMap';
 import { matchPitch, judge, notePoints, summarize, type GameSummary, type NoteResult, type Judgement } from './scoring';
 
@@ -37,6 +38,11 @@ export interface EngineOptions {
   guideNotes: boolean;
   metronome: boolean;
   backingBuffer?: AudioBuffer;
+  /**
+   * Режим «петь по линии»: целью при матчинге служит контур map.pitchline,
+   * а map.notes — виртуальные фразы (см. contourSegments) для комбо/вердиктов.
+   */
+  lineTarget?: boolean;
   onFinish: (summary: GameSummary) => void;
 }
 
@@ -201,14 +207,24 @@ export class GameEngine {
     let inTol = false;
     let cents: number | null = null;
     if (note) {
-      const m = matchPitch(f.midi, note.midi, this.opts.difficulty);
-      displayMidi = m.displayMidi;
-      inTol = m.inTolerance;
-      cents = m.cents;
+      // в режиме линии цель — дробная высота контура в этот момент, не плашка
+      const target =
+        this.opts.lineTarget && this.map.pitchline
+          ? contourMidiAt(this.map.pitchline, songMs)
+          : note.midi;
       const st = this.noteStates[noteIdx];
-      const dt = st.lastFrameT !== null ? Math.min((f.t - st.lastFrameT) * 1000, MAX_FRAME_DT_MS) : 11;
-      st.lastFrameT = f.t;
-      if (inTol) st.inTolMs += dt;
+      if (target !== null) {
+        const m = matchPitch(f.midi, target, this.opts.difficulty);
+        displayMidi = m.displayMidi;
+        inTol = m.inTolerance;
+        cents = m.cents;
+        const dt = st.lastFrameT !== null ? Math.min((f.t - st.lastFrameT) * 1000, MAX_FRAME_DT_MS) : 11;
+        st.lastFrameT = f.t;
+        if (inTol) st.inTolMs += dt;
+      } else {
+        // разрыв контура внутри фразы: время не считаем ни в плюс, ни в минус
+        st.lastFrameT = f.t;
+      }
     }
     this.lastFrame = { songMs, midi: displayMidi, voiced: true, cents };
     this.trail.push({ songMs, midi: displayMidi, inTolerance: inTol });

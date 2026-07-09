@@ -11,6 +11,7 @@ import { GameEngine } from '../game/engine';
 import { chooseOctaveShift, rollWindow, shiftNotes, shiftPitchline } from '../game/octave';
 import { saveMap, vocalUrl as vocalUrlFor } from '../lib/api';
 import { comfortZone } from '../lib/music';
+import { contourSegments } from '../lib/pitchline';
 import { DIFFICULTY_META, type Difficulty, type MapNote, type SongMap } from '../lib/songMap';
 import type { GameSummary } from '../game/scoring';
 import { useProfile } from '../state/ProfileContext';
@@ -38,6 +39,7 @@ export function GameScreen() {
   const [hud, setHud] = useState({ score: 0, combo: 0, progress: 0, countdown: 0 });
   const [editing, setEditing] = useState(false);
   const [tuning, setTuning] = useState(false); // панель настроек извлечения
+  const [lineMode, setLineMode] = useState(false); // экспериментально: петь по линии-контуру
   // карта живёт в состоянии: редактор нот её меняет
   const [songMap, setSongMap] = useState<SongMap | null>(play?.map ?? null);
   const backingBufferRef = useRef<AudioBuffer | null>(null);
@@ -68,10 +70,24 @@ export function GameScreen() {
     return rollWindow(songMap.notes, range);
   }, [songMap, range]);
 
+  /** Возможен ли режим «петь по линии» для этой карты. */
+  const canLineMode = play?.kind === 'song' && !!songMap?.pitchline?.midi.length;
+  const lineOn = lineMode && canLineMode;
+
+  /**
+   * Карта для движка: в режиме линии ноты подменяются виртуальными фразами
+   * из контура (комбо/вердикты), целью матчинга становится сам контур.
+   */
+  const engineMap: SongMap | null = useMemo(() => {
+    if (!shiftedMap) return null;
+    if (!lineOn || !shiftedMap.pitchline) return shiftedMap;
+    return { ...shiftedMap, notes: contourSegments(shiftedMap.pitchline) };
+  }, [shiftedMap, lineOn]);
+
   const window_ = useMemo(() => {
-    if (!shiftedMap || !range) return null;
-    return rollWindow(shiftedMap.notes, range);
-  }, [shiftedMap, range]);
+    if (!engineMap || !range) return null;
+    return rollWindow(engineMap.notes, range);
+  }, [engineMap, range]);
 
   useEffect(() => () => stopMic(), []);
 
@@ -90,7 +106,7 @@ export function GameScreen() {
     return () => clearInterval(iv);
   }, [engine, status]);
 
-  if (!play || !songMap || !shiftedMap || !window_) {
+  if (!play || !songMap || !shiftedMap || !engineMap || !window_) {
     return (
       <div className="screen">
         <p className="error">{!range ? 'Сначала определи диапазон голоса.' : 'Нет данных для игры.'}</p>
@@ -117,11 +133,12 @@ export function GameScreen() {
       const eng = new GameEngine({
         ctx,
         tracker,
-        map: shiftedMap,
+        map: engineMap,
         difficulty,
         latencyMs: profile.latencyMs,
         guideNotes,
         metronome,
+        lineTarget: lineOn,
         backingBuffer: backingBufferRef.current ?? undefined,
         onFinish: (summary: GameSummary) => {
           recordScore({
@@ -136,7 +153,7 @@ export function GameScreen() {
           // хвост голоса для итогового графика (прореженный)
           const trail = (engRef.current?.trail ?? []).filter((_, i) => i % 2 === 0);
           navigate('/results', {
-            state: { summary, playState: play, shiftedMap, window: window_, trail, title: songMap.title, difficulty },
+            state: { summary, playState: play, shiftedMap: engineMap, window: window_, trail, title: songMap.title, difficulty },
             replace: true,
           });
         },
@@ -218,7 +235,7 @@ export function GameScreen() {
       <div className="game-progress"><div style={{ width: `${hud.progress * 100}%` }} /></div>
 
       <div className="game-stage">
-        {engine && <PianoRoll engine={engine} window={window_} />}
+        {engine && <PianoRoll engine={engine} window={window_} lineMode={lineOn} />}
 
         {status === 'setup' && !editing && !tuning && (
           <div className="overlay">
@@ -240,6 +257,20 @@ export function GameScreen() {
                   <label className="check"><input type="checkbox" checked={guideNotes} onChange={(e) => setGuideNotes(e.target.checked)} /> Играть подсказки (опорные ноты)</label>
                   <label className="check"><input type="checkbox" checked={metronome} onChange={(e) => setMetronome(e.target.checked)} /> Метроном</label>
                 </>
+              )}
+              {canLineMode && (
+                <label className="field">
+                  Цель
+                  <div className="seg">
+                    <button className={lineMode ? 'seg-btn' : 'seg-btn active'} onClick={() => setLineMode(false)}>Ноты</button>
+                    <button className={lineMode ? 'seg-btn active' : 'seg-btn'} onClick={() => setLineMode(true)}>Линия 🧪</button>
+                  </div>
+                  <span className="dim small">
+                    {lineMode
+                      ? 'экспериментально: пой по контуру-дорожке, очки — за близость к линии'
+                      : 'классика: попадай голосом в плашки-ноты'}
+                  </span>
+                </label>
               )}
               {play.kind === 'song' && (
                 <p className="dim small">Октава: {shift === 0 ? 'как в оригинале' : `сдвиг ${shift > 0 ? '+' : ''}${shift} — мелодия перенесена в твой диапазон`}. Изменить можно кнопками ± сверху.</p>
