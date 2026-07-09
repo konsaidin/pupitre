@@ -10,7 +10,7 @@ import { SeekBar } from '../components/SeekBar';
 import { SongEditor } from '../components/SongEditor';
 import { GameEngine } from '../game/engine';
 import { chooseOctaveShift, rollWindow, shiftNotes, shiftPitchline } from '../game/octave';
-import { saveMap, vocalUrl as vocalUrlFor } from '../lib/api';
+import { mixUrl, saveMap, vocalUrl as vocalUrlFor } from '../lib/api';
 import { comfortZone } from '../lib/music';
 import { contourSegments } from '../lib/pitchline';
 import { DIFFICULTY_META, type Difficulty, type MapNote, type SongMap } from '../lib/songMap';
@@ -41,9 +41,12 @@ export function GameScreen() {
   const [editing, setEditing] = useState(false);
   const [tuning, setTuning] = useState(false); // панель настроек извлечения
   const [lineMode, setLineMode] = useState(false); // экспериментально: петь по линии-контуру
+  // вариант исполнения: минус / оригинал с вокалом / только извлечённый вокал
+  const [backingVariant, setBackingVariant] = useState<'minus' | 'mix' | 'vocal'>('minus');
   // карта живёт в состоянии: редактор нот её меняет
   const [songMap, setSongMap] = useState<SongMap | null>(play?.map ?? null);
-  const backingBufferRef = useRef<AudioBuffer | null>(null);
+  // буфер аккомпанемента кэшируется по url: смена варианта исполнения — новый трек
+  const backingBufferRef = useRef<{ url: string; buffer: AudioBuffer } | null>(null);
   const editedRef = useRef(false);
 
   const range = profile.range;
@@ -81,9 +84,14 @@ export function GameScreen() {
    */
   const engineMap: SongMap | null = useMemo(() => {
     if (!shiftedMap) return null;
-    if (!lineOn || !shiftedMap.pitchline) return shiftedMap;
-    return { ...shiftedMap, notes: contourSegments(shiftedMap.pitchline) };
-  }, [shiftedMap, lineOn]);
+    let m = shiftedMap;
+    if (lineOn && m.pitchline) m = { ...m, notes: contourSegments(m.pitchline) };
+    if (play?.kind === 'song' && backingVariant !== 'minus') {
+      const url = backingVariant === 'mix' ? mixUrl(m.id) : vocalUrlFor(m.id);
+      m = { ...m, backing: { kind: 'url', url } };
+    }
+    return m;
+  }, [shiftedMap, lineOn, backingVariant, play?.kind]);
 
   const window_ = useMemo(() => {
     if (!engineMap || !range) return null;
@@ -124,10 +132,13 @@ export function GameScreen() {
     try {
       const ctx = getAudioContext();
       const tracker = await ensureMic(profile.micDeviceId);
-      if (shiftedMap.backing.kind === 'url' && !backingBufferRef.current) {
-        const resp = await fetch(shiftedMap.backing.url);
-        if (!resp.ok) throw new Error(`Не удалось загрузить инструментал (${resp.status})`);
-        backingBufferRef.current = await ctx.decodeAudioData(await resp.arrayBuffer());
+      if (engineMap.backing.kind === 'url' && backingBufferRef.current?.url !== engineMap.backing.url) {
+        const resp = await fetch(engineMap.backing.url);
+        if (!resp.ok) throw new Error(`Не удалось загрузить аккомпанемент (${resp.status})`);
+        backingBufferRef.current = {
+          url: engineMap.backing.url,
+          buffer: await ctx.decodeAudioData(await resp.arrayBuffer()),
+        };
       }
       update({ difficulty, guideNotes, metronome });
       const engRef: { current: GameEngine | null } = { current: null };
@@ -140,7 +151,7 @@ export function GameScreen() {
         guideNotes,
         metronome,
         lineTarget: lineOn,
-        backingBuffer: backingBufferRef.current ?? undefined,
+        backingBuffer: backingBufferRef.current?.buffer,
         onFinish: (summary: GameSummary) => {
           recordScore({
             mapId: songMap.id,
@@ -193,33 +204,36 @@ export function GameScreen() {
     setEditing(true);
   };
 
-  // хоткеи: Space — старт/пауза, ←/→ — перемотка ±5 с, Esc — пауза → выход
-  useEffect(() => {
+  // хоткеи: Space — старт/пауза, ←/→ — перемотка ±5 с, Esc — пауза → выход.
+  // Логика живёт в ref и обновляется каждый рендер: обработчик в useEffect с
+  // депсами держал бы устаревшие замыкания (start со старыми настройками).
+  const keyHandlerRef = useRef<(e: KeyboardEvent) => void>(() => {});
+  keyHandlerRef.current = (e: KeyboardEvent) => {
     if (editing || tuning) return; // у редактора/панели свои клавиши
-    const onKey = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        (document.activeElement as HTMLElement | null)?.blur?.();
-        if (status === 'running') pause();
-        else if (status === 'paused') resume();
-        else if (status === 'setup') {
-          update({ headphonesWarned: true });
-          void start();
-        }
-      } else if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
-        if (!engine || (status !== 'running' && status !== 'paused')) return;
-        e.preventDefault();
-        engine.seekTo(engine.songMs() + (e.code === 'ArrowRight' ? 5000 : -5000));
-      } else if (e.code === 'Escape') {
-        e.preventDefault();
-        if (status === 'running') pause();
-        else if (status === 'paused' || status === 'setup' || status === 'finished') quit();
+    if (e.code === 'Space') {
+      e.preventDefault();
+      (document.activeElement as HTMLElement | null)?.blur?.();
+      if (status === 'running') pause();
+      else if (status === 'paused') resume();
+      else if (status === 'setup') {
+        update({ headphonesWarned: true });
+        void start();
       }
-    };
+    } else if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
+      if (!engine || (status !== 'running' && status !== 'paused')) return;
+      e.preventDefault();
+      engine.seekTo(engine.songMs() + (e.code === 'ArrowRight' ? 5000 : -5000));
+    } else if (e.code === 'Escape') {
+      e.preventDefault();
+      if (status === 'running') pause();
+      else if (status === 'paused' || status === 'setup' || status === 'finished') quit();
+    }
+  };
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => keyHandlerRef.current(e);
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, engine, editing, tuning]);
+  }, []);
 
   /** Правка идёт в исходных координатах — движок пересобираем после закрытия. */
   const onEditorSave = async (notes: MapNote[]) => {
@@ -286,6 +300,28 @@ export function GameScreen() {
                   <label className="check"><input type="checkbox" checked={guideNotes} onChange={(e) => setGuideNotes(e.target.checked)} /> Играть подсказки (опорные ноты)</label>
                   <label className="check"><input type="checkbox" checked={metronome} onChange={(e) => setMetronome(e.target.checked)} /> Метроном</label>
                 </>
+              )}
+              {play.kind === 'song' && (
+                <label className="field">
+                  Исполнение
+                  <div className="seg">
+                    <button className={backingVariant === 'minus' ? 'seg-btn active' : 'seg-btn'} onClick={() => setBackingVariant('minus')}>Без вокала</button>
+                    <button className={backingVariant === 'mix' ? 'seg-btn active' : 'seg-btn'} onClick={() => setBackingVariant('mix')}>С вокалом</button>
+                    <button
+                      className={backingVariant === 'vocal' ? 'seg-btn active' : 'seg-btn'}
+                      disabled={!songMap.hasVocal}
+                      title={songMap.hasVocal ? undefined : 'вокал не отделён для этого трека'}
+                      onClick={() => setBackingVariant('vocal')}
+                    >
+                      Только вокал
+                    </button>
+                  </div>
+                  <span className="dim small">
+                    {backingVariant === 'minus' && 'инструментал — вокал поёшь ты'}
+                    {backingVariant === 'mix' && 'оригинал целиком — пой вместе с исполнителем (лучше в наушниках)'}
+                    {backingVariant === 'vocal' && 'только извлечённый вокал — как ориентир (лучше в наушниках)'}
+                  </span>
+                </label>
               )}
               {canLineMode && (
                 <label className="field">

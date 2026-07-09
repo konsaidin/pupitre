@@ -82,6 +82,26 @@ def get_instrumental(song_id: str) -> FileResponse:
     return FileResponse(path, media_type="audio/mpeg")
 
 
+MEDIA_TYPES = {
+    ".mp3": "audio/mpeg",
+    ".wav": "audio/wav",
+    ".flac": "audio/flac",
+    ".m4a": "audio/mp4",
+    ".ogg": "audio/ogg",
+    ".opus": "audio/ogg",
+    ".aac": "audio/aac",
+}
+
+
+@app.get("/api/songs/{song_id}/mix")
+def get_mix(song_id: str) -> FileResponse:
+    """Оригинальный трек как есть (вариант исполнения «с вокалом»)."""
+    path = store.original_path(song_id)
+    if path is None:
+        raise HTTPException(404, "исходный файл не найден")
+    return FileResponse(path, media_type=MEDIA_TYPES.get(path.suffix.lower(), "application/octet-stream"))
+
+
 @app.get("/api/songs/{song_id}/vocal")
 def get_vocal(song_id: str) -> FileResponse:
     """Извлечённый вокал (превью/ориентир). В игре не используется."""

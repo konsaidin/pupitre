@@ -73,6 +73,11 @@ export function vocalUrl(id: string): string {
   return `/api/songs/${id}/vocal`;
 }
 
+/** Оригинальный трек с вокалом (вариант исполнения «с вокалом»). */
+export function mixUrl(id: string): string {
+  return `/api/songs/${id}/mix`;
+}
+
 /** Контур высоты вокала. null — если бэкенд его не сохранил (старые карты). */
 export async function getPitchline(id: string): Promise<Pitchline | null> {
   const resp = await fetch(`/api/songs/${id}/pitchline`);
