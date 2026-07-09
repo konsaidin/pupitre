@@ -10,12 +10,26 @@ export interface MapNote {
   lyric?: string;
 }
 
+/**
+ * Непрерывный контур высоты извлечённого вокала — «дорожка», по которой едет
+ * шарик-ориентир (то, что «спелось бы в микрофон»). null = тишина/неозвучено.
+ */
+export interface Pitchline {
+  hopMs: number;
+  midi: (number | null)[];
+}
+
 export interface SongMap {
   id: string;
   title: string;
   subtitle?: string;
   durationMs: number;
   notes: MapNote[];
+  /** контур высоты голоса; подгружается отдельно (см. api.getPitchline) */
+  pitchline?: Pitchline;
+  /** есть ли на бэкенде контур/вокал для подгрузки */
+  hasPitchline?: boolean;
+  hasVocal?: boolean;
   /**
    * Что играет синт вместо notes (упражнения на слух: играется опорная нота,
    * а спеть надо другую). Рисуются на ролле призрачными плашками.

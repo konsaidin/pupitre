@@ -2,7 +2,7 @@
 // Сдвигаем ВСЮ карту на целое число октав — контур мелодии сохраняется.
 
 import type { VocalRange } from '../lib/music';
-import type { MapNote } from '../lib/songMap';
+import type { MapNote, Pitchline } from '../lib/songMap';
 
 /**
  * Подбирает сдвиг в октавах (−3..3), при котором максимум длительности нот
@@ -39,6 +39,12 @@ export function chooseOctaveShift(notes: MapNote[], comfort: VocalRange): number
 export function shiftNotes(notes: MapNote[], octaves: number): MapNote[] {
   if (octaves === 0) return notes;
   return notes.map((n) => ({ ...n, midi: n.midi + octaves * 12 }));
+}
+
+export function shiftPitchline(line: Pitchline, octaves: number): Pitchline {
+  if (octaves === 0) return line;
+  const d = octaves * 12;
+  return { ...line, midi: line.midi.map((m) => (m === null ? null : m + d)) };
 }
 
 /** Границы окна пиано-ролла: диапазон пользователя ± запас, растянутый на ноты карты при необходимости. */

@@ -8,7 +8,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi import Body, FastAPI, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 
 from .jobs import jobs
@@ -80,6 +80,61 @@ def get_instrumental(song_id: str) -> FileResponse:
     if not path.exists():
         raise HTTPException(404, "инструментал ещё не готов")
     return FileResponse(path, media_type="audio/mpeg")
+
+
+@app.get("/api/songs/{song_id}/vocal")
+def get_vocal(song_id: str) -> FileResponse:
+    """Извлечённый вокал (превью/ориентир). В игре не используется."""
+    path = store.song_dir(song_id) / "vocal.mp3"
+    if not path.exists():
+        raise HTTPException(404, "вокал не отделён для этого трека")
+    return FileResponse(path, media_type="audio/mpeg")
+
+
+@app.get("/api/songs/{song_id}/pitchline")
+def get_pitchline(song_id: str) -> FileResponse:
+    """Контур высоты голоса: {"hopMs", "midi": [float|null, ...]}."""
+    path = store.song_dir(song_id) / "pitchline.json"
+    if not path.exists():
+        raise HTTPException(404, "контур не готов для этого трека")
+    return FileResponse(path, media_type="application/json")
+
+
+@app.put("/api/songs/{song_id}/map")
+def save_map(song_id: str, notes: list[dict] = Body(..., embed=True)) -> dict:
+    """Перезаписать ноты в карте (ручная правка в редакторе)."""
+    meta = store.load_meta(song_id)
+    if meta is None:
+        raise HTTPException(404, "песня не найдена")
+    song_map = store.load_map(song_id)
+    if song_map is None:
+        raise HTTPException(409, "карта ещё не готова")
+
+    clean: list[dict] = []
+    for n in notes:
+        try:
+            note = {
+                "startMs": int(n["startMs"]),
+                "durMs": max(1, int(n["durMs"])),
+                "midi": int(n["midi"]),
+            }
+        except (KeyError, TypeError, ValueError):
+            raise HTTPException(400, "нота должна содержать целые startMs, durMs, midi")
+        if "lyric" in n and n["lyric"] is not None:
+            note["lyric"] = str(n["lyric"])
+        clean.append(note)
+    clean.sort(key=lambda x: x["startMs"])
+
+    song_map["notes"] = clean
+    (store.song_dir(song_id) / "map.json").write_text(
+        __import__("json").dumps(song_map, ensure_ascii=False)
+    )
+    meta.note_count = len(clean)
+    if clean:
+        meta.low_midi = min(n["midi"] for n in clean)
+        meta.high_midi = max(n["midi"] for n in clean)
+    store.save_meta(meta)
+    return {"ok": True, "noteCount": len(clean)}
 
 
 @app.delete("/api/songs/{song_id}", status_code=204)

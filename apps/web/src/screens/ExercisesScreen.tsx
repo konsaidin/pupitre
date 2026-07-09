@@ -6,6 +6,8 @@ import { EXERCISES, type ExerciseDef } from '../game/exercises';
 import { comfortZone, midiToName } from '../lib/music';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
+import { SpotlightCard } from '../components/fx/SpotlightCard';
+import { RangeSlider } from '../components/fx/RangeSlider';
 import type { PlayState } from './GameScreen';
 
 export function ExercisesScreen() {
@@ -69,7 +71,7 @@ function ExerciseCard({ ex, open, onToggle }: { ex: ExerciseDef; open: boolean; 
   };
 
   return (
-    <div className={open ? 'card open' : 'card'}>
+    <SpotlightCard as="div" className={open ? 'card open' : 'card'} tilt={false} magnetism={false}>
       <button className="card-head" onClick={onToggle}>
         <span className="card-icon">{ex.icon}</span>
         <span className="card-title">
@@ -80,27 +82,18 @@ function ExerciseCard({ ex, open, onToggle }: { ex: ExerciseDef; open: boolean; 
       </button>
       {open && (
         <div className="card-body">
-          <label className="field">
-            Темп: <b>{bpm} BPM</b>
-            <input type="range" min={50} max={160} step={5} value={bpm} onChange={(e) => setBpm(+e.target.value)} />
-          </label>
-          <label className="field">
-            Повторы: <b>{repeats}</b>
-            <input type="range" min={1} max={ex.maxRepeats} value={repeats} onChange={(e) => setRepeats(+e.target.value)} />
-          </label>
-          <label className="field">
-            От ноты: <b>{midiToName(rootMidi)}</b>
-            <input
-              type="range"
-              min={zone.lowMidi}
-              max={Math.max(zone.lowMidi, zone.highMidi - 7)}
-              value={rootMidi}
-              onChange={(e) => setRootMidi(+e.target.value)}
-            />
-          </label>
+          <RangeSlider min={50} max={160} step={5} value={bpm} onChange={setBpm} label={<>Темп: <b>{bpm} BPM</b></>} />
+          <RangeSlider min={1} max={ex.maxRepeats} value={repeats} onChange={setRepeats} label={<>Повторы: <b>{repeats}</b></>} />
+          <RangeSlider
+            min={zone.lowMidi}
+            max={Math.max(zone.lowMidi, zone.highMidi - 7)}
+            value={rootMidi}
+            onChange={setRootMidi}
+            label={<>От ноты: <b>{midiToName(rootMidi)}</b></>}
+          />
           <button className="btn primary" onClick={startPlay}>Петь</button>
         </div>
       )}
-    </div>
+    </SpotlightCard>
   );
 }

@@ -5,12 +5,15 @@
 import { useEffect, useRef } from 'react';
 import type { GameEngine } from '../game/engine';
 import { isBlackKey, midiToName } from '../lib/music';
+import { contourMidiAt } from '../lib/pitchline';
 
 interface Props {
   engine: GameEngine;
   window: { lowMidi: number; highMidi: number };
   /** сколько мс видно на экране справа от линии "сейчас" */
   lookaheadMs?: number;
+  /** показывать контур извлечённого вокала (дорожку + шарик-ориентир) */
+  showPitchline?: boolean;
 }
 
 const KEYBOARD_W = 56;
@@ -32,12 +35,14 @@ const C = {
   miss: '#e05f5f',
   trailHit: '#38d98c',
   trailMiss: 'rgba(200,205,215,0.55)',
+  pitch: '#22d3ee',
+  pitchDim: 'rgba(34,211,238,0.35)',
   nowLine: 'rgba(255,255,255,0.35)',
   text: 'rgba(230,235,245,0.85)',
   textDim: 'rgba(230,235,245,0.45)',
 };
 
-export function PianoRoll({ engine, window: win, lookaheadMs = 4000 }: Props) {
+export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchline = true }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -159,6 +164,56 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000 }: Props) {
           ctx2d.font = '12px system-ui, sans-serif';
           ctx2d.textBaseline = 'top';
           ctx2d.fillText(n.lyric, Math.max(x1, KEYBOARD_W) + 4, y + h / 2 + 3);
+        }
+      }
+
+      // контур извлечённого вокала — «дорожка», по которой едет шарик-ориентир
+      const line = engine.map.pitchline;
+      if (showPitchline && line && line.midi.length > 0) {
+        const leftMs = songMs + (KEYBOARD_W - nowX) / pxPerMs;
+        const rightMs = songMs + lookaheadMs;
+        const i0 = Math.max(0, Math.floor(leftMs / line.hopMs) - 1);
+        const i1 = Math.min(line.midi.length - 1, Math.ceil(rightMs / line.hopMs) + 1);
+        ctx2d.lineWidth = 2.5;
+        ctx2d.lineCap = 'round';
+        ctx2d.lineJoin = 'round';
+        ctx2d.strokeStyle = C.pitch;
+        ctx2d.shadowColor = C.pitch;
+        ctx2d.shadowBlur = 6;
+        ctx2d.beginPath();
+        let pen = false;
+        for (let i = i0; i <= i1; i++) {
+          const m = line.midi[i];
+          if (m === null) {
+            pen = false;
+            continue;
+          }
+          const x = msToX(i * line.hopMs);
+          const y = midiToY(m);
+          if (!pen) {
+            ctx2d.moveTo(x, y);
+            pen = true;
+          } else {
+            ctx2d.lineTo(x, y);
+          }
+        }
+        ctx2d.stroke();
+        ctx2d.shadowBlur = 0;
+        ctx2d.lineWidth = 1;
+
+        // шарик-ориентир на линии «сейчас»
+        const cm = contourMidiAt(line, Math.max(0, songMs));
+        if (cm !== null) {
+          const y = midiToY(cm);
+          if (y >= -4 && y <= H + 4) {
+            ctx2d.fillStyle = C.pitch;
+            ctx2d.shadowColor = C.pitch;
+            ctx2d.shadowBlur = 12;
+            ctx2d.beginPath();
+            ctx2d.arc(nowX, y, 5, 0, Math.PI * 2);
+            ctx2d.fill();
+            ctx2d.shadowBlur = 0;
+          }
         }
       }
 

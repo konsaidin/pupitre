@@ -1,6 +1,6 @@
 // Клиент бэкенда песен (FastAPI за /api, см. vite proxy).
 
-import type { SongMap } from './songMap';
+import type { MapNote, Pitchline, SongMap } from './songMap';
 
 export type SongStatus = 'queued' | 'processing' | 'done' | 'error';
 export type SongStage = 'queued' | 'decode' | 'separate' | 'analyze' | 'done' | 'error';
@@ -67,4 +67,32 @@ export async function retrySong(id: string): Promise<SongInfo> {
 
 export function instrumentalUrl(id: string): string {
   return `/api/songs/${id}/instrumental`;
+}
+
+export function vocalUrl(id: string): string {
+  return `/api/songs/${id}/vocal`;
+}
+
+/** Контур высоты вокала. null — если бэкенд его не сохранил (старые карты). */
+export async function getPitchline(id: string): Promise<Pitchline | null> {
+  const resp = await fetch(`/api/songs/${id}/pitchline`);
+  if (resp.status === 404) return null;
+  return jsonOrThrow<Pitchline>(resp);
+}
+
+/** Сохранить отредактированные ноты в карту песни на бэкенде. */
+export async function saveMap(id: string, notes: MapNote[]): Promise<{ noteCount: number }> {
+  const body = notes.map((n) => ({
+    startMs: Math.round(n.startMs),
+    durMs: Math.round(n.durMs),
+    midi: Math.round(n.midi),
+    ...(n.lyric ? { lyric: n.lyric } : {}),
+  }));
+  return jsonOrThrow(
+    await fetch(`/api/songs/${id}/map`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ notes: body }),
+    }),
+  );
 }

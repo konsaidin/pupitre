@@ -5,10 +5,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
 import { PianoRoll } from '../components/PianoRoll';
+import { SongEditor } from '../components/SongEditor';
 import { GameEngine } from '../game/engine';
-import { chooseOctaveShift, rollWindow, shiftNotes } from '../game/octave';
+import { chooseOctaveShift, rollWindow, shiftNotes, shiftPitchline } from '../game/octave';
+import { saveMap, vocalUrl as vocalUrlFor } from '../lib/api';
 import { comfortZone } from '../lib/music';
-import { DIFFICULTY_META, type Difficulty, type SongMap } from '../lib/songMap';
+import { DIFFICULTY_META, type Difficulty, type MapNote, type SongMap } from '../lib/songMap';
 import type { GameSummary } from '../game/scoring';
 import { useProfile } from '../state/ProfileContext';
 
@@ -33,25 +35,36 @@ export function GameScreen() {
   const [octaveShift, setOctaveShift] = useState<number | null>(null);
   const [engine, setEngine] = useState<GameEngine | null>(null);
   const [hud, setHud] = useState({ score: 0, combo: 0, progress: 0, countdown: 0 });
+  const [editing, setEditing] = useState(false);
+  // карта живёт в состоянии: редактор нот её меняет
+  const [songMap, setSongMap] = useState<SongMap | null>(play?.map ?? null);
   const backingBufferRef = useRef<AudioBuffer | null>(null);
+  const editedRef = useRef(false);
 
   const range = profile.range;
 
   // октавный сдвиг для песен считается один раз от комфортной зоны
   const autoShift = useMemo(() => {
-    if (!play || !range || play.kind !== 'song') return 0;
-    return chooseOctaveShift(play.map.notes, comfortZone(range));
-  }, [play, range]);
+    if (!songMap || !range || play?.kind !== 'song') return 0;
+    return chooseOctaveShift(songMap.notes, comfortZone(range));
+  }, [songMap, range, play?.kind]);
   const shift = octaveShift ?? autoShift;
 
   const shiftedMap: SongMap | null = useMemo(() => {
-    if (!play) return null;
+    if (!songMap) return null;
     return {
-      ...play.map,
-      notes: shiftNotes(play.map.notes, shift),
-      guideEvents: play.map.guideEvents ? shiftNotes(play.map.guideEvents, shift) : undefined,
+      ...songMap,
+      notes: shiftNotes(songMap.notes, shift),
+      guideEvents: songMap.guideEvents ? shiftNotes(songMap.guideEvents, shift) : undefined,
+      pitchline: songMap.pitchline ? shiftPitchline(songMap.pitchline, shift) : undefined,
     };
-  }, [play, shift]);
+  }, [songMap, shift]);
+
+  /** Окно редактора — в исходных (несдвинутых) координатах карты. */
+  const editorWindow = useMemo(() => {
+    if (!songMap || !range) return null;
+    return rollWindow(songMap.notes, range);
+  }, [songMap, range]);
 
   const window_ = useMemo(() => {
     if (!shiftedMap || !range) return null;
@@ -75,7 +88,7 @@ export function GameScreen() {
     return () => clearInterval(iv);
   }, [engine, status]);
 
-  if (!play || !shiftedMap || !window_) {
+  if (!play || !songMap || !shiftedMap || !window_) {
     return (
       <div className="screen">
         <p className="error">{!range ? 'Сначала определи диапазон голоса.' : 'Нет данных для игры.'}</p>
@@ -110,8 +123,8 @@ export function GameScreen() {
         backingBuffer: backingBufferRef.current ?? undefined,
         onFinish: (summary: GameSummary) => {
           recordScore({
-            mapId: play.map.id,
-            title: play.map.title,
+            mapId: songMap.id,
+            title: songMap.title,
             score: summary.score,
             accuracy: summary.accuracy,
             stars: summary.stars,
@@ -121,7 +134,7 @@ export function GameScreen() {
           // хвост голоса для итогового графика (прореженный)
           const trail = (engRef.current?.trail ?? []).filter((_, i) => i % 2 === 0);
           navigate('/results', {
-            state: { summary, playState: play, shiftedMap, window: window_, trail, title: play.map.title, difficulty },
+            state: { summary, playState: play, shiftedMap, window: window_, trail, title: songMap.title, difficulty },
             replace: true,
           });
         },
@@ -155,6 +168,26 @@ export function GameScreen() {
     setStatus('setup');
   };
 
+  const openEditor = () => {
+    engine?.pause();
+    setEditing(true);
+  };
+
+  /** Правка идёт в исходных координатах — движок пересобираем после закрытия. */
+  const onEditorSave = async (notes: MapNote[]) => {
+    await saveMap(songMap.id, notes);
+    setSongMap({ ...songMap, notes });
+    editedRef.current = true;
+  };
+
+  const onEditorClose = () => {
+    setEditing(false);
+    if (editedRef.current) {
+      editedRef.current = false;
+      restart();
+    }
+  };
+
   const meta = DIFFICULTY_META[difficulty];
 
   return (
@@ -162,8 +195,8 @@ export function GameScreen() {
       <header className="game-header">
         <button className="btn ghost" onClick={quit}>← Выйти</button>
         <div className="game-title">
-          <b>{play.map.title}</b>
-          {play.map.subtitle && <span className="dim"> · {play.map.subtitle}</span>}
+          <b>{songMap.title}</b>
+          {songMap.subtitle && <span className="dim"> · {songMap.subtitle}</span>}
         </div>
         {play.kind === 'song' && (
           <div className="octave-badge" title="Мелодия сдвинута в твою октаву">
@@ -185,10 +218,10 @@ export function GameScreen() {
       <div className="game-stage">
         {engine && <PianoRoll engine={engine} window={window_} />}
 
-        {status === 'setup' && (
+        {status === 'setup' && !editing && (
           <div className="overlay">
             <div className="panel">
-              <h2>{play.map.title}</h2>
+              <h2>{songMap.title}</h2>
               <label className="field">
                 Сложность
                 <div className="seg">
@@ -216,6 +249,11 @@ export function GameScreen() {
               <button className="btn primary big" onClick={() => { update({ headphonesWarned: true }); void start(); }}>
                 Поехали
               </button>
+              {play.kind === 'song' && (
+                <div className="btn-row tight">
+                  <button className="btn ghost" onClick={openEditor}>✎ Редактировать ноты</button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -228,17 +266,30 @@ export function GameScreen() {
           <div className="overlay transparent"><span className="countdown">{Math.ceil(hud.countdown)}</span></div>
         )}
 
-        {status === 'paused' && (
+        {status === 'paused' && !editing && (
           <div className="overlay">
             <div className="panel">
               <h2>Пауза</h2>
               <div className="btn-col">
                 <button className="btn primary" onClick={resume}>Продолжить</button>
+                {play.kind === 'song' && (
+                  <button className="btn" onClick={openEditor}>✎ Редактировать ноты</button>
+                )}
                 <button className="btn" onClick={restart}>Заново</button>
                 <button className="btn" onClick={quit}>Выйти</button>
               </div>
             </div>
           </div>
+        )}
+
+        {editing && editorWindow && (
+          <SongEditor
+            map={songMap}
+            window={editorWindow}
+            vocalUrl={songMap.hasVocal ? vocalUrlFor(songMap.id) : null}
+            onSave={onEditorSave}
+            onClose={onEditorClose}
+          />
         )}
 
         {status === 'error' && (

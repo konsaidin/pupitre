@@ -29,6 +29,7 @@ FMAX = 1047.0  # C6
 MIN_NOTE_MS = 90
 MERGE_GAP_MS = 80
 SPLIT_SEMITONES = 0.75
+PITCHLINE_DECIMATE = 2  # прореживание контура f0 перед сохранением (кадры)
 
 ProgressCb = Callable[[str, int], None]  # (stage, progress 0..100)
 
@@ -111,8 +112,13 @@ def hz_to_midi(hz: np.ndarray) -> np.ndarray:
     return 69.0 + 12.0 * np.log2(hz / 440.0)
 
 
-def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], int]:
-    """pYIN f0 → сегментация в ноты. Возвращает (notes, duration_ms)."""
+def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], int, dict]:
+    """pYIN f0 → сегментация в ноты.
+
+    Возвращает (notes, duration_ms, pitchline), где pitchline — непрерывный контур
+    высоты голоса: {"hopMs": float, "midi": [float|None, ...]} — то, что «спелось бы
+    в микрофон». None означает тишину/неозвученный кадр.
+    """
     import librosa
 
     y, sr = librosa.load(str(vocal_wav), sr=SR_ANALYSIS, mono=True)
@@ -147,8 +153,22 @@ def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], in
 
     frame_ms = HOP / sr * 1000.0
     notes = _segment(midi, frame_ms)
+    pitchline = _build_pitchline(midi, frame_ms)
     progress("analyze", 98)
-    return notes, duration_ms
+    return notes, duration_ms, pitchline
+
+
+def _build_pitchline(midi: np.ndarray, frame_ms: float) -> dict:
+    """Прореженный контур высоты для отрисовки «дорожки» и режима «петь по линии».
+
+    NaN (тишина) → None; значения округляем до 0.01 полутона, чтобы JSON не пух.
+    """
+    dec = max(1, PITCHLINE_DECIMATE)
+    out: list[float | None] = []
+    for i in range(0, len(midi), dec):
+        v = midi[i]
+        out.append(None if math.isnan(v) else round(float(v), 2))
+    return {"hopMs": round(frame_ms * dec, 3), "midi": out}
 
 
 def _median_smooth(x: np.ndarray, width: int) -> np.ndarray:
@@ -267,18 +287,22 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
             meta.separated = False
         progress("analyze", 70)
 
-        notes, duration_ms = extract_notes(vocal_src, progress)
+        notes, duration_ms, pitchline = extract_notes(vocal_src, progress)
         if not notes and vocal_src != mix_wav:
             # вокальный стем пуст (Demucs не признал голос или трек без вокала) —
             # пробуем снять мелодию с полного микса
             log.warning("%s: в вокальном стеме нот нет, анализирую полный микс", meta.id)
-            notes, duration_ms = extract_notes(mix_wav, progress)
+            notes, duration_ms, pitchline = extract_notes(mix_wav, progress)
         if not notes:
             raise RuntimeError(
                 "не удалось найти мелодию в треке — возможно, он инструментальный"
             )
 
         encode_instrumental(instr_src, d / "instrumental.mp3")
+        # превью извлечённого вокала (для редактора/ориентира); в игре не играется
+        vocal_wav = d / "vocals.wav"
+        if vocal_wav.exists():
+            encode_instrumental(vocal_wav, d / "vocal.mp3")
 
         meta.duration_ms = duration_ms
         meta.note_count = len(notes)
@@ -292,15 +316,19 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
             "durationMs": duration_ms,
             "notes": notes,
             "backing": {"kind": "url", "url": f"/api/songs/{meta.id}/instrumental"},
+            "hasPitchline": True,
+            "hasVocal": (d / "vocal.mp3").exists(),
         }
         import json
 
         (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False))
+        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False))
 
-        # промежуточные артефакты больше не нужны
-        for tmp in ("mix.wav", "vocals.wav", "instrumental.wav"):
+        # промежуточные артефакты больше не нужны; vocals.wav оставляем — из него
+        # делается превью и (в будущем) повторное извлечение без Demucs
+        for tmp in ("mix.wav", "instrumental.wav"):
             p = d / tmp
-            if p.exists() and tmp != "vocals.wav":  # vocals оставляем для отладки карт
+            if p.exists():
                 p.unlink()
 
         meta.status = "done"

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   deleteSong,
+  getPitchline,
   getSong,
   instrumentalUrl,
   listSongs,
@@ -15,6 +16,7 @@ import {
 import { bestScore } from '../lib/profile';
 import type { SongMap } from '../lib/songMap';
 import { useProfile } from '../state/ProfileContext';
+import { SpotlightCard } from '../components/fx/SpotlightCard';
 import type { PlayState } from './GameScreen';
 
 const STAGE_LABEL: Record<SongStage, string> = {
@@ -68,11 +70,13 @@ export function LibraryScreen() {
     try {
       const detail = await getSong(s.id);
       if (!detail.map) throw new Error('Карта нот ещё не готова');
+      const pitchline = detail.map.hasPitchline ? await getPitchline(s.id).catch(() => null) : null;
       const map: SongMap = {
         ...detail.map,
         title: s.title,
         subtitle: s.artist || detail.map.subtitle,
         backing: { kind: 'url', url: instrumentalUrl(s.id) },
+        pitchline: pitchline ?? undefined,
       };
       const state: PlayState = { map, kind: 'song' };
       navigate('/play', { state });
@@ -111,7 +115,7 @@ export function LibraryScreen() {
           const best = bestScore(profile, s.id);
           const busy = s.status === 'queued' || s.status === 'processing';
           return (
-            <div key={s.id} className="card song-card">
+            <SpotlightCard key={s.id} as="div" className="card song-card" tilt={false} magnetism={false}>
               <div className="card-head static">
                 <span className="card-icon">{s.status === 'done' ? '🎧' : s.status === 'error' ? '⚠️' : '⏳'}</span>
                 <span className="card-title">
@@ -142,7 +146,7 @@ export function LibraryScreen() {
                   </button>
                 </div>
               </div>
-            </div>
+            </SpotlightCard>
           );
         })}
       </div>
