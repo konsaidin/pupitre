@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 
 from fastapi import Body, FastAPI, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 
 from .jobs import jobs
@@ -20,6 +21,14 @@ ALLOWED_EXT = {".mp3", ".wav", ".flac", ".m4a", ".ogg", ".opus", ".aac"}
 MAX_UPLOAD_MB = 60
 
 app = FastAPI(title="Slopsician API")
+
+# десктопное приложение ходит с file:// (opaque origin) — без CORS не сможет
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.on_event("startup")

@@ -6,6 +6,7 @@ import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
 import { DEFAULT_MIC } from '../audio/PitchTracker';
 import { Synth } from '../audio/synth';
 import { RangeSlider } from '../components/fx/RangeSlider';
+import { getApiBase, setApiBase } from '../lib/api';
 import { midiToName } from '../lib/music';
 import { DIFFICULTY_META, type Difficulty } from '../lib/songMap';
 import { micOptions } from '../lib/profile';
@@ -23,6 +24,7 @@ export function SettingsScreen() {
   const [calStatus, setCalStatus] = useState<string | null>(null);
   const [monitoring, setMonitoring] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
+  const [serverUrl, setServerUrl] = useState(getApiBase());
   const cancelRef = useRef(false);
   const meterFillRef = useRef<HTMLDivElement>(null);
   const meterStateRef = useRef<HTMLSpanElement>(null);
@@ -157,7 +159,7 @@ export function SettingsScreen() {
             checked={profile.micNoiseSuppression}
             onChange={(e) => update({ micNoiseSuppression: e.target.checked })}
           />
-          Шумоподавление браузера
+          Шумоподавление
           <span className="dim small">глушит фон (вентилятор, улицу), но может резать тихий вокал</span>
         </label>
         <label className="check">
@@ -176,7 +178,7 @@ export function SettingsScreen() {
             onChange={(e) => update({ micAutoGain: e.target.checked })}
           />
           Автоусиление
-          <span className="dim small">браузер сам крутит громкость — обычно мешает нойзгейту</span>
+          <span className="dim small">система сама крутит громкость — обычно мешает нойзгейту</span>
         </label>
 
         <RangeSlider
@@ -273,13 +275,41 @@ export function SettingsScreen() {
       </section>
 
       <section className="settings-block">
+        <h2 className="cat">Сервер обработки песен</h2>
+        <p className="dim small">
+          Адрес бэкенда, который отделяет вокал и снимает мелодию (<code>uvicorn app.main:app --port 8000</code>{' '}
+          в <code>services/api</code>). Распевки и упражнения работают без него.
+        </p>
+        <div className="btn-row tight">
+          <input
+            className="text-input"
+            type="url"
+            placeholder="http://localhost:8000"
+            value={serverUrl}
+            onChange={(e) => setServerUrl(e.target.value)}
+          />
+          <button
+            className="btn"
+            onClick={() => {
+              setApiBase(serverUrl);
+              setServerUrl(getApiBase());
+            }}
+          >
+            Сохранить
+          </button>
+        </div>
+      </section>
+
+      <section className="settings-block">
         <h2 className="cat">Данные</h2>
         <button
           className="btn danger"
           onClick={() => {
             if (confirm('Сбросить профиль, диапазон и всю историю результатов?')) {
               localStorage.clear();
-              location.href = '/';
+              // работает и на file:// в десктопном приложении
+              location.hash = '#/';
+              location.reload();
             }
           }}
         >

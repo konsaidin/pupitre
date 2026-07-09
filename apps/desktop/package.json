@@ -1,0 +1,44 @@
+{
+  "name": "slopsician-desktop",
+  "productName": "Slopsician",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Slopsician — тренажёр вокала: пой в ноты, приложение слышит голос",
+  "author": "konsaidin",
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "copy-web": "node copy-web.mjs",
+    "dev": "npm run copy-web && electron .",
+    "pack": "npm run copy-web && electron-builder --dir",
+    "dist": "npm run copy-web && electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "app.slopsician.desktop",
+    "productName": "Slopsician",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "main.js",
+      "dist-web/**"
+    ],
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Audio",
+      "artifactName": "Slopsician-${version}-linux-${arch}.${ext}"
+    },
+    "win": {
+      "target": ["nsis", "portable"],
+      "artifactName": "Slopsician-${version}-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "artifactName": "Slopsician-Setup-${version}.${ext}"
+    }
+  }
+}

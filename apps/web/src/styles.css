@@ -705,3 +705,17 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
 }
 .mic-meter-state { min-height: 1.4em; margin-top: 0.3rem; }
 .check .dim { margin-left: 0.3rem; }
+
+/* текстовое поле (адрес сервера и т.п.) */
+.text-input {
+  flex: 1;
+  min-width: 12rem;
+  background: var(--panel);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }

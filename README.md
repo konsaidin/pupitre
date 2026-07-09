@@ -7,6 +7,16 @@
 
 Подробный план и разбивка фич: [PLAN.md](PLAN.md).
 
+## Скачать приложение
+
+Готовые сборки для Windows (installer/portable `.exe`) и Linux (`.AppImage`) —
+на странице [Releases](https://github.com/konsaidin/slopsician/releases).
+CI собирает их автоматически по тегу `v*` (см. `.github/workflows/desktop.yml`).
+
+Приложение самодостаточно для распевок и упражнений. Для загрузки своих песен
+нужен бэкенд обработки (см. ниже) — его адрес задаётся в «Настройки → Сервер
+обработки песен» (по умолчанию `http://localhost:8000`).
+
 ## Запуск
 
 Фронтенд (Node 20+):
@@ -49,5 +59,6 @@ torch/demucs бэкенд тоже работает: мелодия снимае
 
 ```
 apps/web       — React/TS: пиано-ролл, упражнения, библиотека, профиль голоса
+apps/desktop   — Electron-обёртка (Windows/Linux сборки)
 services/api   — FastAPI + пайплайн обработки (см. services/api/README.md)
 ```

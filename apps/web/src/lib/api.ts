@@ -1,6 +1,27 @@
 // Клиент бэкенда песен (FastAPI за /api, см. vite proxy).
+//
+// В вебе база пустая — запросы идут на тот же хост (vite proxy / reverse proxy).
+// В десктопном приложении (file://) база по умолчанию http://localhost:8000,
+// и её можно сменить в настройках (см. getApiBase/setApiBase).
 
 import type { ExtractSettings, MapNote, Pitchline, SongMap } from './songMap';
+
+const API_BASE_KEY = 'slopsician.apiBase.v1';
+const IS_DESKTOP = location.protocol === 'file:';
+
+export function getApiBase(): string {
+  const saved = localStorage.getItem(API_BASE_KEY);
+  if (saved != null) return saved.replace(/\/+$/, '');
+  return IS_DESKTOP ? 'http://localhost:8000' : '';
+}
+
+/** Пустая строка = «как у сайта»; null/пусто в десктопе вернёт дефолт при чтении. */
+export function setApiBase(url: string | null): void {
+  if (url == null || url.trim() === '') localStorage.removeItem(API_BASE_KEY);
+  else localStorage.setItem(API_BASE_KEY, url.trim().replace(/\/+$/, ''));
+}
+
+const api = (path: string): string => `${getApiBase()}${path}`;
 
 export type SongStatus = 'queued' | 'processing' | 'done' | 'error';
 export type SongStage = 'queued' | 'decode' | 'separate' | 'analyze' | 'done' | 'error';
@@ -44,43 +65,43 @@ async function jsonOrThrow<T>(resp: Response): Promise<T> {
 }
 
 export async function listSongs(): Promise<SongInfo[]> {
-  return jsonOrThrow(await fetch('/api/songs'));
+  return jsonOrThrow(await fetch(api('/api/songs')));
 }
 
 export async function uploadSong(file: File): Promise<SongInfo> {
   const form = new FormData();
   form.append('file', file);
-  return jsonOrThrow(await fetch('/api/songs', { method: 'POST', body: form }));
+  return jsonOrThrow(await fetch(api('/api/songs'), { method: 'POST', body: form }));
 }
 
 export async function getSong(id: string): Promise<SongDetail> {
-  return jsonOrThrow(await fetch(`/api/songs/${id}`));
+  return jsonOrThrow(await fetch(api(`/api/songs/${id}`)));
 }
 
 export async function deleteSong(id: string): Promise<void> {
-  await jsonOrThrow(await fetch(`/api/songs/${id}`, { method: 'DELETE' }));
+  await jsonOrThrow(await fetch(api(`/api/songs/${id}`), { method: 'DELETE' }));
 }
 
 export async function retrySong(id: string): Promise<SongInfo> {
-  return jsonOrThrow(await fetch(`/api/songs/${id}/retry`, { method: 'POST' }));
+  return jsonOrThrow(await fetch(api(`/api/songs/${id}/retry`), { method: 'POST' }));
 }
 
 export function instrumentalUrl(id: string): string {
-  return `/api/songs/${id}/instrumental`;
+  return api(`/api/songs/${id}/instrumental`);
 }
 
 export function vocalUrl(id: string): string {
-  return `/api/songs/${id}/vocal`;
+  return api(`/api/songs/${id}/vocal`);
 }
 
 /** Оригинальный трек с вокалом (вариант исполнения «с вокалом»). */
 export function mixUrl(id: string): string {
-  return `/api/songs/${id}/mix`;
+  return api(`/api/songs/${id}/mix`);
 }
 
 /** Контур высоты вокала. null — если бэкенд его не сохранил (старые карты). */
 export async function getPitchline(id: string): Promise<Pitchline | null> {
-  const resp = await fetch(`/api/songs/${id}/pitchline`);
+  const resp = await fetch(api(`/api/songs/${id}/pitchline`));
   if (resp.status === 404) return null;
   return jsonOrThrow<Pitchline>(resp);
 }
@@ -105,7 +126,7 @@ export async function loadSongMap(id: string): Promise<SongMap> {
 /** Переснять мелодию с новыми настройками (без Demucs); дальше — поллинг статуса. */
 export async function reextractSong(id: string, params: ExtractSettings): Promise<SongInfo> {
   return jsonOrThrow(
-    await fetch(`/api/songs/${id}/reextract`, {
+    await fetch(api(`/api/songs/${id}/reextract`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -122,7 +143,7 @@ export async function saveMap(id: string, notes: MapNote[]): Promise<{ noteCount
     ...(n.lyric ? { lyric: n.lyric } : {}),
   }));
   return jsonOrThrow(
-    await fetch(`/api/songs/${id}/map`, {
+    await fetch(api(`/api/songs/${id}/map`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ notes: body }),
