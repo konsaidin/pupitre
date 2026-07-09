@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ensureMic, stopMic } from '../audio/audioSession';
 import { LiveKeyboard } from '../components/LiveKeyboard';
+import { ScreenHeader } from '../components/ScreenHeader';
 import { classifyRange, midiToName, type VocalRange } from '../lib/music';
 import { useProfile } from '../state/ProfileContext';
 
@@ -119,11 +120,10 @@ export function RangeWizard() {
   if (step === 'intro') {
     return (
       <div className="screen wizard">
-        <h1>Определим твой диапазон</h1>
-        <p className="lead">
-          Приложение подстраивает упражнения и песни под твой голос: показывает только твою полосу нот и
-          переносит мелодии в твою октаву. Для этого нужно один раз измерить диапазон — займёт минуту.
-        </p>
+        <ScreenHeader
+          title="Определим твой диапазон"
+          subtitle="Приложение подстраивает упражнения и песни под твой голос: показывает только твою полосу нот и переносит мелодии в твою октаву. Для этого нужно один раз измерить диапазон — займёт минуту."
+        />
         <ul className="tips">
           <li>🎧 Надень наушники, если рядом играет музыка</li>
           <li>🤫 Найди тихое место</li>
@@ -140,7 +140,7 @@ export function RangeWizard() {
   if (step === 'done' && low != null && high != null) {
     return (
       <div className="screen wizard">
-        <h1>Твой диапазон</h1>
+        <ScreenHeader title="Твой диапазон" />
         <div className="range-result">
           <span className="range-notes">
             {midiToName(low)} – {midiToName(high)}
@@ -165,7 +165,7 @@ export function RangeWizard() {
   return (
     <div className="screen wizard wizard-live">
       <div className="wizard-panel">
-        <h2>{stepInfo[step].title}</h2>
+        <ScreenHeader title={stepInfo[step].title} />
         <p className="lead">{stepInfo[step].hint}</p>
         {micError && <p className="error">⚠️ {micError}</p>}
         <div className="wizard-status">

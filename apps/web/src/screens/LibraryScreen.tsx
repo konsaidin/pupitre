@@ -13,6 +13,7 @@ import {
 } from '../lib/api';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
+import { ScreenHeader } from '../components/ScreenHeader';
 import { SpotlightCard } from '../components/fx/SpotlightCard';
 import type { PlayState } from './GameScreen';
 
@@ -74,7 +75,7 @@ export function LibraryScreen() {
 
   return (
     <div className="screen">
-      <h1>Песни</h1>
+      <ScreenHeader title="Песни" />
       <div
         className={dragOver ? 'dropzone over' : 'dropzone'}
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}

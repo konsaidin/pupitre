@@ -6,6 +6,7 @@ import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
 import { Synth } from '../audio/synth';
 import { DIFFICULTY_META, type Difficulty } from '../lib/songMap';
 import { useProfile } from '../state/ProfileContext';
+import { ScreenHeader } from '../components/ScreenHeader';
 
 const CLICKS = 10;
 const CLICK_INTERVAL = 0.6; // сек (100 BPM)
@@ -83,7 +84,7 @@ export function SettingsScreen() {
 
   return (
     <div className="screen">
-      <h1>Настройки</h1>
+      <ScreenHeader title="Настройки" />
 
       <section className="settings-block">
         <h2 className="cat">Микрофон</h2>

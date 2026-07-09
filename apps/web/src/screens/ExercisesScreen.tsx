@@ -6,6 +6,7 @@ import { EXERCISES, type ExerciseDef } from '../game/exercises';
 import { comfortZone, midiToName } from '../lib/music';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
+import { ScreenHeader } from '../components/ScreenHeader';
 import { SpotlightCard } from '../components/fx/SpotlightCard';
 import { RangeSlider } from '../components/fx/RangeSlider';
 import type { PlayState } from './GameScreen';
@@ -18,8 +19,10 @@ export function ExercisesScreen() {
   if (!profile.range) {
     return (
       <div className="screen">
-        <h1>Распевки и упражнения</h1>
-        <p className="lead">Сначала измерим твой диапазон — упражнения генерируются под него.</p>
+        <ScreenHeader
+          title="Распевки и упражнения"
+          subtitle="Сначала измерим твой диапазон — упражнения генерируются под него."
+        />
         <button className="btn primary" onClick={() => navigate('/range')}>Определить диапазон</button>
       </div>
     );
@@ -29,10 +32,10 @@ export function ExercisesScreen() {
 
   return (
     <div className="screen">
-      <h1>Распевки и упражнения</h1>
-      <p className="lead dim">
-        Все упражнения построены под твой диапазон ({midiToName(profile.range.lowMidi)}–{midiToName(profile.range.highMidi)}).
-      </p>
+      <ScreenHeader
+        title="Распевки и упражнения"
+        subtitle={`Все упражнения построены под твой диапазон (${midiToName(profile.range.lowMidi)}–${midiToName(profile.range.highMidi)}).`}
+      />
       {categories.map((cat) => (
         <section key={cat}>
           <h2 className="cat">{cat}</h2>
