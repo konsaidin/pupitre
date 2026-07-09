@@ -580,3 +580,11 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   .results-grid { gap: 1.2rem; }
   .game-header { flex-wrap: wrap; gap: 0.4rem; }
 }
+
+/* панель настроек извлечения: ползунков много — скроллим внутри */
+.extract-panel {
+  max-height: min(85vh, 42rem);
+  overflow-y: auto;
+  max-width: 26rem;
+}
+.extract-panel .field { margin-bottom: 0.35rem; }

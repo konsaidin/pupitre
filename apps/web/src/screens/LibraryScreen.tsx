@@ -4,17 +4,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   deleteSong,
-  getPitchline,
-  getSong,
-  instrumentalUrl,
   listSongs,
+  loadSongMap,
   retrySong,
   uploadSong,
   type SongInfo,
   type SongStage,
 } from '../lib/api';
 import { bestScore } from '../lib/profile';
-import type { SongMap } from '../lib/songMap';
 import { useProfile } from '../state/ProfileContext';
 import { SpotlightCard } from '../components/fx/SpotlightCard';
 import type { PlayState } from './GameScreen';
@@ -68,17 +65,7 @@ export function LibraryScreen() {
 
   const playSong = async (s: SongInfo) => {
     try {
-      const detail = await getSong(s.id);
-      if (!detail.map) throw new Error('Карта нот ещё не готова');
-      const pitchline = detail.map.hasPitchline ? await getPitchline(s.id).catch(() => null) : null;
-      const map: SongMap = {
-        ...detail.map,
-        title: s.title,
-        subtitle: s.artist || detail.map.subtitle,
-        backing: { kind: 'url', url: instrumentalUrl(s.id) },
-        pitchline: pitchline ?? undefined,
-      };
-      const state: PlayState = { map, kind: 'song' };
+      const state: PlayState = { map: await loadSongMap(s.id), kind: 'song' };
       navigate('/play', { state });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Не удалось открыть песню');

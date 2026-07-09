@@ -1,6 +1,6 @@
 // Клиент бэкенда песен (FastAPI за /api, см. vite proxy).
 
-import type { MapNote, Pitchline, SongMap } from './songMap';
+import type { ExtractSettings, MapNote, Pitchline, SongMap } from './songMap';
 
 export type SongStatus = 'queued' | 'processing' | 'done' | 'error';
 export type SongStage = 'queued' | 'decode' | 'separate' | 'analyze' | 'done' | 'error';
@@ -78,6 +78,34 @@ export async function getPitchline(id: string): Promise<Pitchline | null> {
   const resp = await fetch(`/api/songs/${id}/pitchline`);
   if (resp.status === 404) return null;
   return jsonOrThrow<Pitchline>(resp);
+}
+
+/**
+ * Готовая к игре карта песни: map.json + контур + url инструментала.
+ * Общий загрузчик для библиотеки и обновления после переснятия.
+ */
+export async function loadSongMap(id: string): Promise<SongMap> {
+  const detail = await getSong(id);
+  if (!detail.map) throw new Error('Карта нот ещё не готова');
+  const pitchline = detail.map.hasPitchline ? await getPitchline(id).catch(() => null) : null;
+  return {
+    ...detail.map,
+    title: detail.title || detail.map.title,
+    subtitle: detail.artist || detail.map.subtitle,
+    backing: { kind: 'url', url: instrumentalUrl(id) },
+    pitchline: pitchline ?? undefined,
+  };
+}
+
+/** Переснять мелодию с новыми настройками (без Demucs); дальше — поллинг статуса. */
+export async function reextractSong(id: string, params: ExtractSettings): Promise<SongInfo> {
+  return jsonOrThrow(
+    await fetch(`/api/songs/${id}/reextract`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    }),
+  );
 }
 
 /** Сохранить отредактированные ноты в карту песни на бэкенде. */

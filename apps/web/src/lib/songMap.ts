@@ -19,6 +19,30 @@ export interface Pitchline {
   midi: (number | null)[];
 }
 
+/** Настройки извлечения мелодии (ползунки); зеркало ExtractParams бэкенда. */
+export interface ExtractSettings {
+  /** границы поиска высоты, Гц */
+  fmin: number;
+  fmax: number;
+  /** энергетический гейт: доля от p95 RMS (0 — выключен) */
+  gateRatio: number;
+  minNoteMs: number;
+  mergeGapMs: number;
+  splitSemitones: number;
+  /** ширина медианного сглаживания, кадров (нечётная) */
+  medianWidth: number;
+}
+
+export const EXTRACT_DEFAULTS: ExtractSettings = {
+  fmin: 65,
+  fmax: 1047,
+  gateRatio: 0.05,
+  minNoteMs: 90,
+  mergeGapMs: 80,
+  splitSemitones: 0.75,
+  medianWidth: 5,
+};
+
 export interface SongMap {
   id: string;
   title: string;
@@ -30,6 +54,8 @@ export interface SongMap {
   /** есть ли на бэкенде контур/вокал для подгрузки */
   hasPitchline?: boolean;
   hasVocal?: boolean;
+  /** настройки, которыми снята текущая карта (для панели переснятия) */
+  extract?: ExtractSettings;
   /**
    * Что играет синт вместо notes (упражнения на слух: играется опорная нота,
    * а спеть надо другую). Рисуются на ролле призрачными плашками.

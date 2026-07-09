@@ -143,6 +143,33 @@ def delete_song(song_id: str) -> None:
         raise HTTPException(404, "песня не найдена")
 
 
+@app.post("/api/songs/{song_id}/reextract")
+def reextract(song_id: str, params: dict = Body(default_factory=dict)) -> dict:
+    """Переснять мелодию с новыми настройками (без Demucs — от vocals.wav)."""
+    meta = store.load_meta(song_id)
+    if meta is None:
+        raise HTTPException(404, "песня не найдена")
+    if meta.status not in ("done", "error"):
+        raise HTTPException(409, "песня уже в обработке")
+    if store.load_map(song_id) is None:
+        raise HTTPException(409, "карта ещё не готова — сначала дождись обработки")
+
+    from .pipeline import ExtractParams
+
+    try:
+        parsed = ExtractParams.from_api(params)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+    meta.status = "queued"
+    meta.stage = "queued"
+    meta.progress = 0
+    meta.error = ""
+    store.save_meta(meta)
+    jobs.enqueue_reextract(song_id, parsed)
+    return meta.to_api()
+
+
 @app.post("/api/songs/{song_id}/retry")
 def retry_song(song_id: str) -> dict:
     meta = store.load_meta(song_id)

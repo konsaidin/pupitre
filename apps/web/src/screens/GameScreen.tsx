@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
+import { ExtractionPanel } from '../components/ExtractionPanel';
 import { PianoRoll } from '../components/PianoRoll';
 import { SongEditor } from '../components/SongEditor';
 import { GameEngine } from '../game/engine';
@@ -36,6 +37,7 @@ export function GameScreen() {
   const [engine, setEngine] = useState<GameEngine | null>(null);
   const [hud, setHud] = useState({ score: 0, combo: 0, progress: 0, countdown: 0 });
   const [editing, setEditing] = useState(false);
+  const [tuning, setTuning] = useState(false); // панель настроек извлечения
   // карта живёт в состоянии: редактор нот её меняет
   const [songMap, setSongMap] = useState<SongMap | null>(play?.map ?? null);
   const backingBufferRef = useRef<AudioBuffer | null>(null);
@@ -218,7 +220,7 @@ export function GameScreen() {
       <div className="game-stage">
         {engine && <PianoRoll engine={engine} window={window_} />}
 
-        {status === 'setup' && !editing && (
+        {status === 'setup' && !editing && !tuning && (
           <div className="overlay">
             <div className="panel">
               <h2>{songMap.title}</h2>
@@ -252,6 +254,7 @@ export function GameScreen() {
               {play.kind === 'song' && (
                 <div className="btn-row tight">
                   <button className="btn ghost" onClick={openEditor}>✎ Редактировать ноты</button>
+                  <button className="btn ghost" onClick={() => setTuning(true)}>⚙ Извлечение</button>
                 </div>
               )}
             </div>
@@ -280,6 +283,18 @@ export function GameScreen() {
               </div>
             </div>
           </div>
+        )}
+
+        {tuning && (
+          <ExtractionPanel
+            map={songMap}
+            onApplied={(fresh) => {
+              // новая карта: ноты/контур другие, ручной октавный выбор сбрасываем
+              setSongMap(fresh);
+              setOctaveShift(null);
+            }}
+            onClose={() => setTuning(false)}
+          />
         )}
 
         {editing && editorWindow && (

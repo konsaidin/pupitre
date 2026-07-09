@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import math
 import subprocess
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable
 
@@ -24,14 +25,58 @@ log = logging.getLogger("pipeline")
 SR_ANALYSIS = 22050
 HOP = 256  # ~11.6 мс на кадр
 FRAME = 2048
-FMIN = 65.0  # C2
-FMAX = 1047.0  # C6
-MIN_NOTE_MS = 90
-MERGE_GAP_MS = 80
-SPLIT_SEMITONES = 0.75
 PITCHLINE_DECIMATE = 2  # прореживание контура f0 перед сохранением (кадры)
 
 ProgressCb = Callable[[str, int], None]  # (stage, progress 0..100)
+
+
+@dataclass(frozen=True)
+class ExtractParams:
+    """Настройки извлечения мелодии; крутятся ползунками в UI (reextract)."""
+
+    fmin: float = 65.0  # C2 — нижняя граница поиска высоты, Гц
+    fmax: float = 1047.0  # C6 — верхняя граница, Гц
+    gate_ratio: float = 0.05  # энергетический гейт: доля от p95 RMS
+    min_note_ms: int = 90  # ноты короче — отбрасываются
+    merge_gap_ms: int = 80  # склейка одинаковых нот через микропаузу
+    split_semitones: float = 0.75  # уход от медианы сегмента, рвущий ноту
+    median_width: int = 5  # ширина медианного сглаживания, кадров (нечётная)
+
+    @classmethod
+    def from_api(cls, payload: dict) -> "ExtractParams":
+        """camelCase-поля из UI → параметры; значения зажимаются в разумные рамки."""
+        def num(key: str, default: float, lo: float, hi: float) -> float:
+            v = payload.get(key, default)
+            if not isinstance(v, (int, float)) or isinstance(v, bool) or math.isnan(float(v)):
+                raise ValueError(f"{key}: ожидается число")
+            return min(hi, max(lo, float(v)))
+
+        d = cls()
+        fmin = num("fmin", d.fmin, 40.0, 500.0)
+        fmax = num("fmax", d.fmax, 200.0, 2000.0)
+        if fmax <= fmin + 50:  # pyin требует fmin < fmax; узкая щель бессмысленна
+            fmax = fmin + 50
+        width = int(num("medianWidth", d.median_width, 1, 21))
+        return cls(
+            fmin=fmin,
+            fmax=fmax,
+            gate_ratio=num("gateRatio", d.gate_ratio, 0.0, 0.5),
+            min_note_ms=int(num("minNoteMs", d.min_note_ms, 20, 500)),
+            merge_gap_ms=int(num("mergeGapMs", d.merge_gap_ms, 0, 500)),
+            split_semitones=num("splitSemitones", d.split_semitones, 0.1, 4.0),
+            median_width=width if width % 2 == 1 else width + 1,
+        )
+
+    def to_api(self) -> dict:
+        return {
+            "fmin": self.fmin,
+            "fmax": self.fmax,
+            "gateRatio": self.gate_ratio,
+            "minNoteMs": self.min_note_ms,
+            "mergeGapMs": self.merge_gap_ms,
+            "splitSemitones": self.split_semitones,
+            "medianWidth": self.median_width,
+        }
 
 
 def run_ffmpeg(args: list[str]) -> None:
@@ -112,7 +157,9 @@ def hz_to_midi(hz: np.ndarray) -> np.ndarray:
     return 69.0 + 12.0 * np.log2(hz / 440.0)
 
 
-def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], int, dict]:
+def extract_notes(
+    vocal_wav: Path, progress: ProgressCb, params: ExtractParams = ExtractParams()
+) -> tuple[list[dict], int, dict]:
     """pYIN f0 → сегментация в ноты.
 
     Возвращает (notes, duration_ms, pitchline), где pitchline — непрерывный контур
@@ -127,8 +174,8 @@ def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], in
 
     f0, voiced_flag, voiced_prob = librosa.pyin(
         y,
-        fmin=FMIN,
-        fmax=FMAX,
+        fmin=params.fmin,
+        fmax=params.fmax,
         sr=sr,
         frame_length=FRAME,
         hop_length=HOP,
@@ -140,7 +187,10 @@ def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], in
     rms = librosa.feature.rms(y=y, frame_length=FRAME, hop_length=HOP)[0]
     n = min(len(f0), len(rms))
     f0, voiced_flag, voiced_prob, rms = f0[:n], voiced_flag[:n], voiced_prob[:n], rms[:n]
-    active = rms > max(1e-4, float(np.percentile(rms[rms > 0], 95)) * 0.05) if np.any(rms > 0) else rms > 0
+    if np.any(rms > 0) and params.gate_ratio > 0:
+        active = rms > max(1e-4, float(np.percentile(rms[rms > 0], 95)) * params.gate_ratio)
+    else:
+        active = rms > 0
 
     # voiced_flag — решение витерби-декодера pyin; voiced_prob у librosa почти
     # всегда < 0.5 даже на чистом вокале, поэтому порог по нему не ставим
@@ -149,10 +199,10 @@ def extract_notes(vocal_wav: Path, progress: ProgressCb) -> tuple[list[dict], in
     midi[voiced] = hz_to_midi(f0[voiced])
 
     # медианное сглаживание внутри озвученных участков гасит выбросы детектора
-    midi = _median_smooth(midi, width=5)
+    midi = _median_smooth(midi, width=params.median_width)
 
     frame_ms = HOP / sr * 1000.0
-    notes = _segment(midi, frame_ms)
+    notes = _segment(midi, frame_ms, params)
     pitchline = _build_pitchline(midi, frame_ms)
     progress("analyze", 98)
     return notes, duration_ms, pitchline
@@ -184,7 +234,9 @@ def _median_smooth(x: np.ndarray, width: int) -> np.ndarray:
     return out
 
 
-def _segment(midi: np.ndarray, frame_ms: float) -> list[dict]:
+def _segment(
+    midi: np.ndarray, frame_ms: float, params: ExtractParams = ExtractParams()
+) -> list[dict]:
     """Нарезка f0-контура на ноты: рвём на паузах и при уходе от медианы сегмента."""
     raw: list[tuple[int, int, float]] = []  # (start_frame, end_frame, midi)
     seg_start = -1
@@ -207,7 +259,7 @@ def _segment(midi: np.ndarray, frame_ms: float) -> list[dict]:
             seg_values = [v]
             continue
         med = float(np.median(seg_values))
-        if abs(v - med) > SPLIT_SEMITONES:
+        if abs(v - med) > params.split_semitones:
             close(i)
             seg_start = i
             seg_values = [v]
@@ -220,7 +272,7 @@ def _segment(midi: np.ndarray, frame_ms: float) -> list[dict]:
     for start_f, end_f, m in raw:
         start_ms = start_f * frame_ms
         dur_ms = (end_f - start_f) * frame_ms
-        if dur_ms < MIN_NOTE_MS:
+        if dur_ms < params.min_note_ms:
             continue
         notes.append({"startMs": int(round(start_ms)), "durMs": int(round(dur_ms)), "midi": int(round(m))})
 
@@ -231,7 +283,7 @@ def _segment(midi: np.ndarray, frame_ms: float) -> list[dict]:
         if (
             prev
             and prev["midi"] == note["midi"]
-            and note["startMs"] - (prev["startMs"] + prev["durMs"]) < MERGE_GAP_MS
+            and note["startMs"] - (prev["startMs"] + prev["durMs"]) < params.merge_gap_ms
         ):
             prev["durMs"] = note["startMs"] + note["durMs"] - prev["startMs"]
         else:
@@ -318,6 +370,7 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
             "backing": {"kind": "url", "url": f"/api/songs/{meta.id}/instrumental"},
             "hasPitchline": True,
             "hasVocal": (d / "vocal.mp3").exists(),
+            "extract": ExtractParams().to_api(),
         }
         import json
 
@@ -340,3 +393,77 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
         meta.stage = "error"
         meta.error = str(e)[:500]
         store.save_meta(meta)
+
+
+def reextract_song(store: SongStore, meta: SongMeta, params: ExtractParams) -> None:
+    """Повторное снятие мелодии с новыми параметрами — только этап analyze.
+
+    Источник — сохранённый vocals.wav (без Demucs, быстро); если его нет
+    (старый трек или Demucs был недоступен) — декодируем оригинал заново.
+    При неудаче старая карта не трогается, песня остаётся играбельной.
+    """
+    import json
+
+    d = store.song_dir(meta.id)
+    old_status = meta.status
+
+    def progress(stage: str, pct: int) -> None:
+        meta.stage = stage
+        meta.progress = max(meta.progress, min(100, pct))
+        store.save_meta(meta)
+
+    tmp_mix: Path | None = None
+    try:
+        meta.status = "processing"
+        progress("analyze", 5)
+
+        vocal_wav = d / "vocals.wav"
+        if vocal_wav.exists():
+            src = vocal_wav
+        else:
+            original = store.original_path(meta.id)
+            if original is None:
+                raise RuntimeError("нет ни vocals.wav, ни исходного файла")
+            tmp_mix = d / "mix.wav"
+            decode_to_wav(original, tmp_mix)
+            src = tmp_mix
+        progress("analyze", 30)
+
+        notes, duration_ms, pitchline = extract_notes(src, progress, params)
+        if not notes:
+            raise RuntimeError("с этими настройками нот не нашлось — карта не изменена")
+
+        song_map = store.load_map(meta.id)
+        if song_map is None:
+            raise RuntimeError("карта не найдена")
+        song_map["notes"] = notes
+        song_map["durationMs"] = duration_ms
+        song_map["hasPitchline"] = True
+        song_map["extract"] = params.to_api()
+
+        # превью вокала могло не существовать (карта до появления фичи)
+        if vocal_wav.exists() and not (d / "vocal.mp3").exists():
+            encode_instrumental(vocal_wav, d / "vocal.mp3")
+        song_map["hasVocal"] = (d / "vocal.mp3").exists()
+
+        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False))
+        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False))
+
+        meta.duration_ms = duration_ms
+        meta.note_count = len(notes)
+        meta.low_midi = min(n["midi"] for n in notes)
+        meta.high_midi = max(n["midi"] for n in notes)
+        meta.status = "done"
+        meta.error = ""
+        progress("done", 100)
+    except Exception as e:  # noqa: BLE001 — сообщение должно дойти до UI
+        log.exception("reextract %s упал", meta.id)
+        # карта цела — возвращаем прежний статус, ошибку показываем текстом
+        meta.status = old_status if old_status == "done" else "done"
+        meta.stage = "done"
+        meta.progress = 100
+        meta.error = f"переснятие: {str(e)[:400]}"
+        store.save_meta(meta)
+    finally:
+        if tmp_mix is not None and tmp_mix.exists():
+            tmp_mix.unlink()
