@@ -48,22 +48,40 @@ async function download(url, dest, onProgress) {
   await pipeline(Readable.fromWeb(resp.body), counter, fs.createWriteStream(dest));
 }
 
+/** Список распаковщиков, которые стоит попробовать для данного архива. */
+function extractors(archive, destDir) {
+  const tar = ['tar', ['-xf', archive, '-C', destDir]];
+  if (!archive.endsWith('.zip')) return [tar];
+  if (!IS_WIN) return [['unzip', ['-o', archive, '-d', destDir]], tar];
+  // tar.exe на Windows 10+ — это bsdtar, он читает и zip.
+  // Expand-Archive оставлен запасным вариантом: одинарные кавычки обязательны,
+  // powershell.exe не понимает \" — так Node экранирует двойные кавычки.
+  return [
+    tar,
+    ['powershell', ['-NoProfile', '-NonInteractive', '-Command',
+      `$ErrorActionPreference='Stop'; Expand-Archive -Force -LiteralPath '${archive}' -DestinationPath '${destDir}'`]],
+  ];
+}
+
 function extract(archive, destDir) {
+  // Начинаем с чистого каталога: мусор от прошлой неудачной попытки иначе
+  // сойдёт за успешную распаковку — ниже мы судим именно по наличию файлов.
+  fs.rmSync(destDir, { recursive: true, force: true });
   fs.mkdirSync(destDir, { recursive: true });
-  if (archive.endsWith('.zip')) {
-    if (IS_WIN) {
-      const r = spawnSync('powershell', ['-NoProfile', '-Command',
-        `Expand-Archive -Force -Path "${archive}" -DestinationPath "${destDir}"`], { stdio: 'pipe' });
-      if (r.status !== 0) throw new Error(`Expand-Archive: ${r.stderr}`);
-    } else {
-      const r = spawnSync('unzip', ['-o', archive, '-d', destDir], { stdio: 'pipe' });
-      if (r.status !== 0) throw new Error(`unzip: ${r.stderr}`);
-    }
-  } else {
-    // .tar.gz / .tar.xz — системный tar есть и на Linux, и на Windows 10+
-    const r = spawnSync('tar', ['-xf', archive, '-C', destDir], { stdio: 'pipe' });
-    if (r.status !== 0) throw new Error(`tar: ${r.stderr}`);
+  const problems = [];
+  for (const [cmd, args] of extractors(archive, destDir)) {
+    const r = spawnSync(cmd, args, { stdio: 'pipe', windowsHide: true });
+    // Ни один признак по отдельности не надёжен: powershell -Command выходит с
+    // нулём даже после нетерминирующей ошибки Expand-Archive, а упавший tar
+    // успевает оставить часть файлов. Успех — это нулевой код И непустой каталог.
+    const ok = !r.error && r.status === 0;
+    if (ok && fs.readdirSync(destDir).length > 0) return;
+    const why = r.error ? r.error.message : String(r.stderr ?? '').trim() || `код ${r.status}`;
+    problems.push(`${cmd}: ${why || 'каталог пуст'}`);
+    fs.rmSync(destDir, { recursive: true, force: true });
+    fs.mkdirSync(destDir, { recursive: true });
   }
+  throw new Error(`не удалось распаковать ${path.basename(archive)} (${problems.join('; ')})`);
 }
 
 /** Рекурсивный поиск бинарника в распакованном архиве. */
@@ -91,6 +109,8 @@ class Backend {
     this.apiDir = apiDir;
     this.onStatus = onStatus;
     this.proc = null;
+    this.exitCode = null;
+    this.exitTail = '';
   }
 
   get port() {
@@ -118,6 +138,7 @@ class Backend {
     if (spawnSync(IS_WIN ? 'where' : 'which', ['ffmpeg'], { stdio: 'ignore' }).status === 0) return null;
     const ffBin = path.join(this.root, 'bin', IS_WIN ? 'ffmpeg.exe' : 'ffmpeg');
     if (fs.existsSync(ffBin)) return path.dirname(ffBin);
+    fs.mkdirSync(path.dirname(ffBin), { recursive: true });
     this.onStatus({ stage: 'download-ffmpeg' });
     const archive = path.join(this.root, 'tmp', path.basename(urls().ffmpeg));
     await download(urls().ffmpeg, archive, (p) => this.onStatus({ stage: 'download-ffmpeg', progress: p }));
@@ -132,7 +153,16 @@ class Backend {
 
   runUv(uvBin, args, stage) {
     return new Promise((resolve, reject) => {
-      const p = spawn(uvBin, args, { env: { ...process.env, UV_PYTHON_INSTALL_DIR: path.join(this.root, 'python') } });
+      const p = spawn(uvBin, args, {
+        windowsHide: true,
+        env: {
+          ...process.env,
+          UV_PYTHON_INSTALL_DIR: path.join(this.root, 'python'),
+          // Свой Python, а не найденный в системе: на Windows в PATH обычно
+          // висит заглушка из Microsoft Store, которая не годится под venv.
+          UV_PYTHON_PREFERENCE: 'only-managed',
+        },
+      });
       let tail = '';
       const onData = (buf) => {
         const line = buf.toString().trim().split('\n').pop() ?? '';
@@ -170,9 +200,12 @@ class Backend {
     return pythonBin;
   }
 
-  async waitHealthy(timeoutMs = 30000) {
+  // Первый старт долгий: uvicorn импортирует torch/demucs/librosa, на холодном
+  // диске это заметно больше полуминуты.
+  async waitHealthy(timeoutMs = 180000) {
     const t0 = Date.now();
     while (Date.now() - t0 < timeoutMs) {
+      if (this.exitCode != null) throw new Error(`uvicorn упал с кодом ${this.exitCode}: ${this.exitTail}`);
       try {
         const r = await fetch(`http://127.0.0.1:${PORT}/api/health`);
         if (r.ok) return;
@@ -202,20 +235,32 @@ class Backend {
       const ffDir = await this.ensureFfmpeg();
 
       this.onStatus({ stage: 'starting' });
-      const env = {
-        ...process.env,
-        SLOPSICIAN_DATA: path.join(this.root, 'data'),
-        PATH: (ffDir ? ffDir + path.delimiter : '') + process.env.PATH,
-      };
+      const env = { ...process.env, SLOPSICIAN_DATA: path.join(this.root, 'data') };
+      if (ffDir) {
+        // На Windows переменная называется Path; добавив второй ключ PATH,
+        // мы бы отдали дочернему процессу два разных значения одной переменной.
+        const key = Object.keys(env).find((k) => k.toUpperCase() === 'PATH') ?? 'PATH';
+        env[key] = ffDir + path.delimiter + (env[key] ?? '');
+      }
+      this.exitCode = null;
+      this.exitTail = '';
       this.proc = spawn(pythonBin, ['-m', 'uvicorn', 'app.main:app', '--port', String(PORT)], {
         cwd: this.apiDir,
         env,
+        windowsHide: true,
         stdio: ['ignore', 'pipe', 'pipe'],
       });
-      this.proc.stderr.on('data', (b) => console.log('[api]', b.toString().trim()));
+      this.proc.stderr.on('data', (b) => {
+        const s = b.toString().trim();
+        this.exitTail = s.slice(-300);
+        console.log('[api]', s);
+      });
       this.proc.on('close', (code) => {
         this.proc = null;
-        if (code !== null && code !== 0) this.onStatus({ stage: 'error', detail: `uvicorn exited ${code}` });
+        if (code !== null && code !== 0) {
+          this.exitCode = code;
+          this.onStatus({ stage: 'error', detail: `uvicorn exited ${code}: ${this.exitTail}` });
+        }
       });
       await this.waitHealthy();
       this.onStatus({ stage: 'ready' });
