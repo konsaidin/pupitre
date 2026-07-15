@@ -48,21 +48,19 @@ async function download(url, dest, onProgress) {
   await pipeline(Readable.fromWeb(resp.body), counter, fs.createWriteStream(dest));
 }
 
-function extract(archive, destDir) {
+async function extract(archive, destDir) {
   fs.mkdirSync(destDir, { recursive: true });
   if (archive.endsWith('.zip')) {
-    if (IS_WIN) {
-      const r = spawnSync('powershell', ['-NoProfile', '-Command',
-        `Expand-Archive -Force -Path "${archive}" -DestinationPath "${destDir}"`], { stdio: 'pipe' });
-      if (r.status !== 0) throw new Error(`Expand-Archive: ${r.stderr}`);
-    } else {
-      const r = spawnSync('unzip', ['-o', archive, '-d', destDir], { stdio: 'pipe' });
-      if (r.status !== 0) throw new Error(`unzip: ${r.stderr}`);
-    }
+    // чистый JS: системные распаковщики ненадёжны (wine, например, подсовывает
+    // заглушку powershell.exe, которая «успешно» ничего не делает)
+    await require('extract-zip')(archive, { dir: destDir });
   } else {
     // .tar.gz / .tar.xz — системный tar есть и на Linux, и на Windows 10+
     const r = spawnSync('tar', ['-xf', archive, '-C', destDir], { stdio: 'pipe' });
-    if (r.status !== 0) throw new Error(`tar: ${r.stderr}`);
+    if (r.status !== 0) throw new Error(`tar: ${String(r.stderr || r.error || r.status)}`);
+  }
+  if (fs.readdirSync(destDir).length === 0) {
+    throw new Error(`архив ${path.basename(archive)} распаковался пустым`);
   }
 }
 
@@ -104,7 +102,7 @@ class Backend {
     const archive = path.join(this.root, 'tmp', path.basename(urls().uv));
     await download(urls().uv, archive, (p) => this.onStatus({ stage: 'download-uv', progress: p }));
     const tmpDir = path.join(this.root, 'tmp', 'uv');
-    extract(archive, tmpDir);
+    await extract(archive, tmpDir);
     const found = findBin(tmpDir, IS_WIN ? 'uv.exe' : 'uv');
     if (!found) throw new Error('uv не найден в архиве');
     fs.mkdirSync(path.dirname(uvBin), { recursive: true });
@@ -122,7 +120,7 @@ class Backend {
     const archive = path.join(this.root, 'tmp', path.basename(urls().ffmpeg));
     await download(urls().ffmpeg, archive, (p) => this.onStatus({ stage: 'download-ffmpeg', progress: p }));
     const tmpDir = path.join(this.root, 'tmp', 'ffmpeg');
-    extract(archive, tmpDir);
+    await extract(archive, tmpDir);
     const found = findBin(tmpDir, IS_WIN ? 'ffmpeg.exe' : 'ffmpeg');
     if (!found) throw new Error('ffmpeg не найден в архиве');
     fs.copyFileSync(found, ffBin);
