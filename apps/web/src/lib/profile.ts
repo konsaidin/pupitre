@@ -1,6 +1,6 @@
 // Профиль пользователя в localStorage: диапазон голоса, настройки, результаты.
 
-import { DEFAULT_MIC, type MicOptions } from '../audio/PitchTracker';
+import { DEFAULT_MIC, type MicOptions } from '../audio/AudioInput';
 import type { VocalRange } from './music';
 import type { Difficulty } from './songMap';
 
@@ -30,6 +30,8 @@ export interface Profile {
   guideNotes: boolean;
   metronome: boolean;
   headphonesWarned: boolean;
+  /** главный вид игры: лента вокала (курс 2) или классический пиано-ролл */
+  vocalView: 'ribbon' | 'roll';
   scores: ScoreRecord[];
 }
 
@@ -48,6 +50,7 @@ const DEFAULTS: Profile = {
   guideNotes: true,
   metronome: true,
   headphonesWarned: false,
+  vocalView: 'ribbon',
   scores: [],
 };
 
@@ -72,7 +75,7 @@ export function addScore(p: Profile, rec: ScoreRecord): Profile {
   return next;
 }
 
-/** Настройки микрофона из профиля — для PitchTracker.start. */
+/** Настройки микрофона из профиля — для AudioInput.start. */
 export function micOptions(p: Profile): MicOptions {
   return {
     noiseSuppression: p.micNoiseSuppression,

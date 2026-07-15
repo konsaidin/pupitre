@@ -1,7 +1,7 @@
 // Игровой движок: мастер-часы (AudioContext), аккомпанемент, приём голоса,
 // скоринг в реальном времени, пауза/резюм, итог.
 
-import type { PitchFrame, PitchTracker } from '../audio/PitchTracker';
+import type { AnalysisFrame, AudioInput } from '../audio/AudioInput';
 import { Synth } from '../audio/synth';
 import { contourMidiAt } from '../lib/pitchline';
 import type { SongMap, Difficulty } from '../lib/songMap';
@@ -14,6 +14,14 @@ export interface TrailPoint {
   /** дробный midi для отрисовки (октавно свёрнутый при матчинге) */
   midi: number;
   inTolerance: boolean;
+  /** сырой midi минус сглаженный: волнистость ленты (вибрато/шероховатость) */
+  rawOffset: number;
+  /** громкость, dBFS — толщина ленты */
+  loudDb: number;
+  /** вибрато активно в этом кадре */
+  vibrato: boolean;
+  /** score расщепления 0..1 — рваная текстура ленты */
+  distortion: number;
 }
 
 export interface JudgementEvent {
@@ -31,7 +39,7 @@ interface NoteState {
 
 export interface EngineOptions {
   ctx: AudioContext;
-  tracker: PitchTracker;
+  input: AudioInput;
   map: SongMap;
   difficulty: Difficulty;
   latencyMs: number;
@@ -61,6 +69,8 @@ export class GameEngine {
   results: (NoteResult | null)[];
   /** последний голосовой кадр для HUD/индикаторов */
   lastFrame: { songMs: number; midi: number; voiced: boolean; cents: number | null } | null = null;
+  /** последний полный кадр анализа — техники для бейджей ленты */
+  lastAnalysis: AnalysisFrame | null = null;
 
   private opts: EngineOptions;
   private synth: Synth;
@@ -185,7 +195,7 @@ export class GameEngine {
     this.startCtxTime = ctx.currentTime + leadSec - fromMs / 1000;
     this.phase = 'countdown';
     this.scheduleBacking(fromMs);
-    this.unsubscribe = this.opts.tracker.onFrame((f) => this.onPitchFrame(f));
+    this.unsubscribe = this.opts.input.onFrame((f) => this.onPitchFrame(f));
   }
 
   private scheduleBacking(fromMs: number): void {
@@ -229,8 +239,9 @@ export class GameEngine {
     this.backingSource = null;
   }
 
-  private onPitchFrame(f: PitchFrame): void {
+  private onPitchFrame(f: AnalysisFrame): void {
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
+    this.lastAnalysis = f;
     // компенсация задержки тракта: голос "звучал" чуть раньше, чем дошёл до нас
     const songMs = (f.t - this.startCtxTime) * 1000 - this.opts.latencyMs;
     if (songMs < 0) return;
@@ -268,7 +279,19 @@ export class GameEngine {
       }
     }
     this.lastFrame = { songMs, midi: displayMidi, voiced: true, cents };
-    this.trail.push({ songMs, midi: displayMidi, inTolerance: inTol });
+    // rawOffset — дельта сырого контура к сглаженному: переживает октавную
+    // свёртку displayMidi и несёт волну вибрато/шероховатость для ленты
+    const rawOffset =
+      Number.isNaN(f.midiRaw) || Number.isNaN(f.midi) ? 0 : f.midiRaw - f.midi;
+    this.trail.push({
+      songMs,
+      midi: displayMidi,
+      inTolerance: inTol,
+      rawOffset,
+      loudDb: f.loudDb,
+      vibrato: f.vibrato.active,
+      distortion: f.distortion.score,
+    });
   }
 
   private findActiveNote(songMs: number): number {

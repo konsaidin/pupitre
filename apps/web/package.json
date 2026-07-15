@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:dsp": "cargo build --release --target wasm32-unknown-unknown --manifest-path ../../packages/dsp/Cargo.toml && cp ../../packages/dsp/target/wasm32-unknown-unknown/release/slopsician_dsp.wasm src/assets/dsp.wasm",
     "preview": "vite preview"
   },
   "dependencies": {

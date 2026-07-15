@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
-import { DEFAULT_MIC } from '../audio/PitchTracker';
+import { ensureMic, getAudioContext, getAudioInput, stopMic } from '../audio/audioSession';
+import { DEFAULT_MIC, type AudioDevice } from '../audio/AudioInput';
 import { Synth } from '../audio/synth';
 import { RangeSlider } from '../components/fx/RangeSlider';
 import { getApiBase, setApiBase } from '../lib/api';
@@ -20,7 +20,7 @@ const CLICK_INTERVAL = 0.6; // сек (100 BPM)
 export function SettingsScreen() {
   const { profile, update } = useProfile();
   const navigate = useNavigate();
-  const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+  const [devices, setDevices] = useState<AudioDevice[]>([]);
   const [calibrating, setCalibrating] = useState(false);
   const [calStatus, setCalStatus] = useState<string | null>(null);
   const [monitoring, setMonitoring] = useState(false);
@@ -38,9 +38,9 @@ export function SettingsScreen() {
     (async () => {
       try {
         setMicError(null);
-        const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
+        const input = await ensureMic(profile.micDeviceId, micOptions(profile));
         if (cancelled) return;
-        unsub = tracker.onFrame((f) => {
+        unsub = input.onFrame((f) => {
           const fill = meterFillRef.current;
           const state = meterStateRef.current;
           if (!fill || !state) return;
@@ -49,11 +49,14 @@ export function SettingsScreen() {
           const pct = Math.min(100, Math.max(0, ((db + 60) / 50) * 100));
           fill.style.width = `${pct}%`;
           fill.style.background = f.voiced ? 'var(--green)' : 'var(--accent)';
-          state.textContent = f.voiced
-            ? t('voice: {note} · clarity {pct}%', { note: midiToName(Math.round(f.midi)), pct: (f.clarity * 100).toFixed(0) })
-            : f.rms >= profile.micGateRms
-              ? t('sound detected, but it’s not a clear note (below clarity threshold)')
-              : t('silence (below the gate)');
+          const lat = input.latencyMs();
+          const latText = Number.isNaN(lat) ? '' : ` · ${t('mic path ~{ms} ms', { ms: Math.round(lat) })}`;
+          state.textContent =
+            (f.voiced
+              ? t('voice: {note} · clarity {pct}%', { note: midiToName(Math.round(f.midi)), pct: (f.clarity * 100).toFixed(0) })
+              : f.rms >= profile.micGateRms
+                ? t('sound detected, but it’s not a clear note (below clarity threshold)')
+                : t('silence (below the gate)')) + latText;
         });
       } catch (e) {
         setMicError(e instanceof Error ? e.message : t('Could not open the microphone'));
@@ -75,9 +78,9 @@ export function SettingsScreen() {
   const gatePct = Math.min(100, Math.max(0, ((gateDb + 60) / 50) * 100));
 
   useEffect(() => {
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((all) => setDevices(all.filter((d) => d.kind === 'audioinput')))
+    getAudioInput()
+      .listDevices()
+      .then(setDevices)
       .catch(() => setDevices([]));
     return () => {
       cancelRef.current = true;
@@ -91,7 +94,7 @@ export function SettingsScreen() {
     cancelRef.current = false;
     try {
       const ctx = getAudioContext();
-      const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
+      const input = await ensureMic(profile.micDeviceId, micOptions(profile));
       const synth = new Synth(ctx, 0.6);
       const t0 = ctx.currentTime + 1;
       const clickTimes: number[] = [];
@@ -103,7 +106,7 @@ export function SettingsScreen() {
       // ловим онсеты голоса: переход из тишины в voiced
       const onsets: number[] = [];
       let wasVoiced = false;
-      const unsub = tracker.onFrame((f) => {
+      const unsub = input.onFrame((f) => {
         if (f.voiced && !wasVoiced) onsets.push(f.t);
         wasVoiced = f.voiced;
       });
@@ -149,7 +152,7 @@ export function SettingsScreen() {
         >
           <option value="">{t('Default')}</option>
           {devices.map((d) => (
-            <option key={d.deviceId} value={d.deviceId}>{d.label || t('Microphone {id}', { id: d.deviceId.slice(0, 6) })}</option>
+            <option key={d.id} value={d.id}>{d.label || t('Microphone {id}', { id: d.id.slice(0, 6) })}</option>
           ))}
         </select>
         <p className="dim small">{t('If the names are empty — grant mic access (the “Test” button below) and come back.')}</p>

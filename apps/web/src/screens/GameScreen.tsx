@@ -7,6 +7,7 @@ import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
 import { ExtractionPanel } from '../components/ExtractionPanel';
 import { PianoRoll } from '../components/PianoRoll';
 import { SeekBar } from '../components/SeekBar';
+import { VocalRibbon } from '../components/VocalRibbon';
 import { SongEditor } from '../components/SongEditor';
 import { GameEngine } from '../game/engine';
 import { chooseOctaveShift, rollWindow, shiftNotes, shiftPitchline } from '../game/octave';
@@ -133,7 +134,7 @@ export function GameScreen() {
     setError(null);
     try {
       const ctx = getAudioContext();
-      const tracker = await ensureMic(profile.micDeviceId, micOptions(profile));
+      const input = await ensureMic(profile.micDeviceId, micOptions(profile));
       if (engineMap.backing.kind === 'url' && backingBufferRef.current?.url !== engineMap.backing.url) {
         const resp = await fetch(engineMap.backing.url);
         if (!resp.ok) throw new Error(t('Could not load the backing track ({status})', { status: resp.status }));
@@ -146,7 +147,7 @@ export function GameScreen() {
       const engRef: { current: GameEngine | null } = { current: null };
       const eng = new GameEngine({
         ctx,
-        tracker,
+        input,
         map: engineMap,
         difficulty,
         latencyMs: profile.latencyMs,
@@ -269,6 +270,20 @@ export function GameScreen() {
             <button className="btn tiny" disabled={status === 'running'} onClick={() => { setOctaveShift(shift + 1); restart(); }}>+</button>
           </div>
         )}
+        <div className="seg" title={t('View: vocal ribbon or piano roll')}>
+          <button
+            className={profile.vocalView === 'ribbon' ? 'seg-btn active' : 'seg-btn'}
+            onClick={() => update({ vocalView: 'ribbon' })}
+          >
+            {t('Ribbon')}
+          </button>
+          <button
+            className={profile.vocalView === 'roll' ? 'seg-btn active' : 'seg-btn'}
+            onClick={() => update({ vocalView: 'roll' })}
+          >
+            {t('Roll')}
+          </button>
+        </div>
         <div className="hud">
           <span className="hud-score">{hud.score}</span>
           {hud.combo > 1 && <span className="hud-combo">×{hud.combo}</span>}
@@ -280,7 +295,12 @@ export function GameScreen() {
       <div className="game-progress"><div style={{ width: `${hud.progress * 100}%` }} /></div>
 
       <div className="game-stage">
-        {engine && <PianoRoll engine={engine} window={window_} lineMode={lineOn} />}
+        {engine &&
+          (profile.vocalView === 'roll' ? (
+            <PianoRoll engine={engine} window={window_} lineMode={lineOn} />
+          ) : (
+            <VocalRibbon engine={engine} window={window_} lineMode={lineOn} />
+          ))}
 
         {status === 'setup' && !editing && !tuning && (
           <div className="overlay">
