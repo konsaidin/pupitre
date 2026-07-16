@@ -9,9 +9,10 @@
   "main": "main.js",
   "scripts": {
     "copy-web": "node copy-web.mjs",
-    "dev": "npm run copy-web && electron .",
-    "pack": "npm run copy-web && electron-builder --dir",
-    "dist": "npm run copy-web && electron-builder"
+    "build:native": "node ../../packages/native-audio/build.mjs",
+    "dev": "npm run copy-web && (npm run build:native || echo native-audio: сборка не удалась, будет worklet-путь) && electron .",
+    "pack": "npm run copy-web && npm run build:native && electron-builder --dir",
+    "dist": "npm run copy-web && npm run build:native && electron-builder"
   },
   "devDependencies": {
     "electron": "^33.2.1",
@@ -27,9 +28,17 @@
       "main.js",
       "backend.js",
       "preload.js",
+      "native-audio.js",
       "dist-web/**"
     ],
     "extraResources": [
+      {
+        "from": "../../packages/native-audio",
+        "to": "native",
+        "filter": [
+          "*.node"
+        ]
+      },
       {
         "from": "../../services/api/app",
         "to": "api/app",

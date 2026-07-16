@@ -14,3 +14,19 @@ contextBridge.exposeInMainWorld('desktop', {
     return () => ipcRenderer.removeListener('backend-status', listener);
   },
 });
+
+// нативный захват (этап 4): мост появляется только когда main загрузил аддон;
+// рендерер по наличию window.nativeAudio выбирает бэкенд AudioInput
+if (process.argv.includes('--slopsician-native-audio')) {
+  contextBridge.exposeInMainWorld('nativeAudio', {
+    listDevices: () => ipcRenderer.invoke('native-audio:list'),
+    start: (opts) => ipcRenderer.invoke('native-audio:start', opts),
+    stop: () => ipcRenderer.invoke('native-audio:stop'),
+    setGate: (gateRms, gateClarity) => ipcRenderer.send('native-audio:gate', { gateRms, gateClarity }),
+    onFrames(cb) {
+      const listener = (_e, batch) => cb(batch);
+      ipcRenderer.on('native-audio:frames', listener);
+      return () => ipcRenderer.removeListener('native-audio:frames', listener);
+    },
+  });
+}

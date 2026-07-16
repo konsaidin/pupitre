@@ -1,0 +1,25 @@
+[package]
+name = "slopsician-native-audio"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "slopsician_native_audio"
+crate-type = ["cdylib"]
+
+[dependencies]
+# win_delay_load_hook обязателен для Electron на Windows: N-API-символы
+# резолвятся в electron.exe, а не в node.exe — без хука аддон не загрузится
+napi = { version = "2", default-features = false, features = ["napi8", "win_delay_load_hook"] }
+napi-derive = "2"
+cpal = "0.15"
+slopsician-dsp = { path = "../dsp" }
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

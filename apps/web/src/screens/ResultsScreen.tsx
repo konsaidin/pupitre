@@ -51,6 +51,13 @@ export function ResultsScreen() {
         <span className="v good">Good {s.good}</span>
         <span className="v miss">Miss {s.miss}</span>
       </div>
+      {(s.tech.vibratoMs >= 500 || s.tech.distortionMs >= 500) && (
+        <p className="dim tech-stats">
+          {s.tech.vibratoMs >= 500 && `〜 ${t('vibrato')} ${(s.tech.vibratoMs / 1000).toFixed(1)} ${t('s')}`}
+          {s.tech.vibratoMs >= 500 && s.tech.distortionMs >= 500 && ' · '}
+          {s.tech.distortionMs >= 500 && `⚡ ${t('rasp')} ${(s.tech.distortionMs / 1000).toFixed(1)} ${t('s')}`}
+        </p>
+      )}
       <ResultGraph st={st} />
       <div className="btn-row">
         <button className="btn primary" onClick={() => navigate('/play', { state: st.playState })}>{t('Try again')}</button>

@@ -50,7 +50,9 @@ export function SettingsScreen() {
           fill.style.width = `${pct}%`;
           fill.style.background = f.voiced ? 'var(--green)' : 'var(--accent)';
           const lat = input.latencyMs();
-          const latText = Number.isNaN(lat) ? '' : ` · ${t('mic path ~{ms} ms', { ms: Math.round(lat) })}`;
+          const latText = Number.isNaN(lat)
+            ? ''
+            : ` · ${t('mic path ~{ms} ms', { ms: Math.round(lat) })} · ${input.kind}`;
           state.textContent =
             (f.voiced
               ? t('voice: {note} · clarity {pct}%', { note: midiToName(Math.round(f.midi)), pct: (f.clarity * 100).toFixed(0) })

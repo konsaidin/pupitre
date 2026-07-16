@@ -60,6 +60,8 @@ export interface AudioDevice {
 }
 
 export interface AudioInput {
+  /** имя бэкенда для монитора настроек */
+  readonly kind: 'worklet' | 'native';
   /** Доступные устройства захвата (метки — после выдачи разрешения). */
   listDevices(): Promise<AudioDevice[]>;
   start(deviceId: string | null, opts?: MicOptions): Promise<void>;
@@ -69,4 +71,31 @@ export interface AudioInput {
   setGate(gateRms: number, gateClarity: number): void;
   /** Фактическая задержка тракта захват→кадр, мс; NaN пока не измерена. */
   latencyMs(): number;
+}
+
+/** Число f32 на кадр — контракт с AnalysisFrame::write в packages/dsp. */
+export const FRAME_FLOATS = 15;
+/** Окно YIN ядра: оценка усреднена по окну — врождённая задержка анализа. */
+export const YIN_WIN = 1024;
+
+/** Декодирование кадра из плоской укладки ядра; tBase прибавляется к t кадра. */
+export function decodeFrame(flat: Float32Array, o: number, tBase: number): AnalysisFrame {
+  return {
+    t: tBase + flat[o],
+    hz: flat[o + 1],
+    midi: flat[o + 2],
+    midiRaw: flat[o + 3],
+    clarity: flat[o + 4],
+    rms: flat[o + 5],
+    voiced: flat[o + 6] > 0.5,
+    loudDb: flat[o + 7],
+    vibrato: {
+      active: flat[o + 8] > 0.5,
+      rateHz: flat[o + 9],
+      depthCents: flat[o + 10],
+      regularity: flat[o + 11],
+    },
+    distortion: { active: flat[o + 12] > 0.5, score: flat[o + 13] },
+    breathiness: flat[o + 14],
+  };
 }

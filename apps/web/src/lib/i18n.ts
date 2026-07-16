@@ -103,6 +103,11 @@ export const RU: Record<string, string> = {
   'P4': 'ч4',
   'P5': 'ч5',
   'octave': 'октава',
+  'Techniques': 'Техники',
+  'Vibrato hold': 'Удержание вибрато',
+  'Hold a long note with vibrato — only the time with active vibrato counts.':
+    'Держи длинную ноту с вибрато — засчитывается только время с активным вибрато.',
+  's': 'с',
   'Tempo': 'Темп',
   'Key (root note)': 'Тональность (нижняя нота)',
   'Repeats': 'Повторы',

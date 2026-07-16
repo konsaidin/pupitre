@@ -1,0 +1,43 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>native-audio e2e</title>
+<script>
+  // тот же расчёт, что в NativeAudioInput.latencyMs(): пол-окна YIN + EMA
+  // возраста кадра при доставке (драйвер + IPC)
+  (async () => {
+    try {
+      const b = window.nativeAudio;
+      if (!b) throw new Error('window.nativeAudio отсутствует');
+      const devices = await b.listDevices();
+      const info = await b.start({ deviceId: null, gateRms: 0.006, gateClarity: 0.6 });
+      let lag = NaN;
+      let batches = 0;
+      let frames = 0;
+      const unsub = b.onFrames((batch) => {
+        const transit = Math.max(0, Date.now() - batch.postedAtMs);
+        const l = batch.ageMs + transit;
+        lag = Number.isNaN(lag) ? l : lag + 0.1 * (l - lag);
+        batches++;
+        frames += batch.frames.length / 15;
+      });
+      await new Promise((r) => setTimeout(r, 2000));
+      unsub();
+      await b.stop();
+      const analysisMs = (1024 / 2 / info.sampleRate) * 1000;
+      console.log(
+        'E2E_RESULT ' +
+          JSON.stringify({
+            devices: devices.length,
+            device: info.device,
+            sampleRate: info.sampleRate,
+            batches,
+            framesPerSec: Math.round(frames / 2),
+            lagMs: +lag.toFixed(2),
+            latencyMs: +(analysisMs + lag).toFixed(1),
+          }),
+      );
+    } catch (e) {
+      console.log('E2E_ERROR ' + (e && e.message ? e.message : String(e)));
+    }
+  })();
+</script>

@@ -5,13 +5,22 @@ import type { AnalysisFrame, AudioInput } from '../audio/AudioInput';
 import { Synth } from '../audio/synth';
 import { contourMidiAt } from '../lib/pitchline';
 import type { SongMap, Difficulty } from '../lib/songMap';
-import { matchPitch, judge, notePoints, summarize, type GameSummary, type NoteResult, type Judgement } from './scoring';
+import {
+  matchPitch,
+  judge,
+  notePoints,
+  summarize,
+  type GameSummary,
+  type NoteResult,
+  type Judgement,
+  type TechStats,
+} from './scoring';
 
 export type GamePhase = 'idle' | 'countdown' | 'playing' | 'paused' | 'finished';
 
 export interface TrailPoint {
   songMs: number;
-  /** дробный midi для отрисовки (октавно свёрнутый при матчинге) */
+  /** дробный midi для отрисовки (с липкой октавной свёрткой к цели) */
   midi: number;
   inTolerance: boolean;
   /** сырой midi минус сглаженный: волнистость ленты (вибрато/шероховатость) */
@@ -71,6 +80,8 @@ export class GameEngine {
   lastFrame: { songMs: number; midi: number; voiced: boolean; cents: number | null } | null = null;
   /** последний полный кадр анализа — техники для бейджей ленты */
   lastAnalysis: AnalysisFrame | null = null;
+  /** суммарное время техник за игру (в итоги) */
+  readonly techStats: TechStats = { vibratoMs: 0, distortionMs: 0 };
 
   private opts: EngineOptions;
   private synth: Synth;
@@ -80,6 +91,10 @@ export class GameEngine {
   private noteStates: NoteState[];
   private unsubscribe: (() => void) | null = null;
   private finished = false;
+  /** липкая октавная поправка отображения (кратна 12) — см. matchPitch */
+  private foldOffset = 0;
+  /** t предыдущего голосового кадра — шаг времени для статистики техник */
+  private lastVoicedT: number | null = null;
 
   constructor(opts: EngineOptions) {
     this.opts = opts;
@@ -252,10 +267,21 @@ export class GameEngine {
     if (!f.voiced) {
       this.lastFrame = { songMs, midi: NaN, voiced: false, cents: null };
       if (note) this.noteStates[noteIdx].lastFrameT = f.t;
+      this.lastVoicedT = null;
       return;
     }
 
-    let displayMidi = f.midi;
+    // статистика техник: время с активным вибрато/расщеплением
+    const techDt =
+      this.lastVoicedT !== null ? Math.min((f.t - this.lastVoicedT) * 1000, MAX_FRAME_DT_MS) : 11;
+    this.lastVoicedT = f.t;
+    if (f.vibrato.active) this.techStats.vibratoMs += techDt;
+    if (f.distortion.active) this.techStats.distortionMs += techDt;
+
+    // вне ноты (и в разрывах контура) держим последнюю октавную поправку:
+    // иначе точка телепортирует на ±12 на каждой границе ноты, если поёшь
+    // не в октаве карты
+    let displayMidi = f.midi + this.foldOffset;
     let inTol = false;
     let cents: number | null = null;
     if (note) {
@@ -266,10 +292,14 @@ export class GameEngine {
           : note.midi;
       const st = this.noteStates[noteIdx];
       if (target !== null) {
-        const m = matchPitch(f.midi, target, this.opts.difficulty);
+        const m = matchPitch(f.midi, target, this.opts.difficulty, this.foldOffset);
+        this.foldOffset = m.fold;
         displayMidi = m.displayMidi;
-        inTol = m.inTolerance;
         cents = m.cents;
+        // нота с требуемой техникой: попадание только пока техника активна —
+        // и в счёте времени, и в цвете ленты (обратная связь честная)
+        const techOk = note.tech !== 'vibrato' || f.vibrato.active;
+        inTol = m.inTolerance && techOk;
         const dt = st.lastFrameT !== null ? Math.min((f.t - st.lastFrameT) * 1000, MAX_FRAME_DT_MS) : 11;
         st.lastFrameT = f.t;
         if (inTol) st.inTolMs += dt;
@@ -337,6 +367,6 @@ export class GameEngine {
     this.unsubscribe?.();
     this.unsubscribe = null;
     const results = this.results.filter((r): r is NoteResult => r !== null);
-    this.opts.onFinish(summarize(results, this.score, this.maxCombo));
+    this.opts.onFinish(summarize(results, this.score, this.maxCombo, this.techStats));
   }
 }

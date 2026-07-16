@@ -21,6 +21,10 @@ interface Props {
 const KEYBOARD_W = 56;
 const NOW_FRAC = 0.3;
 const TRAIL_MS = 3000;
+/** перепад между соседними точками хвоста, при котором линию рвём:
+ *  голос не прыгает на пол-октавы за кадр ~5 мс — это октавный телепорт
+ *  свёртки или срыв детектора, соединять его вертикальной «иглой» нельзя */
+const TRAIL_BREAK_SEMIS = 6;
 
 const C = {
   bg: '#0d1117',
@@ -174,11 +178,12 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
           }
         }
 
-        if (n.lyric && x2 - x1 > 20) {
+        const label = n.vibrato && !n.lyric?.includes('〜') ? `${n.lyric ?? ''}〜` : n.lyric;
+        if (label && x2 - x1 > 20) {
           ctx2d.fillStyle = C.text;
           ctx2d.font = '12px system-ui, sans-serif';
           ctx2d.textBaseline = 'top';
-          ctx2d.fillText(n.lyric, Math.max(x1, KEYBOARD_W) + 4, y + h / 2 + 3);
+          ctx2d.fillText(label, Math.max(x1, KEYBOARD_W) + 4, y + h / 2 + 3);
         }
       }
 
@@ -241,6 +246,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       const trailPaths: (Path2D | undefined)[] = [];
       let prevX = 0;
       let prevY = 0;
+      let prevMidi = 0;
       let hasPrev = false;
       for (let i = trail.length - 1; i >= 0; i--) {
         const p = trail[i];
@@ -249,7 +255,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         const x = msToX(p.songMs);
         if (x < KEYBOARD_W) break;
         const y = midiToY(p.midi);
-        if (hasPrev && Math.abs(prevX - x) < 40) {
+        if (hasPrev && Math.abs(prevX - x) < 40 && Math.abs(prevMidi - p.midi) < TRAIL_BREAK_SEMIS) {
           const bucket = Math.min(3, Math.floor((age / TRAIL_MS) * 4)) + (p.inTolerance ? 4 : 0);
           const path = (trailPaths[bucket] ??= new Path2D());
           path.moveTo(prevX, prevY);
@@ -257,6 +263,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         }
         prevX = x;
         prevY = y;
+        prevMidi = p.midi;
         hasPrev = true;
       }
       ctx2d.lineWidth = 2.5;

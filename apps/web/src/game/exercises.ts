@@ -16,7 +16,7 @@ export interface ExerciseDef {
   title: string;
   description: string;
   icon: string;
-  category: 'Warm-ups' | 'Scales' | 'Ear training';
+  category: 'Warm-ups' | 'Scales' | 'Ear training' | 'Techniques';
   defaultBpm: number;
   defaultRepeats: number;
   maxRepeats: number;
@@ -182,6 +182,38 @@ function buildLongTones(range: VocalRange, opts: ExerciseOptions): SongMap {
   return buildRising('long-tones', 'Long tones', pattern, range, opts, 2);
 }
 
+/**
+ * Удержание вибрато: длинная нота (~4 с), время в допуске идёт только
+ * при активном вибрато (детектор ядра: ≥20 центов, 4–8 Гц). Perfect ≈
+ * «держал вибрато ≥80% ноты», т.е. ≥3 с — приёмка этапа 6.
+ */
+function buildVibratoHold(range: VocalRange, opts: ExerciseOptions): SongMap {
+  const zone = comfortZone(range);
+  const beatMs = 60000 / opts.bpm;
+  const holdMs = Math.max(3800, Math.round(4 * beatMs));
+  const center = opts.rootMidi ?? Math.round((zone.lowMidi + zone.highMidi) / 2);
+  const degrees = [0, 2, -2, 4]; // немного двигаемся между повторами
+  const notes: MapNote[] = [];
+  let t = 0;
+  for (let rep = 0; rep < opts.repeats; rep++) {
+    const midi = Math.min(zone.highMidi, Math.max(zone.lowMidi, center + degrees[rep % degrees.length]));
+    notes.push({ startMs: Math.round(t), durMs: holdMs, midi, lyric: 'a〜', tech: 'vibrato' });
+    t += holdMs + 2 * beatMs;
+  }
+  const leadInMs = Math.round(4 * beatMs);
+  const shifted = notes.map((n) => ({ ...n, startMs: n.startMs + leadInMs }));
+  return {
+    id: `vibrato-hold@${opts.bpm}x${opts.repeats}r${center}`,
+    title: 'Vibrato hold',
+    subtitle: `${midiToName(center)} · ${opts.bpm} BPM`,
+    durationMs: (shifted.at(-1)?.startMs ?? 0) + (shifted.at(-1)?.durMs ?? 0) + Math.round(2 * beatMs),
+    notes: shifted,
+    backing: { kind: 'synth', guideNotes: true },
+    bpm: opts.bpm,
+    leadInMs,
+  };
+}
+
 export const EXERCISES: ExerciseDef[] = [
   {
     id: 'long-tones',
@@ -259,5 +291,16 @@ export const EXERCISES: ExerciseDef[] = [
     defaultRepeats: 4,
     maxRepeats: 10,
     build: buildIntervals,
+  },
+  {
+    id: 'vibrato-hold',
+    title: 'Vibrato hold',
+    description: 'Hold a long note with vibrato — only the time with active vibrato counts.',
+    icon: '〰️',
+    category: 'Techniques',
+    defaultBpm: 60,
+    defaultRepeats: 4,
+    maxRepeats: 8,
+    build: buildVibratoHold,
   },
 ];

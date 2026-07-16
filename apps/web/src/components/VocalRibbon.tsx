@@ -31,6 +31,10 @@ const WIDTH_MAX = 22;
 const WIGGLE_CLAMP_SEMIS = 1.5;
 /** ступени затухания хвоста по возрасту */
 const AGE_BUCKETS = 3;
+/** перепад между соседними точками хвоста, при котором ленту рвём:
+ *  голос не прыгает на пол-октавы за кадр ~5 мс — это октавный телепорт
+ *  свёртки или срыв детектора, тянуть ленту вертикальной «иглой» нельзя */
+const TRAIL_BREAK_SEMIS = 6;
 
 const C = {
   bg: '#0d1117',
@@ -192,11 +196,12 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
               ctx2d.stroke();
             }
           }
-          if (n.lyric && x2 - x1 > 20) {
+          const label = n.vibrato && !n.lyric?.includes('〜') ? `${n.lyric ?? ''}〜` : n.lyric;
+          if (label && x2 - x1 > 20) {
             ctx2d.fillStyle = C.text;
             ctx2d.font = '12px system-ui, sans-serif';
             ctx2d.textBaseline = 'top';
-            ctx2d.fillText(n.lyric, Math.max(x1, PAD_L) + 2, y + 7);
+            ctx2d.fillText(label, Math.max(x1, PAD_L) + 2, y + 7);
           }
         }
         ctx2d.lineWidth = 1;
@@ -258,6 +263,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
       let py = 0;
       let pw = 0;
       let pj = 0;
+      let pMidi = 0;
       let hasPrev = false;
       for (let i = trail.length - 1; i >= 0; i--) {
         const p = trail[i];
@@ -269,7 +275,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
         const y = midiToY(p.midi + wiggle);
         const w = loudToW(p.loudDb);
         const j = p.distortion > 0.25 ? jag(i) * (2 + 4 * p.distortion) : 0;
-        if (hasPrev && Math.abs(px - x) < 40) {
+        if (hasPrev && Math.abs(px - x) < 40 && Math.abs(pMidi - p.midi) < TRAIL_BREAK_SEMIS) {
           const ageB = Math.min(AGE_BUCKETS - 1, Math.floor((age / trailMs) * AGE_BUCKETS));
           const bucket =
             ageB + (p.inTolerance ? AGE_BUCKETS : 0) + (p.distortion > 0.4 ? AGE_BUCKETS * 2 : 0);
@@ -284,6 +290,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
         py = y;
         pw = w;
         pj = j;
+        pMidi = p.midi;
         hasPrev = true;
       }
       for (let b = 0; b < AGE_BUCKETS * 4; b++) {

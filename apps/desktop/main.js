@@ -5,8 +5,10 @@
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
 const path = require('node:path');
 const { Backend, PORT } = require('./backend');
+const { initNativeAudio } = require('./native-audio');
 
 let backend = null;
+let nativeAudioReady = false;
 let lastStatus = { stage: 'starting' };
 const statusSubscribers = new Set();
 
@@ -28,7 +30,10 @@ function createWindow() {
     title: 'Slopsician',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      additionalArguments: [`--slopsician-api=http://127.0.0.1:${PORT}`],
+      additionalArguments: [
+        `--slopsician-api=http://127.0.0.1:${PORT}`,
+        ...(nativeAudioReady ? ['--slopsician-native-audio'] : []),
+      ],
     },
   });
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -42,6 +47,8 @@ app.whenReady().then(() => {
   session.defaultSession.setPermissionRequestHandler((_wc, permission, cb) => {
     cb(permission === 'media');
   });
+
+  nativeAudioReady = initNativeAudio(ipcMain, app.isPackaged, process.resourcesPath);
 
   ipcMain.on('backend-status-subscribe', (e) => {
     statusSubscribers.add(e.sender);

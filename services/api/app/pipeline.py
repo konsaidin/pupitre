@@ -202,10 +202,118 @@ def extract_notes(
     midi = _median_smooth(midi, width=params.median_width)
 
     frame_ms = HOP / sr * 1000.0
+    # октавные срывы pYIN (уход на кратное 12 и обратно) возвращаем в регистр
+    midi = _fix_octave_flips(midi, frame_ms)
     notes = _segment(midi, frame_ms, params)
+    _mark_vibrato(notes, midi, frame_ms)
     pitchline = _build_pitchline(midi, frame_ms)
     progress("analyze", 98)
     return notes, duration_ms, pitchline
+
+
+def _fix_octave_flips(midi: np.ndarray, frame_ms: float) -> np.ndarray:
+    """Свёртка октавных срывов pYIN вида A–B–A внутри фразы.
+
+    Срыв — участок B, приклеенный микропаузами к соседям A слева и справа,
+    которые согласны между собой по высоте, и отстоящий от них на почти точное
+    кратное октавы (половинная/двойная частота даёт ровно ±12). Такой участок
+    возвращаем к соседям. Правило намеренно консервативное: без скользящего
+    «регистра» (его захватывают фантомные линии стема — гармоники, пролезший
+    инструментал), поэтому настоящие смены регистра — после вдоха, надолго —
+    не трогаются по построению.
+    """
+    glued_gap_ms = 150.0  # склейка с соседями: срыв живёт внутри фразы
+    agree_semis = 3.5  # согласие соседей A между собой
+    fold_residual = 1.5  # отклонение скачка от кратного октаве
+    max_flip_ms = 2000.0  # длиннее — не срыв, а осмысленный кусок мелодии
+
+    voiced = ~np.isnan(midi)
+    if not np.any(voiced):
+        return midi
+    out = midi.copy()
+
+    # сегменты → «пробеги» (runs): цепочки сегментов через микропаузы,
+    # согласные по высоте; срыв двигает медиану > agree_semis и рвёт пробег
+    def build_runs() -> list[tuple[int, int, float]]:
+        segs: list[tuple[int, int, float]] = []
+        i = 0
+        while i < len(out):
+            if not voiced[i]:
+                i += 1
+                continue
+            a = i
+            while i < len(out) and voiced[i]:
+                i += 1
+            segs.append((a, i, float(np.median(out[a:i]))))
+        runs: list[tuple[int, int, float]] = []
+        for a, b, med in segs:
+            if runs:
+                pa, pb, pmed = runs[-1]
+                if (a - pb) * frame_ms <= glued_gap_ms and abs(med - pmed) <= agree_semis:
+                    w_old = pb - pa
+                    w_new = b - a
+                    runs[-1] = (pa, b, (pmed * w_old + med * w_new) / (w_old + w_new))
+                    continue
+            runs.append((a, b, med))
+        return runs
+
+    # свёртка среднего пробега в сэндвиче A-B-A; цепочки A-B-A-B-A сходятся
+    # за несколько проходов (после свёртки B пробеги сливаются)
+    for _ in range(4):
+        runs = build_runs()
+        changed = False
+        for j in range(1, len(runs) - 1):
+            pa, pb, pm = runs[j - 1]
+            a, b, m = runs[j]
+            na, nb, nm = runs[j + 1]
+            if (a - pb) * frame_ms > glued_gap_ms or (na - b) * frame_ms > glued_gap_ms:
+                continue
+            if (b - a) * frame_ms > max_flip_ms or abs(nm - pm) > agree_semis:
+                continue
+            dm = m - (pm + nm) / 2.0
+            k = round(dm / 12.0)
+            if k != 0 and abs(dm - 12.0 * k) <= fold_residual:
+                out[a:b] -= 12.0 * k
+                changed = True
+        if not changed:
+            break
+    return out
+
+
+def _mark_vibrato(notes: list[dict], midi: np.ndarray, frame_ms: float) -> None:
+    """Пометить ноты, спетые с вибрато (аддитивное поле "vibrato": true).
+
+    Критерий согласован с live-детектором ядра (packages/dsp/src/vibrato.rs):
+    периодическая модуляция 4–8 Гц глубиной ≥ 20 центов, минимум ~2 периода.
+    Детренд скользящим средним ~250 мс убирает движение мелодии, период —
+    по максимуму нормированной автокорреляции в полосе.
+    """
+    trend_win = max(3, int(250 / frame_ms) | 1)
+    lag_lo = max(2, int(round(1000 / 8 / frame_ms)))  # период 8 Гц в кадрах
+    lag_hi = int(round(1000 / 4 / frame_ms))  # период 4 Гц
+
+    for note in notes:
+        a = int(round(note["startMs"] / frame_ms))
+        b = int(round((note["startMs"] + note["durMs"]) / frame_ms))
+        seg = midi[a:b]
+        seg = seg[~np.isnan(seg)]
+        # детренд только в валидной зоне свёртки: zero-padding краёв дал бы
+        # выбросы величиной с саму ноту; нужен запас на 2 периода 4 Гц
+        if len(seg) < trend_win + lag_hi * 2:
+            continue
+        trend = np.convolve(seg, np.ones(trend_win) / trend_win, mode="valid")
+        x = seg[trend_win // 2 : trend_win // 2 + trend.size] - trend
+        x = x - x.mean()
+        var = float(np.dot(x, x))
+        if var <= 0.0:
+            continue
+        best = 0.0
+        for lag in range(lag_lo, min(lag_hi, len(x) - 1) + 1):
+            r = float(np.dot(x[:-lag], x[lag:])) / var
+            best = max(best, r)
+        depth_cents = float(np.std(x)) * float(np.sqrt(2.0)) * 100.0
+        if best >= 0.35 and depth_cents >= 20.0:
+            note["vibrato"] = True
 
 
 def _build_pitchline(midi: np.ndarray, frame_ms: float) -> dict:

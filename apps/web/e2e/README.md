@@ -14,6 +14,15 @@ node e2e/live-tract.cjs   # живой тракт: WorkletAudioInput → кад�
 node e2e/ribbon.cjs       # игра: лента рисуется, переключение Ribbon/Roll, скриншоты
 ```
 
+Скоринг вибрато-упражнения (без браузера: настоящие карта+движок, синтетические
+кадры; dev-сервер не нужен):
+
+```bash
+npx esbuild e2e/vibrato-exercise.ts --bundle --format=esm --platform=node \
+  --banner:js="globalThis.localStorage={getItem:()=>null,setItem:()=>{}};" \
+  --outfile=/tmp/vibrato-exercise.mjs && node /tmp/vibrato-exercise.mjs
+```
+
 Грабли:
 - профиль сеется в localStorage — после этого обязателен `page.reload()`
   (профиль читается при инициализации React);

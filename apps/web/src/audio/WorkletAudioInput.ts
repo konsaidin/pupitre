@@ -11,17 +11,15 @@ import { PITCH_PROCESSOR_SOURCE } from './pitchProcessorSource';
 import dspWasmDataUri from '../assets/dsp.wasm?inline';
 import {
   DEFAULT_MIC,
-  type AnalysisFrame,
+  FRAME_FLOATS,
+  YIN_WIN,
+  decodeFrame,
   type AudioDevice,
   type AudioInput,
   type FrameListener,
   type MicOptions,
 } from './AudioInput';
 
-/** Число f32 на кадр — контракт с AnalysisFrame::write в ядре. */
-const FRAME_FLOATS = 15;
-/** Окно YIN: оценка описывает середину окна — врождённая задержка анализа. */
-const YIN_WIN = 1024;
 /** сглаживание замера доставки кадров */
 const LAT_EMA = 0.1;
 
@@ -40,6 +38,8 @@ function dspModule(): Promise<WebAssembly.Module> {
 }
 
 export class WorkletAudioInput implements AudioInput {
+  readonly kind = 'worklet' as const;
+
   private ctx: AudioContext;
   private node: AudioWorkletNode | null = null;
   private stream: MediaStream | null = null;
@@ -144,24 +144,7 @@ export class WorkletAudioInput implements AudioInput {
   /** Раскладка кадра — контракт с AnalysisFrame::write в packages/dsp. */
   private onBatch(t0: number, flat: Float32Array): void {
     for (let o = 0; o + FRAME_FLOATS <= flat.length; o += FRAME_FLOATS) {
-      const frame: AnalysisFrame = {
-        t: t0 + flat[o],
-        hz: flat[o + 1],
-        midi: flat[o + 2],
-        midiRaw: flat[o + 3],
-        clarity: flat[o + 4],
-        rms: flat[o + 5],
-        voiced: flat[o + 6] > 0.5,
-        loudDb: flat[o + 7],
-        vibrato: {
-          active: flat[o + 8] > 0.5,
-          rateHz: flat[o + 9],
-          depthCents: flat[o + 10],
-          regularity: flat[o + 11],
-        },
-        distortion: { active: flat[o + 12] > 0.5, score: flat[o + 13] },
-        breathiness: flat[o + 14],
-      };
+      const frame = decodeFrame(flat, o, t0);
       this.listeners.forEach((fn) => fn(frame));
     }
     // доставка: разница часов графа между последним сэмплом кадра и «сейчас»
