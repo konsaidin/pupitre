@@ -1,8 +1,8 @@
-import { useState } from 'react';
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { useState, type ReactNode } from 'react';
+import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ProfileProvider } from './state/ProfileContext';
 import { BackendSetupBanner } from './components/BackendSetupBanner';
-import { LightRays } from './components/fx/LightRays';
+import { TopBar } from './components/TopBar';
 import { getSavedLang } from './lib/i18n';
 import { HomeScreen } from './screens/HomeScreen';
 import { LanguagePicker } from './screens/LanguagePicker';
@@ -13,30 +13,42 @@ import { ResultsScreen } from './screens/ResultsScreen';
 import { LibraryScreen } from './screens/LibraryScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 
+/** Игра и живой шаг визарда занимают всю высоту — там топбар не рисуем. */
+const BARE_ROUTES = new Set(['/play', '/range']);
+
+function Chrome({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  return (
+    <>
+      {!BARE_ROUTES.has(pathname) && <TopBar />}
+      {children}
+    </>
+  );
+}
+
 export default function App() {
   // язык выбирается один раз при первом старте; дальше живёт в localStorage
   const [lang, setLangState] = useState(getSavedLang());
 
   return (
     <ProfileProvider>
-      <div className="app-bg" aria-hidden="true">
-        <LightRays raysColor="#6366f1" raysOrigin="top-center" lightSpread={0.9} rayLength={1.4} saturation={0.7} fadeDistance={1.1} mouseInfluence={0.08} noiseAmount={0.05} />
-      </div>
       {lang === null ? (
         <LanguagePicker onPick={setLangState} />
       ) : (
         <>
           <BackendSetupBanner />
           <HashRouter>
-            <Routes>
-              <Route path="/" element={<HomeScreen />} />
-              <Route path="/range" element={<RangeWizard />} />
-              <Route path="/exercises" element={<ExercisesScreen />} />
-              <Route path="/songs" element={<LibraryScreen />} />
-              <Route path="/play" element={<GameScreen />} />
-              <Route path="/results" element={<ResultsScreen />} />
-              <Route path="/settings" element={<SettingsScreen />} />
-            </Routes>
+            <Chrome>
+              <Routes>
+                <Route path="/" element={<HomeScreen />} />
+                <Route path="/range" element={<RangeWizard />} />
+                <Route path="/exercises" element={<ExercisesScreen />} />
+                <Route path="/songs" element={<LibraryScreen />} />
+                <Route path="/play" element={<GameScreen />} />
+                <Route path="/results" element={<ResultsScreen />} />
+                <Route path="/settings" element={<SettingsScreen />} />
+              </Routes>
+            </Chrome>
           </HashRouter>
         </>
       )}

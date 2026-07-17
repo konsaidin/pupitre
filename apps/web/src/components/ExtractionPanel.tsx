@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { getSong, loadSongMap, reextractSong } from '../lib/api';
 import { t } from '../lib/i18n';
 import { EXTRACT_DEFAULTS, type ExtractSettings, type SongMap } from '../lib/songMap';
-import { RangeSlider } from './fx/RangeSlider';
+import { RangeSlider } from './RangeSlider';
 
 interface ExtractionPanelProps {
   map: SongMap;

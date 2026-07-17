@@ -86,6 +86,28 @@ export function micOptions(p: Profile): MicOptions {
   };
 }
 
+/**
+ * Дней занятий подряд (по локальным датам scores). День без занятий пока не
+ * наступил полностью: если сегодня ещё не пел, серия до вчера включительно жива.
+ */
+export function practiceStreak(scores: ScoreRecord[], now = new Date()): number {
+  if (scores.length === 0) return 0;
+  const days = new Set<string>();
+  for (const s of scores) days.add(dayKey(new Date(s.playedAt)));
+  const cur = new Date(now);
+  if (!days.has(dayKey(cur))) cur.setDate(cur.getDate() - 1);
+  let streak = 0;
+  while (days.has(dayKey(cur))) {
+    streak++;
+    cur.setDate(cur.getDate() - 1);
+  }
+  return streak;
+}
+
+function dayKey(d: Date): string {
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+}
+
 export function bestScore(p: Profile, mapId: string): ScoreRecord | null {
   let best: ScoreRecord | null = null;
   for (const s of p.scores) {

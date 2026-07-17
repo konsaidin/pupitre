@@ -13,41 +13,42 @@ export interface NoteResult {
 }
 
 /**
- * Гистерезис октавной свёртки: прежняя поправка живёт, пока держит голос
- * в этой полосе от цели. Свёртка кладёт голос в цель±6 полутонов, поэтому
- * пересчёт каждый кадр флипал октаву у самой границы (пение около тритона
- * от цели, глиссандо к дальней ноте) — точка телепортировала туда-обратно.
- */
-const FOLD_HYST_SEMIS = 7.5;
-
-/**
- * Сравнение спетой высоты с целевой нотой.
- * Возвращает отклонение в центах (с учётом октавной свёртки) и попадание.
- * fold — октавная поправка отображения (кратна 12): передавать её же
- * следующим кадром как prevFold, чтобы свёртка была липкой.
+ * Сравнение спетой высоты с целевой нотой — только скоринг, без отображения.
+ * В октаво-независимых сложностях голос сворачивается к ближайшей октаве цели
+ * каждый кадр: на границе свёртки (тритон от цели) это ±600 центов — заведомо
+ * мимо любого допуска, так что дрожание границы на вердикт не влияет.
  */
 export function matchPitch(
   sungMidi: number,
   targetMidi: number,
   difficulty: Difficulty,
-  prevFold = 0,
-): { cents: number; inTolerance: boolean; displayMidi: number; fold: number } {
+): { cents: number; inTolerance: boolean } {
   const meta = DIFFICULTY_META[difficulty];
-  let fold = 0;
-  if (meta.octaveAgnostic) {
-    fold =
-      Math.abs(sungMidi + prevFold - targetMidi) <= FOLD_HYST_SEMIS
-        ? prevFold
-        : foldToOctaveOf(sungMidi, targetMidi) - sungMidi;
-  }
-  const effective = sungMidi + fold;
+  const effective = meta.octaveAgnostic ? foldToOctaveOf(sungMidi, targetMidi) : sungMidi;
   const cents = (effective - targetMidi) * 100;
-  return {
-    cents,
-    inTolerance: Math.abs(cents) <= meta.toleranceCents,
-    displayMidi: effective,
-    fold,
-  };
+  return { cents, inTolerance: Math.abs(cents) <= meta.toleranceCents };
+}
+
+/** Прежняя октавная поправка сохраняется на онсете, если кладёт голос не дальше этого от цели. */
+const KEEP_FOLD_SEMIS = 9;
+
+/**
+ * Октавная поправка отображения (кратна 12). Пересчитывается ТОЛЬКО на онсете
+ * голоса (первый озвученный кадр после паузы): пока голос звучит непрерывно,
+ * поправка заморожена — точка на ролле двигается ровно как голос, телепорты
+ * на ±12 исключены по построению. Пересвёртка каждый кадр (даже с гистерезисом)
+ * прыгала на октаву при глиссандо от цели и на скачках мелодии > полосы.
+ * Дыхание/согласная октаву не дёргают: близкая к цели прежняя поправка живёт.
+ */
+export function displayFoldAtOnset(
+  sungMidi: number,
+  targetMidi: number,
+  difficulty: Difficulty,
+  prevFold: number,
+): number {
+  if (!DIFFICULTY_META[difficulty].octaveAgnostic) return 0;
+  if (Math.abs(sungMidi + prevFold - targetMidi) <= KEEP_FOLD_SEMIS) return prevFold;
+  return foldToOctaveOf(sungMidi, targetMidi) - sungMidi;
 }
 
 export function judge(hitRatio: number): Judgement {

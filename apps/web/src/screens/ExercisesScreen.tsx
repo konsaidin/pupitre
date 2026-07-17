@@ -1,20 +1,29 @@
 // Список распевок и упражнений с настройкой темпа/тональности/повторов.
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { EXERCISES, type ExerciseDef } from '../game/exercises';
 import { t } from '../lib/i18n';
 import { comfortZone, midiToName } from '../lib/music';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 import { ScreenHeader } from '../components/ScreenHeader';
-import { SpotlightCard } from '../components/fx/SpotlightCard';
-import { RangeSlider } from '../components/fx/RangeSlider';
+import { RangeSlider } from '../components/RangeSlider';
+import { Icon, type IconName } from '../components/Icon';
 import type { PlayState } from './GameScreen';
+
+/* сдержанный моно-глиф вместо цветных эмодзи из данных упражнений */
+const CATEGORY_ICON: Record<ExerciseDef['category'], IconName> = {
+  'Warm-ups': 'waves',
+  'Scales': 'note',
+  'Ear training': 'ear',
+  'Techniques': 'sparkle',
+};
 
 export function ExercisesScreen() {
   const { profile } = useProfile();
   const navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
   const [openId, setOpenId] = useState<string | null>(null);
 
   if (!profile.range) {
@@ -30,6 +39,9 @@ export function ExercisesScreen() {
   }
 
   const categories = [...new Set(EXERCISES.map((e) => e.category))];
+  // фильтр категории приходит с главной (?cat=Warm-ups) и переключается чипами
+  const catFilter = params.get('cat');
+  const shown = catFilter && (categories as string[]).includes(catFilter) ? [catFilter] : categories;
 
   return (
     <div className="screen">
@@ -37,7 +49,24 @@ export function ExercisesScreen() {
         title={t('Warm-ups & exercises')}
         subtitle={t('All exercises are built for your range ({low}–{high}).', { low: midiToName(profile.range.lowMidi), high: midiToName(profile.range.highMidi) })}
       />
-      {categories.map((cat) => (
+      <div className="chip-row">
+        <button
+          className={!catFilter ? 'chip-btn active' : 'chip-btn'}
+          onClick={() => setParams({}, { replace: true })}
+        >
+          {t('All')}
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className={catFilter === cat ? 'chip-btn active' : 'chip-btn'}
+            onClick={() => setParams({ cat }, { replace: true })}
+          >
+            {t(cat)}
+          </button>
+        ))}
+      </div>
+      {shown.map((cat) => (
         <section key={cat}>
           <h2 className="cat">{t(cat)}</h2>
           <div className="card-list">
@@ -75,15 +104,26 @@ function ExerciseCard({ ex, open, onToggle }: { ex: ExerciseDef; open: boolean; 
   };
 
   return (
-    <SpotlightCard as="div" className={open ? 'card open' : 'card'} tilt={false} magnetism={false}>
-      <button className="card-head" onClick={onToggle}>
-        <span className="card-icon">{ex.icon}</span>
+    <div className={open ? 'card open' : 'card'}>
+      {/* шапка — как карточка песни в библиотеке: глиф, текст, «Спеть» справа;
+          клик по остальной площади раскрывает настройки темпа/тональности */}
+      <div className="card-head" onClick={onToggle} role="button" tabIndex={0}>
+        <span className="card-glyph"><Icon name={CATEGORY_ICON[ex.category]} size={19} /></span>
         <span className="card-title">
           <b>{t(ex.title)}</b>
           <span className="dim small">{t(ex.description)}</span>
         </span>
         {best && <span className="card-best">{'★'.repeat(best.stars)}<span className="dim"> {best.score}</span></span>}
-      </button>
+        <button
+          className="btn primary"
+          onClick={(e) => {
+            e.stopPropagation();
+            startPlay();
+          }}
+        >
+          {t('Sing')}
+        </button>
+      </div>
       {open && (
         <div className="card-body">
           <RangeSlider min={50} max={160} step={5} value={bpm} onChange={setBpm} label={<>{t('Tempo')}: <b>{bpm} BPM</b></>} />
@@ -95,9 +135,8 @@ function ExerciseCard({ ex, open, onToggle }: { ex: ExerciseDef; open: boolean; 
             onChange={setRootMidi}
             label={<>{t('Key (root note)')}: <b>{midiToName(rootMidi)}</b></>}
           />
-          <button className="btn primary" onClick={startPlay}>{t('Sing')}</button>
         </div>
       )}
-    </SpotlightCard>
+    </div>
   );
 }

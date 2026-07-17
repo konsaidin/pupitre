@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { ensureMic, getAudioContext, getAudioInput, stopMic } from '../audio/audioSession';
 import { DEFAULT_MIC, type AudioDevice } from '../audio/AudioInput';
 import { Synth } from '../audio/synth';
-import { RangeSlider } from '../components/fx/RangeSlider';
+import { RangeSlider } from '../components/RangeSlider';
 import { getApiBase, setApiBase } from '../lib/api';
 import { midiToName } from '../lib/music';
 import { DIFFICULTY_META, type Difficulty } from '../lib/songMap';

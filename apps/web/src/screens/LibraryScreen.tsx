@@ -15,7 +15,7 @@ import { t } from '../lib/i18n';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 import { ScreenHeader } from '../components/ScreenHeader';
-import { SpotlightCard } from '../components/fx/SpotlightCard';
+import { Icon } from '../components/Icon';
 import type { PlayState } from './GameScreen';
 
 const STAGE_LABEL: Record<SongStage, string> = {
@@ -86,7 +86,8 @@ export function LibraryScreen() {
         role="button"
         tabIndex={0}
       >
-        <span>📥 {t('Drop mp3/wav/flac/m4a here or click to pick a file')}</span>
+        <span className="upload-orb"><Icon name="upload" size={20} /></span>
+        <span>{t('Drop mp3/wav/flac/m4a here or click to pick a file')}</span>
         <span className="dim small">{t('The track is processed on the server: vocals get separated, the melody becomes notes')}</span>
         <input ref={fileRef} type="file" accept="audio/*" multiple hidden onChange={(e) => void onFiles(e.target.files)} />
       </div>
@@ -104,9 +105,11 @@ export function LibraryScreen() {
           const best = bestScore(profile, s.id);
           const busy = s.status === 'queued' || s.status === 'processing';
           return (
-            <SpotlightCard key={s.id} as="div" className="card song-card" tilt={false} magnetism={false}>
+            <div key={s.id} className="card song-card">
               <div className="card-head static">
-                <span className="card-icon">{s.status === 'done' ? '🎧' : s.status === 'error' ? '⚠️' : '⏳'}</span>
+                <span className="card-glyph">
+                  <Icon name={s.status === 'done' ? 'note' : s.status === 'error' ? 'alert' : 'clock'} size={19} />
+                </span>
                 <span className="card-title">
                   <b>{s.artist ? `${s.artist} — ${s.title}` : s.title}</b>
                   <span className="dim small">
@@ -129,13 +132,14 @@ export function LibraryScreen() {
                   )}
                   <button
                     className="btn ghost"
+                    aria-label={t('Delete')}
                     onClick={() => { if (confirm(t('Delete “{title}”?', { title: s.title }))) void deleteSong(s.id).then(refresh); }}
                   >
-                    🗑
+                    <Icon name="trash" size={17} />
                   </button>
                 </div>
               </div>
-            </SpotlightCard>
+            </div>
           );
         })}
       </div>

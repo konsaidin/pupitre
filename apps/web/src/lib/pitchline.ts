@@ -2,6 +2,10 @@
 
 import type { MapNote, Pitchline } from './songMap';
 
+/** перепад соседних сэмплов контура, сквозь который не интерполируем:
+ *  голос так не движется за один hop — это октавный срыв в данных */
+const CONTOUR_BREAK_SEMIS = 6;
+
 /** Интерполированная высота контура в момент ms (null — тишина/вне данных). */
 export function contourMidiAt(line: Pitchline, ms: number): number | null {
   const f = ms / line.hopMs;
@@ -10,7 +14,7 @@ export function contourMidiAt(line: Pitchline, ms: number): number | null {
   const a = line.midi[i0];
   if (a === null) return null;
   const b = i0 + 1 < line.midi.length ? line.midi[i0 + 1] : null;
-  if (b === null) return a;
+  if (b === null || Math.abs(b - a) >= CONTOUR_BREAK_SEMIS) return a;
   return a + (b - a) * (f - i0);
 }
 

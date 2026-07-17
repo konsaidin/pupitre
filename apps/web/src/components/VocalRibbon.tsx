@@ -216,6 +216,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
         const i1 = Math.min(line.midi.length - 1, Math.ceil(rightMs / line.hopMs) + 1);
         const path = new Path2D();
         let pen = false;
+        let prevM = 0;
         for (let i = i0; i <= i1; i++) {
           const m = line.midi[i];
           if (m === null) {
@@ -224,12 +225,14 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
           }
           const x = msToX(i * line.hopMs);
           const y = midiToY(m);
-          if (!pen) {
+          // октавный срыв в данных контура — рвём, как и ленту
+          if (!pen || Math.abs(m - prevM) >= TRAIL_BREAK_SEMIS) {
             path.moveTo(x, y);
             pen = true;
           } else {
             path.lineTo(x, y);
           }
+          prevM = m;
         }
         ctx2d.lineCap = 'round';
         ctx2d.lineJoin = 'round';

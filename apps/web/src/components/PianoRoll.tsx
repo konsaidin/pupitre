@@ -198,6 +198,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         // canvas shadowBlur на длинной ломаной роняет fps в разы
         const path = new Path2D();
         let pen = false;
+        let prevM = 0;
         for (let i = i0; i <= i1; i++) {
           const m = line.midi[i];
           if (m === null) {
@@ -206,12 +207,14 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
           }
           const x = msToX(i * line.hopMs);
           const y = midiToY(m);
-          if (!pen) {
+          // октавный срыв в данных контура — рвём, как и хвост голоса
+          if (!pen || Math.abs(m - prevM) >= TRAIL_BREAK_SEMIS) {
             path.moveTo(x, y);
             pen = true;
           } else {
             path.lineTo(x, y);
           }
+          prevM = m;
         }
         ctx2d.lineCap = 'round';
         ctx2d.lineJoin = 'round';

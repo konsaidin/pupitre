@@ -31,22 +31,20 @@ const PROFILE = {
     await page.goto('http://localhost:5173/#/exercises', { waitUntil: 'load' });
     await page.reload({ waitUntil: 'load' }); // профиль читается при инициализации
 
-    // открыть первую карточку → «Sing» → сетап → старт
+    // «Sing» прямо в шапке первой карточки → сетап → старт
     try {
-      await page.waitForSelector('.card-head', { timeout: 10000 });
+      await page.waitForSelector('.card-head .btn.primary', { timeout: 10000 });
     } catch (e) {
       await page.screenshot({ path: 'debug-no-card.png' });
       console.log('URL:', page.url(), 'BODY:', (await page.evaluate(() => document.body.innerText)).slice(0, 300));
       throw e;
     }
-    await page.click('.card-head');
-    await page.waitForSelector('.card-body .btn.primary');
-    await page.click('.card-body .btn.primary');
+    await page.click('.card-head .btn.primary');
     await page.waitForSelector('.btn.primary.big');
     await page.click('.btn.primary.big');
 
-    // отсчёт 3 с + немного игры
-    await new Promise((r) => setTimeout(r, 6500));
+    // отсчёт 3 с + немного игры (с запасом на холодный старт dev-сервера)
+    await new Promise((r) => setTimeout(r, 7500));
     await page.screenshot({ path: 'ribbon.png' });
 
     const ribbonStats = await page.evaluate(() => {

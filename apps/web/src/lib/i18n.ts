@@ -41,18 +41,47 @@ export const RU: Record<string, string> = {
   'To menu': 'В меню',
   'Try again': 'Ещё раз',
 
-  // — главный экран —
-  'Sing the notes — the app hears your voice and shows where to hit':
-    'Пой в ноты — приложение слышит голос и показывает, куда попадать',
+  // — шапка и главный экран —
+  'Home': 'Главная',
+  'Library': 'Библиотека',
+  'Exercises': 'Упражнения',
+  'Practice streak': 'Серия занятий',
+  '{n} d.': '{n} дн.',
+  'My voice': 'Мой голос',
+  '5 min · daily': '5 мин · ежедневно',
+  'Long tones, sirens, five-note runs — built for your range.':
+    'Длинные ноты, сирены, пятиступенные ходы под твой диапазон.',
+  '{n} exercises': '{n} упражнений',
+  'Pitch accuracy': 'Точность интонации',
+  'Scales, arpeggios, intervals. Tune tempo and key.':
+    'Гаммы, арпеджио, интервалы. Настраивай темп и тональность.',
+  '{n} in the library': '{n} в библиотеке',
+  'Your repertoire': 'Твой репертуар',
+  'My songs': 'Мои песни',
+  'Upload mp3/wav — vocals are extracted locally, the melody lands in your octave.':
+    'Загрузи mp3/wav — вокал извлечём локально, мелодия ляжет в твою октаву.',
+  '{n} processed': '{n} обработано',
+  'Open the library': 'Открыть библиотеку',
+  'Voice profile': 'Голосовой профиль',
+  'Range': 'Диапазон',
+  'Type': 'Тип',
+  'Upload a song': 'Загрузить песню',
+  'mp3, wav or flac. Demucs separates vocals, pYIN traces the melody — locally.':
+    'mp3, wav или flac. Вокал выделит Demucs, мелодию снимет pYIN — локально.',
+  'Processing server ready': 'Сервер обработки готов',
+  'Server unavailable': 'Сервер недоступен',
+  'Checking the server…': 'Проверяем сервер…',
+  'Calibration': 'Калибровка',
+  'Compensates audio-path latency. Set it once — scoring gets fairer.':
+    'Поправка на задержку аудиотракта. Сделай один раз — попадания станут честнее.',
+  'ms latency': 'мс задержки',
+  'Adjust': 'Настроить',
+  'All': 'Все',
   'Measure your vocal range': 'Измерить диапазон голоса',
   'takes a minute — everything adapts to you': 'займёт минуту — всё подстроится под тебя',
-  '{cls} · tap to remeasure': '{cls} · нажми, чтобы перемерить',
   'Warm-ups & exercises': 'Распевки и упражнения',
-  'warm-up, scales, intervals — built for your range': 'разогрев, гаммы, интервалы — под твой диапазон',
   'Songs': 'Песни',
-  'upload a track and sing it note by note': 'загрузи трек — споёшь его по нотам',
   'Settings': 'Настройки',
-  'microphone, latency calibration, difficulty': 'микрофон, калибровка задержки, сложность',
   'Recent results': 'Последние результаты',
 
   // — классификация голоса —
@@ -128,6 +157,7 @@ export const RU: Record<string, string> = {
   'Error': 'Ошибка',
   'Sing': 'Петь',
   'Retry': 'Повторить',
+  'Delete': 'Удалить',
   'Delete “{title}”?': 'Удалить «{title}»?',
   '{n} notes': '{n} нот',
   'vocals not separated (full mix plays)': 'вокал не отделён (играет полный микс)',
