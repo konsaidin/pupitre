@@ -31,14 +31,28 @@ class JobQueue:
     def _worker(self) -> None:
         while True:
             kind, song_id, params = self._q.get()
-            meta = self.store.load_meta(song_id)
-            if meta is None:
-                continue
-            log.info("%s %s (%s)", kind, song_id, meta.title)
-            if kind == "reextract":
-                reextract_song(self.store, meta, params or ExtractParams())
-            else:
-                process_song(self.store, meta)
+            # поток один: сбежавшее исключение оставило бы все следующие
+            # задания в очереди навсегда
+            try:
+                meta = self.store.load_meta(song_id)
+                if meta is None:
+                    continue  # песню удалили, пока она ждала в очереди
+                log.info("%s %s (%s)", kind, song_id, meta.title)
+                if kind == "reextract":
+                    reextract_song(self.store, meta, params or ExtractParams())
+                else:
+                    process_song(self.store, meta)
+            except Exception:  # noqa: BLE001
+                log.exception("%s %s: необработанная ошибка", kind, song_id)
+                try:
+                    meta = self.store.load_meta(song_id)
+                    if meta is not None and meta.status == "processing":
+                        meta.status = "error"
+                        meta.stage = "error"
+                        meta.error = "внутренняя ошибка обработки"
+                        self.store.save_meta(meta)
+                except Exception:  # noqa: BLE001
+                    pass
 
     def recover_stale(self) -> None:
         """После рестарта: зависшие в processing/queued песни — обратно в очередь."""

@@ -37,6 +37,8 @@ class SongMeta:
     low_midi: int = 0
     high_midi: int = 0
     separated: bool = True
+    # причина, по которой вокал не отделён (Demucs недоступен/упал); "" — отделён
+    separation_error: str = ""
     created_at: float = field(default_factory=time.time)
     original_name: str = ""
 
@@ -55,6 +57,7 @@ class SongMeta:
             "lowMidi": d["low_midi"],
             "highMidi": d["high_midi"],
             "separated": d["separated"],
+            "separationError": d["separation_error"],
             "createdAt": d["created_at"],
         }
 
@@ -78,23 +81,29 @@ class SongStore:
 
     def save_meta(self, meta: SongMeta) -> None:
         with self._lock:
-            path = self.song_dir(meta.id) / "meta.json"
+            d = self.song_dir(meta.id)
+            if not d.exists():
+                return  # песню удалили во время обработки — не воскрешаем каталог
+            path = d / "meta.json"
             tmp = path.with_suffix(".json.tmp")
-            tmp.write_text(json.dumps(asdict(meta), ensure_ascii=False, indent=2))
+            # encoding обязателен: на Windows дефолт — cp1252, кириллица в
+            # title/error роняла запись
+            tmp.write_text(json.dumps(asdict(meta), ensure_ascii=False, indent=2), encoding="utf-8")
             tmp.replace(path)
 
     def load_meta(self, song_id: str) -> SongMeta | None:
         path = self.song_dir(song_id) / "meta.json"
-        if not path.exists():
+        try:
+            return SongMeta(**json.loads(path.read_text(encoding="utf-8")))
+        except (FileNotFoundError, json.JSONDecodeError, TypeError):
             return None
-        return SongMeta(**json.loads(path.read_text()))
 
     def list_meta(self) -> list[SongMeta]:
         metas = []
         for d in self.root.iterdir():
             if (d / "meta.json").exists():
                 try:
-                    metas.append(SongMeta(**json.loads((d / "meta.json").read_text())))
+                    metas.append(SongMeta(**json.loads((d / "meta.json").read_text(encoding="utf-8"))))
                 except (json.JSONDecodeError, TypeError):
                     continue
         return sorted(metas, key=lambda m: m.created_at, reverse=True)
@@ -103,7 +112,7 @@ class SongStore:
         path = self.song_dir(song_id) / "map.json"
         if not path.exists():
             return None
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
 
     def delete(self, song_id: str) -> bool:
         d = self.song_dir(song_id)

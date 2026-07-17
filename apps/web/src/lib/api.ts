@@ -52,6 +52,8 @@ export interface SongInfo {
   highMidi: number;
   /** false — Demucs недоступен, инструментал = полный микс */
   separated: boolean;
+  /** причина, по которой вокал не отделён; '' — отделён */
+  separationError: string;
   createdAt: number;
 }
 

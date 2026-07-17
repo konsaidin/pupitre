@@ -7,7 +7,6 @@ import { contourMidiAt } from '../lib/pitchline';
 import type { SongMap, Difficulty } from '../lib/songMap';
 import {
   matchPitch,
-  displayFoldAtOnset,
   judge,
   notePoints,
   summarize,
@@ -21,7 +20,7 @@ export type GamePhase = 'idle' | 'countdown' | 'playing' | 'paused' | 'finished'
 
 export interface TrailPoint {
   songMs: number;
-  /** дробный midi для отрисовки (октавная поправка заморожена на время непрерывного голоса) */
+  /** дробный midi для отрисовки — ровно то, что спел голос, без октавных поправок */
   midi: number;
   inTolerance: boolean;
   /** сырой midi минус сглаженный: волнистость ленты (вибрато/шероховатость) */
@@ -95,10 +94,6 @@ export class GameEngine {
   private noteStates: NoteState[];
   private unsubscribe: (() => void) | null = null;
   private finished = false;
-  /** октавная поправка отображения (кратна 12) — см. displayFoldAtOnset */
-  private foldOffset = 0;
-  /** голос звучал в прошлом кадре: онсет = переход false→true */
-  private wasVoiced = false;
   /** t предыдущего голосового кадра — шаг времени для статистики техник */
   private lastVoicedT: number | null = null;
 
@@ -236,8 +231,7 @@ export class GameEngine {
     const ctx = this.opts.ctx;
     this.startCtxTime = ctx.currentTime + leadSec - fromMs / 1000;
     this.phase = 'countdown';
-    // после паузы/перемотки кадры шли мимо нас: первый голос — снова онсет
-    this.wasVoiced = false;
+    // после паузы/перемотки кадры шли мимо нас — шаг статистики техник заново
     this.lastVoicedT = null;
     this.scheduleBacking(fromMs);
     this.unsubscribe = this.opts.input.onFrame((f) => this.onPitchFrame(f));
@@ -298,12 +292,8 @@ export class GameEngine {
       this.lastFrame = { songMs, midi: NaN, voiced: false, cents: null };
       if (note) this.noteStates[noteIdx].lastFrameT = f.t;
       this.lastVoicedT = null;
-      this.wasVoiced = false;
       return;
     }
-    const onset = !this.wasVoiced;
-    this.wasVoiced = true;
-
     // статистика техник: время с активным вибрато/расщеплением
     const techDt =
       this.lastVoicedT !== null ? Math.min((f.t - this.lastVoicedT) * 1000, MAX_FRAME_DT_MS) : 11;
@@ -311,21 +301,18 @@ export class GameEngine {
     if (f.vibrato.active) this.techStats.vibratoMs += techDt;
     if (f.distortion.active) this.techStats.distortionMs += techDt;
 
+    // в режиме линии цель — дробная высота контура в этот момент, не плашка
+    const target = note
+      ? this.opts.lineTarget && this.map.pitchline
+        ? contourMidiAt(this.map.pitchline, songMs)
+        : note.midi
+      : null;
+
     let inTol = false;
     let cents: number | null = null;
     if (note) {
-      // в режиме линии цель — дробная высота контура в этот момент, не плашка
-      const target =
-        this.opts.lineTarget && this.map.pitchline
-          ? contourMidiAt(this.map.pitchline, songMs)
-          : note.midi;
       const st = this.noteStates[noteIdx];
       if (target !== null) {
-        // октавная поправка отображения меняется только здесь, на онсете
-        // голоса; дальше заморожена до следующей паузы — без телепортов
-        if (onset) {
-          this.foldOffset = displayFoldAtOnset(f.midi, target, this.opts.difficulty, this.foldOffset);
-        }
         const m = matchPitch(f.midi, target, this.opts.difficulty);
         cents = m.cents;
         // нота с требуемой техникой: попадание только пока техника активна —
@@ -340,12 +327,13 @@ export class GameEngine {
         st.lastFrameT = f.t;
       }
     }
-    // вне ноты (и в разрывах контура) поправка тоже держится — точка не
-    // дёргается на границах нот, если поёшь не в октаве карты
-    const displayMidi = f.midi + this.foldOffset;
+    // Точка рисуется РОВНО там, где голос: никаких октавных поправок
+    // отображения. Прощение октавы (beginner/medium) живёт только в скоринге
+    // (matchPitch) — глазам всегда правда, телепортов не существует.
+    const displayMidi = f.midi;
     this.lastFrame = { songMs, midi: displayMidi, voiced: true, cents };
-    // rawOffset — дельта сырого контура к сглаженному: переживает октавную
-    // свёртку displayMidi и несёт волну вибрато/шероховатость для ленты
+    // rawOffset — дельта сырого контура к сглаженному: волна вибрато/
+    // шероховатость для ленты
     const rawOffset =
       Number.isNaN(f.midiRaw) || Number.isNaN(f.midi) ? 0 : f.midiRaw - f.midi;
     this.trail.push({

@@ -25,6 +25,7 @@ function createWindow() {
     height: 800,
     minWidth: 360,
     minHeight: 600,
+    show: false, // показываем уже развёрнутым — без прыжка размера
     backgroundColor: '#0a0a0d',
     autoHideMenuBar: true,
     title: 'Пюпитр',
@@ -36,6 +37,9 @@ function createWindow() {
       ],
     },
   });
+  // как в браузере: на весь экран (обычное развёрнутое окно, не kiosk)
+  win.maximize();
+  win.show();
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('http')) shell.openExternal(url);
     return { action: 'deny' };

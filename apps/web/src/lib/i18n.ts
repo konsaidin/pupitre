@@ -68,9 +68,6 @@ export const RU: Record<string, string> = {
   'Upload a song': 'Загрузить песню',
   'mp3, wav or flac. Demucs separates vocals, pYIN traces the melody — locally.':
     'mp3, wav или flac. Вокал выделит Demucs, мелодию снимет pYIN — локально.',
-  'Processing server ready': 'Сервер обработки готов',
-  'Server unavailable': 'Сервер недоступен',
-  'Checking the server…': 'Проверяем сервер…',
   'Calibration': 'Калибровка',
   'Compensates audio-path latency. Set it once — scoring gets fairer.':
     'Поправка на задержку аудиотракта. Сделай один раз — попадания станут честнее.',

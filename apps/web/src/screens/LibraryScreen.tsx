@@ -118,6 +118,11 @@ export function LibraryScreen() {
                     {s.status === 'done' && s.durationMs ? ` · ${formatDur(s.durationMs)} · ${t('{n} notes', { n: s.noteCount })}` : ''}
                     {s.status === 'done' && !s.separated ? ` · ${t('vocals not separated (full mix plays)')}` : ''}
                   </span>
+                  {s.status === 'done' && !s.separated && s.separationError && (
+                    <span className="dim small warn-line" title={s.separationError}>
+                      ⚠ {s.separationError}
+                    </span>
+                  )}
                   {busy && (
                     <span className="mini-progress"><span style={{ width: `${Math.round(s.progress)}%` }} /></span>
                   )}

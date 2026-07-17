@@ -226,6 +226,21 @@ class Backend {
         // resources/api и каталог portable-exe могут быть только для чтения —
         // __pycache__ туда не пишем
         PYTHONDONTWRITEBYTECODE: '1',
+        // На Windows дефолтная кодировка — cp1252: кириллица в названиях
+        // песен/сообщениях об ошибках роняла запись meta/map и логирование
+        PYTHONUTF8: '1',
+        // Intel OpenMP (libiomp5 из torch/MKL) на старте зовёт
+        // GetNumaNodeProcessorMaskEx(); под Wine это заглушка (ошибка 120,
+        // «Call not implemented») и libiomp5 аварийно роняет uvicorn (код 3).
+        // disabled выключает NUMA-топологию/привязку потоков целиком; на
+        // реальной Windows стоит лишь потери пиннинга потоков.
+        KMP_AFFINITY: 'disabled',
+        // Кэш huggingface_hub (веса htdemucs) на Windows/Wine: симлинки из
+        // snapshots/ в blobs/ не создаются (нужны права/dev-mode), остаются
+        // битые нулевые файлы — и Demucs молча деградирует до полного микса.
+        // Копирование вместо симлинков + обычный HTTP вместо xet-транспорта.
+        HF_HUB_DISABLE_SYMLINKS: '1',
+        HF_HUB_DISABLE_XET: '1',
       };
       if (ffDir) {
         // На Windows переменная называется Path; добавив второй ключ PATH,

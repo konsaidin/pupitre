@@ -45,49 +45,43 @@ beforeEach(() => {
   });
 });
 
-describe('отображение голоса', () => {
-  it('плавное глиссандо на октаву вверх не телепортирует точку', async () => {
+describe('отображение голоса — всегда сырое, без октавных поправок', () => {
+  it('показанная высота равна спетой в каждом кадре (глиссандо с миганием гейта)', async () => {
     await startAt(0);
-    // онсет на цели (60), затем глайд до 72 за секунду — раньше на +7.5 от цели
-    // отображение прыгало на −12
     for (let s = 0; s <= 1; s += 0.01) {
       ctx.currentTime = COUNTDOWN + s;
-      input.push(frame(ctx.currentTime, 60 + 12 * s));
+      const midi = 60 + 10 * s;
+      if (Math.abs(s - 0.7) < 0.005) {
+        input.push(unvoiced(ctx.currentTime)); // согласная/провал гейта
+        continue;
+      }
+      input.push(frame(ctx.currentTime, midi));
+      expect(engine.lastFrame!.midi).toBeCloseTo(midi);
     }
+    // и след повторяет голос точь-в-точь — телепортов не существует
     const trail = engine.trail;
     expect(trail.length).toBeGreaterThan(50);
-    let maxJump = 0;
     for (let i = 1; i < trail.length; i++) {
-      maxJump = Math.max(maxJump, Math.abs(trail[i].midi - trail[i - 1].midi));
+      expect(Math.abs(trail[i].midi - trail[i - 1].midi)).toBeLessThan(0.5);
     }
-    expect(maxJump).toBeLessThan(0.5);
   });
 
-  it('пение октавой ниже: точка привязывается к цели на онсете, попадание честное', async () => {
+  it('пение октавой ниже цели: точка на спетой октаве, но попадание честное (medium)', async () => {
     await startAt(0.1);
     input.push(frame(ctx.currentTime, 48)); // цель 60, поём 48
-    expect(engine.lastFrame?.midi).toBeCloseTo(60);
-    expect(engine.trail.at(-1)?.inTolerance).toBe(true);
+    expect(engine.lastFrame?.midi).toBeCloseTo(48); // рисуем где поём
+    expect(engine.trail.at(-1)?.inTolerance).toBe(true); // скоринг прощает октаву
   });
 
-  it('поправка держится сквозь границу нот при легато', async () => {
-    await startAt(0.9);
-    input.push(frame(ctx.currentTime, 60)); // онсет в ноте 60, fold 0
-    ctx.currentTime += 0.1; // началась нота 69, поём всё ещё 60
-    input.push(frame(ctx.currentTime, 60.1));
-    // без онсета поправка не меняется: точка не дёрнулась на ±12
-    expect(Math.abs(engine.lastFrame!.midi - 60.1)).toBeLessThan(1e-9);
-  });
-
-  it('после паузы в голосе онсет может перепривязать октаву', async () => {
+  it('после паузы в голосе точка всё так же сырая', async () => {
     await startAt(1.1);
-    input.push(frame(ctx.currentTime, 57)); // цель 69, поём октавой ниже → fold +12
-    expect(engine.lastFrame?.midi).toBeCloseTo(69);
+    input.push(frame(ctx.currentTime, 57)); // цель 69, поём октавой ниже
+    expect(engine.lastFrame?.midi).toBeCloseTo(57);
     ctx.currentTime += 0.1;
     input.push(unvoiced(ctx.currentTime)); // вдох
     ctx.currentTime += 0.1;
-    input.push(frame(ctx.currentTime, 69)); // теперь поём в октаве цели
-    expect(engine.lastFrame?.midi).toBeCloseTo(69); // fold сброшен к 0, не 81
+    input.push(frame(ctx.currentTime, 69));
+    expect(engine.lastFrame?.midi).toBeCloseTo(69);
   });
 });
 

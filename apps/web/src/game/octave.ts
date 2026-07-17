@@ -47,7 +47,11 @@ export function shiftPitchline(line: Pitchline, octaves: number): Pitchline {
   return { ...line, midi: line.midi.map((m) => (m === null ? null : m + d)) };
 }
 
-/** Границы окна пиано-ролла: диапазон пользователя ± запас, растянутый на ноты карты при необходимости. */
+/**
+ * Границы окна пиано-ролла: диапазон пользователя ± запас, растянутый на ноты
+ * карты. Окно фиксировано на всю игру, и ни одна нота не лежит на краю —
+ * вокруг крайних нот всегда есть полная строка запаса.
+ */
 export function rollWindow(
   notes: MapNote[],
   range: VocalRange,
@@ -56,8 +60,8 @@ export function rollWindow(
   let low = range.lowMidi - marginSemitones;
   let high = range.highMidi + marginSemitones;
   for (const n of notes) {
-    if (n.midi < low) low = n.midi;
-    if (n.midi > high) high = n.midi;
+    if (n.midi - 1 < low) low = n.midi - 1;
+    if (n.midi + 1 > high) high = n.midi + 1;
   }
   return { lowMidi: Math.floor(low), highMidi: Math.ceil(high) };
 }

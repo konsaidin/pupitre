@@ -8,9 +8,12 @@ name = "slopsician_native_audio"
 crate-type = ["cdylib"]
 
 [dependencies]
-# win_delay_load_hook обязателен для Electron на Windows: N-API-символы
-# резолвятся в electron.exe, а не в node.exe — без хука аддон не загрузится
-napi = { version = "2", default-features = false, features = ["napi8", "win_delay_load_hook"] }
+# Для Electron на Windows нужен delay-load хук (N-API-символы резолвятся в
+# electron.exe, а не node.exe), но фичи win_delay_load_hook в napi 2.16 НЕТ —
+# она ломала резолв зависимостей на всех платформах. Windows-механизм
+# (delayload через linker-args или апгрейд napi) — вместе с win-сборкой
+# нативного модуля на win-машине; Linux/CI собирают без него.
+napi = { version = "2", default-features = false, features = ["napi8"] }
 napi-derive = "2"
 cpal = "0.15"
 slopsician-dsp = { path = "../dsp" }

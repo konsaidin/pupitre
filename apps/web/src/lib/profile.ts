@@ -50,7 +50,9 @@ const DEFAULTS: Profile = {
   guideNotes: true,
   metronome: true,
   headphonesWarned: false,
-  vocalView: 'ribbon',
+  // пиано-ролл по умолчанию: привычный вид с клавиатурой и плашками;
+  // лента доступна переключателем в шапке игры
+  vocalView: 'roll',
   scores: [],
 };
 

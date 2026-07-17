@@ -30,6 +30,10 @@ PITCHLINE_DECIMATE = 2  # прореживание контура f0 перед 
 ProgressCb = Callable[[str, int], None]  # (stage, progress 0..100)
 
 
+class SongDeleted(Exception):
+    """Каталог песни исчез во время обработки — пользователь её удалил."""
+
+
 @dataclass(frozen=True)
 class ExtractParams:
     """Настройки извлечения мелодии; крутятся ползунками в UI (reextract)."""
@@ -97,8 +101,8 @@ def decode_to_wav(src: Path, dst: Path) -> None:
 _demucs_model = None
 
 
-def separate_stems(mix_wav: Path, out_dir: Path, progress: ProgressCb) -> tuple[Path, Path] | None:
-    """Demucs htdemucs → (vocals.wav, instrumental.wav). None, если Demucs недоступен.
+def separate_stems(mix_wav: Path, out_dir: Path, progress: ProgressCb) -> tuple[Path, Path] | str:
+    """Demucs htdemucs → (vocals.wav, instrumental.wav); при сбое — строка-причина.
 
     Используется низкоуровневый API (demucs 4.0.x не имеет demucs.api);
     гранулярного прогресса у apply_model нет, поэтому этап показываем крупно.
@@ -108,11 +112,10 @@ def separate_stems(mix_wav: Path, out_dir: Path, progress: ProgressCb) -> tuple[
         import soundfile as sf
         import torch
         from demucs.apply import apply_model
-        from demucs.audio import AudioFile
         from demucs.pretrained import get_model
     except Exception as e:  # noqa: BLE001 — любой сбой импорта тяжёлого стека
         log.warning("Demucs недоступен (%s), пропускаю разделение", e)
-        return None
+        return f"Demucs недоступен: {str(e)[:200]}"
 
     try:
         progress("separate", 12)
@@ -122,9 +125,14 @@ def separate_stems(mix_wav: Path, out_dir: Path, progress: ProgressCb) -> tuple[
         model = _demucs_model
         progress("separate", 20)
 
-        wav = AudioFile(mix_wav).read(
-            streams=0, samplerate=model.samplerate, channels=model.audio_channels
-        )
+        # не demucs.AudioFile: он дёргает ffprobe, которого нет в поставке
+        # (шипуем только ffmpeg.exe). mix.wav уже stereo 44.1k из decode_to_wav
+        data, in_sr = sf.read(str(mix_wav), dtype="float32", always_2d=True)
+        if in_sr != model.samplerate:
+            raise RuntimeError(f"mix.wav: {in_sr} Гц вместо {model.samplerate}")
+        wav = torch.from_numpy(data.T.copy())  # (channels, frames)
+        if wav.shape[0] == 1:
+            wav = wav.repeat(model.audio_channels, 1)
         ref = wav.mean(0)
         wav = (wav - ref.mean()) / ref.std()
         progress("separate", 25)
@@ -147,10 +155,12 @@ def separate_stems(mix_wav: Path, out_dir: Path, progress: ProgressCb) -> tuple[
         sf.write(str(vocals_path), vocals.clamp(-1, 1).T.numpy(), model.samplerate)
         sf.write(str(instr_path), instrumental.clamp(-1, 1).T.numpy(), model.samplerate)
         return vocals_path, instr_path
-    except Exception:  # noqa: BLE001
+    except SongDeleted:
+        raise
+    except Exception as e:  # noqa: BLE001
         log.exception("Demucs упал, пропускаю разделение")
         progress("separate", 68)
-        return None
+        return f"Demucs упал: {str(e)[:200]}"
 
 
 def hz_to_midi(hz: np.ndarray) -> np.ndarray:
@@ -205,6 +215,14 @@ def extract_notes(
     # октавные срывы pYIN (уход на кратное 12 и обратно) возвращаем в регистр
     midi = _fix_octave_flips(midi, frame_ms)
     notes = _segment(midi, frame_ms, params)
+    # добиваем октавные выбросы, пережившие контурную свёртку (края фраз,
+    # целые фразы на субгармонике) — и применяем те же свёртки к контуру:
+    # полоска (pitchline) обязана совпадать с нотами, это один алгоритм
+    for a_ms, b_ms, delta in _fix_note_octaves(notes):
+        a = max(0, int(a_ms / frame_ms) - 1)
+        b = min(len(midi), int(math.ceil(b_ms / frame_ms)) + 2)
+        seg = midi[a:b]
+        seg[~np.isnan(seg)] += delta
     _mark_vibrato(notes, midi, frame_ms)
     pitchline = _build_pitchline(midi, frame_ms)
     progress("analyze", 98)
@@ -278,6 +296,112 @@ def _fix_octave_flips(midi: np.ndarray, frame_ms: float) -> np.ndarray:
         if not changed:
             break
     return out
+
+
+def _fix_note_octaves(notes: list[dict]) -> list[tuple[float, float, int]]:
+    """Октавные выбросы НОТ после сегментации (правит на месте).
+
+    Возвращает применённые свёртки [(startMs, endMs, deltaSemis)] — вызывающий
+    ОБЯЗАН применить их и к f0-контуру (pitchline): ноты и полоска — один
+    алгоритм, расхождение между ними = скачущая линия при ровных нотах.
+
+    Правила (оба требуют почти точного кратного 12 — честные широкие
+    интервалы октавами не сводятся и не трогаются):
+    1) короткая фраза (< max_phrase_ms; ноты через паузы < phrase_gap_ms)
+       на ~кратное октавы НИЖЕ регистра остальных нот — поднять обратно
+       (классическая субгармоника pYIN: f0/2). Поднимаем только снизу и
+       только ОДИНОЧЕК: если на уровне фразы живёт хоть одна другая фраза
+       приличной длины — это настоящий низкий куплет (куплеты повторяются,
+       срыв — одиночка), не трогаем. Критерий «±12 с малым остатком» без
+       проверки одиночества ломал живые куплеты при контрасте куплет/припев
+       ≈ октава;
+    2) нота, чьи соседи по фразе согласны между собой, а она отстоит от них
+       на почти точное кратное октавы — приклеить к соседям.
+    """
+    phrase_gap_ms = 400.0
+    agree_semis = 3.5  # согласие соседей между собой
+    fold_residual = 2.0  # отклонение сдвига от кратного октаве
+    max_phrase_ms = 6000.0
+    companion_semis = 3.0  # фраза на том же уровне = уровень настоящий
+    companion_min_ms = 600.0  # совсем короткие обрывки компаньонами не считаем
+
+    folds: list[tuple[float, float, int]] = []
+    if len(notes) < 3:
+        return folds
+
+    def wmedian(values: list[tuple[float, float]]) -> float:
+        """Взвешенная медиана [(значение, вес)]."""
+        values = sorted(values)
+        total = sum(w for _, w in values)
+        acc = 0.0
+        for v, w in values:
+            acc += w
+            if acc >= total / 2:
+                return v
+        return values[-1][0]
+
+    # фразы: группы нот, слитые паузами < phrase_gap_ms
+    phrases: list[list[int]] = [[0]]
+    for i in range(1, len(notes)):
+        prev = notes[i - 1]
+        gap = notes[i]["startMs"] - (prev["startMs"] + prev["durMs"])
+        if gap < phrase_gap_ms:
+            phrases[-1].append(i)
+        else:
+            phrases.append([i])
+
+    def phrase_med(idx: list[int]) -> float:
+        return wmedian([(float(notes[i]["midi"]), float(notes[i]["durMs"])) for i in idx])
+
+    def phrase_span(idx: list[int]) -> float:
+        first, last = notes[idx[0]], notes[idx[-1]]
+        return float(last["startMs"] + last["durMs"] - first["startMs"])
+
+    # правило 1: короткая фраза-субгармоника без компаньонов на своём уровне
+    for pi, idx in enumerate(phrases):
+        if phrase_span(idx) > max_phrase_ms:
+            continue
+        med = phrase_med(idx)
+        others = [(float(notes[i]["midi"]), float(notes[i]["durMs"]))
+                  for pj, oidx in enumerate(phrases) if pj != pi for i in oidx]
+        if not others:
+            continue
+        register = wmedian(others)
+        k = round((med - register) / 12.0)
+        if k >= 0 or abs(med - register - 12.0 * k) > fold_residual:
+            continue
+        lonely = all(
+            abs(phrase_med(oidx) - med) > companion_semis or phrase_span(oidx) < companion_min_ms
+            for pj, oidx in enumerate(phrases)
+            if pj != pi
+        )
+        if not lonely:
+            continue  # уровень обжит другими фразами — настоящий низкий куплет
+        first, last = notes[idx[0]], notes[idx[-1]]
+        for i in idx:
+            notes[i]["midi"] -= 12 * k
+        folds.append((float(first["startMs"]), float(last["startMs"] + last["durMs"]), -12 * k))
+
+    # правило 2: одиночный выброс между согласными соседями (внутри фразы)
+    for _ in range(2):
+        changed = False
+        for idx in phrases:
+            for j in range(1, len(idx) - 1):
+                pm = notes[idx[j - 1]]["midi"]
+                m = notes[idx[j]]["midi"]
+                nm = notes[idx[j + 1]]["midi"]
+                if abs(pm - nm) > agree_semis:
+                    continue
+                dm = m - (pm + nm) / 2.0
+                k = round(dm / 12.0)
+                if k != 0 and abs(dm - 12.0 * k) <= fold_residual:
+                    n = notes[idx[j]]
+                    n["midi"] -= 12 * k
+                    folds.append((float(n["startMs"]), float(n["startMs"] + n["durMs"]), -12 * k))
+                    changed = True
+        if not changed:
+            break
+    return folds
 
 
 def _mark_vibrato(notes: list[dict], midi: np.ndarray, frame_ms: float) -> None:
@@ -422,6 +546,8 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
     d = store.song_dir(meta.id)
 
     def progress(stage: str, pct: int) -> None:
+        if not d.exists():
+            raise SongDeleted(meta.id)
         meta.stage = stage
         meta.progress = max(meta.progress, min(100, pct))
         store.save_meta(meta)
@@ -438,13 +564,16 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
         progress("decode", 8)
 
         stems = separate_stems(mix_wav, d, progress)
-        if stems is not None:
+        if isinstance(stems, tuple):
             vocal_src, instr_src = stems
             meta.separated = True
+            meta.separation_error = ""
         else:
-            # деградация: мелодию снимаем с полного микса, он же — аккомпанемент
+            # деградация: мелодию снимаем с полного микса, он же — аккомпанемент.
+            # Причина едет в meta — UI обязан показать её, тихой деградации нет
             vocal_src, instr_src = mix_wav, mix_wav
             meta.separated = False
+            meta.separation_error = stems
         progress("analyze", 70)
 
         notes, duration_ms, pitchline = extract_notes(vocal_src, progress)
@@ -482,8 +611,8 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
         }
         import json
 
-        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False))
-        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False))
+        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False), encoding="utf-8")
+        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False), encoding="utf-8")
 
         # промежуточные артефакты больше не нужны; vocals.wav оставляем — из него
         # делается превью и (в будущем) повторное извлечение без Demucs
@@ -495,6 +624,8 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
         meta.status = "done"
         meta.error = ""
         progress("done", 100)
+    except SongDeleted:
+        log.info("обработка %s прервана: песня удалена", meta.id)
     except Exception as e:  # noqa: BLE001 — статус ошибки должен дойти до UI
         log.exception("обработка %s упала", meta.id)
         meta.status = "error"
@@ -516,6 +647,8 @@ def reextract_song(store: SongStore, meta: SongMeta, params: ExtractParams) -> N
     old_status = meta.status
 
     def progress(stage: str, pct: int) -> None:
+        if not d.exists():
+            raise SongDeleted(meta.id)
         meta.stage = stage
         meta.progress = max(meta.progress, min(100, pct))
         store.save_meta(meta)
@@ -554,8 +687,8 @@ def reextract_song(store: SongStore, meta: SongMeta, params: ExtractParams) -> N
             encode_instrumental(vocal_wav, d / "vocal.mp3")
         song_map["hasVocal"] = (d / "vocal.mp3").exists()
 
-        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False))
-        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False))
+        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False), encoding="utf-8")
+        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False), encoding="utf-8")
 
         meta.duration_ms = duration_ms
         meta.note_count = len(notes)
@@ -564,6 +697,8 @@ def reextract_song(store: SongStore, meta: SongMeta, params: ExtractParams) -> N
         meta.status = "done"
         meta.error = ""
         progress("done", 100)
+    except SongDeleted:
+        log.info("reextract %s прерван: песня удалена", meta.id)
     except Exception as e:  # noqa: BLE001 — сообщение должно дойти до UI
         log.exception("reextract %s упал", meta.id)
         # карта цела — возвращаем прежний статус, ошибку показываем текстом

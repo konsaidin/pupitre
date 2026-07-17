@@ -29,10 +29,10 @@ describe('shiftNotes / rollWindow', () => {
     expect(src[0].midi).toBe(60);
   });
 
-  it('rollWindow — диапазон ± запас, растянутый на выпавшие ноты', () => {
+  it('rollWindow — диапазон ± запас; выпавшие ноты внутри, не на краю', () => {
     const w = rollWindow([note(40), note(80)], { lowMidi: 55, highMidi: 70 });
-    expect(w.lowMidi).toBe(40);
-    expect(w.highMidi).toBe(80);
+    expect(w.lowMidi).toBe(39); // строка запаса под крайней нотой
+    expect(w.highMidi).toBe(81); // и над ней
     const w2 = rollWindow([note(60)], { lowMidi: 55, highMidi: 70 });
     expect(w2).toEqual({ lowMidi: 53, highMidi: 72 });
   });

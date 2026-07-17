@@ -156,7 +156,7 @@ def save_map(song_id: str, notes: list[dict] = Body(..., embed=True)) -> dict:
 
     song_map["notes"] = clean
     (store.song_dir(song_id) / "map.json").write_text(
-        __import__("json").dumps(song_map, ensure_ascii=False)
+        __import__("json").dumps(song_map, ensure_ascii=False), encoding="utf-8"
     )
     meta.note_count = len(clean)
     if clean:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { comboMultiplier, displayFoldAtOnset, judge, matchPitch, notePoints, starsFor, summarize } from './scoring';
+import { comboMultiplier, judge, matchPitch, notePoints, starsFor, summarize } from './scoring';
 import type { MapNote } from '../lib/songMap';
 
 describe('matchPitch', () => {
@@ -17,20 +17,6 @@ describe('matchPitch', () => {
   it('на границе свёртки (тритон) всегда мимо допуска — дрожь границы безвредна', () => {
     expect(Math.abs(matchPitch(66, 60, 'medium').cents)).toBe(600);
     expect(matchPitch(66, 60, 'medium').inTolerance).toBe(false);
-  });
-});
-
-describe('displayFoldAtOnset', () => {
-  it('онсет октавой ниже цели перепривязывает к цели', () => {
-    expect(displayFoldAtOnset(48, 60, 'medium', 0)).toBe(12);
-  });
-
-  it('после вдоха близкая к цели прежняя поправка сохраняется', () => {
-    expect(displayFoldAtOnset(55, 60, 'medium', 12)).toBe(12);
-  });
-
-  it('pro никогда не сдвигает отображение', () => {
-    expect(displayFoldAtOnset(48, 60, 'pro', 12)).toBe(0);
   });
 });
 

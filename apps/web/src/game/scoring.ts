@@ -29,27 +29,10 @@ export function matchPitch(
   return { cents, inTolerance: Math.abs(cents) <= meta.toleranceCents };
 }
 
-/** Прежняя октавная поправка сохраняется на онсете, если кладёт голос не дальше этого от цели. */
-const KEEP_FOLD_SEMIS = 9;
-
-/**
- * Октавная поправка отображения (кратна 12). Пересчитывается ТОЛЬКО на онсете
- * голоса (первый озвученный кадр после паузы): пока голос звучит непрерывно,
- * поправка заморожена — точка на ролле двигается ровно как голос, телепорты
- * на ±12 исключены по построению. Пересвёртка каждый кадр (даже с гистерезисом)
- * прыгала на октаву при глиссандо от цели и на скачках мелодии > полосы.
- * Дыхание/согласная октаву не дёргают: близкая к цели прежняя поправка живёт.
- */
-export function displayFoldAtOnset(
-  sungMidi: number,
-  targetMidi: number,
-  difficulty: Difficulty,
-  prevFold: number,
-): number {
-  if (!DIFFICULTY_META[difficulty].octaveAgnostic) return 0;
-  if (Math.abs(sungMidi + prevFold - targetMidi) <= KEEP_FOLD_SEMIS) return prevFold;
-  return foldToOctaveOf(sungMidi, targetMidi) - sungMidi;
-}
+// Октавных поправок ОТОБРАЖЕНИЯ больше нет: точка на ролле — всегда сырой
+// голос (см. engine.onPitchFrame). Прощение октавы на beginner/medium живёт
+// только здесь, в matchPitch. Историю с display-fold (три починки, всё равно
+// телепортировало) см. PLAN.md «Санация Windows-сборки», пункт 5.
 
 export function judge(hitRatio: number): Judgement {
   if (hitRatio >= 0.8) return 'perfect';

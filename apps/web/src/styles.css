@@ -9,6 +9,34 @@
   font-display: swap;
 }
 
+/* Свой UI-шрифт: одинаковый рендер в вебе, Electron/Windows и под Wine —
+   без него стек падал на разные системные шрифты с разными метриками
+   («сплющенный» интерфейс там, где нет Roboto/Segoe). */
+@font-face {
+  font-family: 'App Sans';
+  src: url('./assets/fonts/roboto-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'App Sans';
+  src: url('./assets/fonts/roboto-medium.woff2') format('woff2');
+  font-weight: 500 600;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'App Sans';
+  src: url('./assets/fonts/roboto-bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'App Sans';
+  src: url('./assets/fonts/roboto-black.woff2') format('woff2');
+  font-weight: 800 900;
+  font-display: swap;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* контролы не наследуют шрифт по умолчанию — а в нём наш эмодзи-фолбэк */
 button, input, select, textarea { font: inherit; }
@@ -56,7 +84,7 @@ body {
     var(--bg);
   background-attachment: fixed;
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'App Emoji', sans-serif;
+  font-family: 'App Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', 'App Emoji', sans-serif;
   line-height: 1.55;
 }
 
@@ -457,20 +485,6 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
 }
 .upload-title { font-size: 1.15rem; font-weight: 700; }
 .upload-desc { color: var(--text-2); font-size: 0.88rem; line-height: 1.5; }
-.status-line {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--dim);
-}
-.status-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--dim); flex: none; }
-.status-dot.ok { background: var(--green); box-shadow: 0 0 8px rgba(52, 211, 153, 0.8); }
-.status-dot.bad { background: var(--yellow); }
 
 .calib-num { font-size: 2.1rem; font-weight: 700; line-height: 1.1; }
 .calib-unit {
@@ -571,6 +585,16 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   height: 100%;
   background: var(--accent);
   transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* причина неотделённого вокала: видимая, но не кричащая */
+.warn-line {
+  display: block;
+  color: var(--yellow);
+  margin-top: 2px;
+  max-width: 34rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* ── Dropzone ── */

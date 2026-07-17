@@ -20,20 +20,15 @@ export function HomeScreen() {
   const navigate = useNavigate();
   const r = profile.range;
 
-  // тихий пинг бэкенда: количество готовых песен + статус сервера обработки
+  // тихий пинг бэкенда: количество готовых песен для карточки «Мои песни»
   const [songCount, setSongCount] = useState<number | null>(null);
-  const [server, setServer] = useState<'wait' | 'ok' | 'down'>('wait');
   useEffect(() => {
     let alive = true;
     listSongs()
       .then((songs) => {
-        if (!alive) return;
-        setSongCount(songs.filter((s) => s.status === 'done').length);
-        setServer('ok');
+        if (alive) setSongCount(songs.filter((s) => s.status === 'done').length);
       })
-      .catch(() => {
-        if (alive) setServer('down');
-      });
+      .catch(() => {});
     return () => {
       alive = false;
     };
@@ -77,12 +72,6 @@ export function HomeScreen() {
           <span className="upload-orb"><Icon name="upload" size={22} /></span>
           <span className="upload-title">{t('Upload a song')}</span>
           <span className="upload-desc">{t('mp3, wav or flac. Demucs separates vocals, pYIN traces the melody — locally.')}</span>
-          <span className="status-line">
-            <span className={server === 'ok' ? 'status-dot ok' : server === 'down' ? 'status-dot bad' : 'status-dot'} />
-            {server === 'ok' && t('Processing server ready')}
-            {server === 'down' && t('Server unavailable')}
-            {server === 'wait' && t('Checking the server…')}
-          </span>
         </button>
         <div className="info-card">
           <div className="info-head">
