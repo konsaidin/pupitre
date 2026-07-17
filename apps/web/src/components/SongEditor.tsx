@@ -282,8 +282,9 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         const y = midiToY(n.midi);
         const h = Math.max(6, rowH * 0.72);
         const isSel = n.id === sel;
+        const sx = Math.max(x1, KEYBOARD_W);
         ctx2d.fillStyle = isSel ? C.noteSel : C.note;
-        roundRect(ctx2d, Math.max(x1, KEYBOARD_W), y - h / 2, Math.max(3, x2 - x1), h, 5);
+        roundRect(ctx2d, sx, y - h / 2, Math.max(3, x2 - sx), h, 5);
         ctx2d.fill();
         ctx2d.strokeStyle = isSel ? C.noteSelBorder : C.noteBorder;
         ctx2d.lineWidth = isSel ? 2 : 1;

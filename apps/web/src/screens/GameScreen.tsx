@@ -104,6 +104,9 @@ export function GameScreen() {
   }, [engineMap, range]);
 
   useEffect(() => () => stopMic(), []);
+  // уход с экрана любым путём (не только кнопкой «Выйти») глушит движок:
+  // иначе запланированный синт/метроном доигрывает поверх следующей игры
+  useEffect(() => () => engine?.quit(), [engine]);
 
   // HUD-опрос движка
   useEffect(() => {

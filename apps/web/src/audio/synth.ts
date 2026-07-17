@@ -74,7 +74,13 @@ export class Synth {
     osc.connect(gain).connect(this.master);
     osc.start(startTime);
     osc.stop(startTime + 0.06);
-    osc.onended = () => gain.disconnect();
+    // клики обязаны попадать в scheduled: иначе cancelAll (пауза/выход) их не
+    // снимает, и метроном доигрывает всю песню поверх следующей игры
+    this.scheduled.push({ osc, gain });
+    osc.onended = () => {
+      gain.disconnect();
+      this.scheduled = this.scheduled.filter((s) => s.osc !== osc);
+    };
   }
 
   /** Отменить всё запланированное (пауза/выход). */

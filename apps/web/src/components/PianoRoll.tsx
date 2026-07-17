@@ -135,8 +135,11 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
           const x2 = msToX(g.startMs + g.durMs);
           if (x2 < KEYBOARD_W || x1 > W) continue;
           const y = midiToY(g.midi);
+          // рисуем от края клавиатуры, но правый край — настоящий x2:
+          // ширина x2−x1 от обрезанного левого края растягивала плашку
+          const gx = Math.max(x1, KEYBOARD_W);
           ctx2d.fillStyle = C.ghost;
-          roundRect(ctx2d, Math.max(x1, KEYBOARD_W), y - rowH * 0.38, Math.max(2, x2 - x1), rowH * 0.76, 4);
+          roundRect(ctx2d, gx, y - rowH * 0.38, Math.max(2, x2 - gx), rowH * 0.76, 4);
           ctx2d.fill();
         }
       }
@@ -160,20 +163,24 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
           border = res.judgement === 'perfect' ? C.perfect : res.judgement === 'good' ? C.good : C.miss;
           fill = res.judgement === 'miss' ? 'rgba(224,95,95,0.25)' : 'rgba(46,168,111,0.35)';
         }
+        // левый край обрезается клавиатурой, правый — настоящий x2 (ширина
+        // x2−x1 от обрезанного края «растягивала» уезжающую ноту)
+        const sx = Math.max(x1, KEYBOARD_W);
         ctx2d.fillStyle = fill;
-        roundRect(ctx2d, Math.max(x1, KEYBOARD_W), y - h / 2, Math.max(3, x2 - x1), h, 5);
+        roundRect(ctx2d, sx, y - h / 2, Math.max(3, x2 - sx), h, 5);
         ctx2d.fill();
         ctx2d.strokeStyle = border;
         ctx2d.lineWidth = active ? 2 : 1;
         ctx2d.stroke();
         ctx2d.lineWidth = 1;
 
-        // заливка прогресса попадания на активной ноте
+        // заливка прогресса попадания на активной ноте (от начала ноты)
         if (active) {
           const hit = engine.noteHitRatio(i);
-          if (hit > 0) {
+          const fillEnd = x1 + (x2 - x1) * hit;
+          if (hit > 0 && fillEnd > sx) {
             ctx2d.fillStyle = C.hit;
-            roundRect(ctx2d, Math.max(x1, KEYBOARD_W), y - h / 2, Math.max(3, (x2 - x1) * hit), h, 5);
+            roundRect(ctx2d, sx, y - h / 2, Math.max(3, fillEnd - sx), h, 5);
             ctx2d.fill();
           }
         }
