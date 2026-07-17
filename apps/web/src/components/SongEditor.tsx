@@ -23,7 +23,7 @@ interface ENote extends MapNote {
   id: number;
 }
 
-type DragMode = 'none' | 'move' | 'resize' | 'seek';
+type DragMode = 'none' | 'move' | 'resize' | 'seek' | 'range';
 
 const KEYBOARD_W = 56;
 const PLAYHEAD_FRAC = 0.3;
@@ -45,6 +45,8 @@ const C = {
   noteSel: '#6d8ad4',
   noteSelBorder: '#a9c0ff',
   pitch: '#22d3ee',
+  selRange: 'rgba(251,191,36,0.10)',
+  selRangeEdge: 'rgba(251,191,36,0.6)',
   playhead: 'rgba(255,255,255,0.5)',
   ruler: '#151a24',
   rulerLine: 'rgba(255,255,255,0.2)',
@@ -69,13 +71,18 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
     grabMidi: 0,
   });
 
+  // выделение по времени (Shift+drag) — для октавного транспонирования фраз
+  const selRangeRef = useRef<{ aMs: number; bMs: number } | null>(null);
+
   const [, setVersion] = useState(0);
   const bump = useCallback(() => setVersion((v) => v + 1), []);
   const [selected, setSelected] = useState<number | null>(null);
+  const [selRange, setSelRange] = useState<{ aMs: number; bMs: number } | null>(null);
   const [playing, setPlaying] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [vocalOk, setVocalOk] = useState(Boolean(vocalUrl));
   const [centerMs, setCenterMs] = useState(0);
 
@@ -83,6 +90,35 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
     selectedRef.current = id;
     setSelected(id);
   }, []);
+
+  const setRange = useCallback((r: { aMs: number; bMs: number } | null) => {
+    selRangeRef.current = r;
+    setSelRange(r);
+  }, []);
+
+  /**
+   * Транспонирование ±12: ноты внутри выделения (пересечение по времени),
+   * без выделения — выбранная нота. За пределы окна ролла не выводим —
+   * операция целиком отменяется, чтобы не ломать интервалы клампом.
+   */
+  const transpose = useCallback(
+    (d: number) => {
+      const r = selRangeRef.current;
+      const targets = r
+        ? notesRef.current.filter((n) => n.startMs < r.bMs && n.startMs + n.durMs > r.aMs)
+        : notesRef.current.filter((n) => n.id === selectedRef.current);
+      if (targets.length === 0) return;
+      if (targets.some((n) => n.midi + d < win.lowMidi || n.midi + d > win.highMidi)) {
+        setNotice(t('Shift would leave the roll window — nothing changed.'));
+        return;
+      }
+      for (const n of targets) n.midi += d;
+      setNotice(null);
+      setDirty(true);
+      bump();
+    },
+    [bump, win.lowMidi, win.highMidi],
+  );
 
   const seekTo = useCallback((ms: number) => {
     const clamped = Math.max(0, Math.min(map.durationMs, ms));
@@ -101,7 +137,7 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
     bump();
   }, [bump, select]);
 
-  // Delete/Backspace удаляют выбранную ноту
+  // Delete/Backspace удаляют выбранную ноту; Shift+↑/↓ — октава; Esc снимает выделение, потом закрывает
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -109,13 +145,17 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
           e.preventDefault();
           deleteSelected();
         }
+      } else if (e.shiftKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+        e.preventDefault();
+        transpose(e.key === 'ArrowUp' ? 12 : -12);
       } else if (e.key === 'Escape') {
-        onClose();
+        if (selRangeRef.current) setRange(null);
+        else onClose();
       }
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [deleteSelected, onClose]);
+  }, [deleteSelected, onClose, transpose, setRange]);
 
   // рендер-цикл
   useEffect(() => {
@@ -213,6 +253,24 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         ctx2d.stroke();
         ctx2d.shadowBlur = 0;
         ctx2d.lineWidth = 1;
+      }
+
+      // выделение по времени (для транспонирования)
+      const sr = selRangeRef.current;
+      if (sr) {
+        const x1 = Math.max(KEYBOARD_W, msToX(Math.min(sr.aMs, sr.bMs)));
+        const x2 = Math.min(W, msToX(Math.max(sr.aMs, sr.bMs)));
+        if (x2 > x1) {
+          ctx2d.fillStyle = C.selRange;
+          ctx2d.fillRect(x1, RULER_H, x2 - x1, H - RULER_H);
+          ctx2d.strokeStyle = C.selRangeEdge;
+          ctx2d.beginPath();
+          ctx2d.moveTo(x1, RULER_H);
+          ctx2d.lineTo(x1, H);
+          ctx2d.moveTo(x2, RULER_H);
+          ctx2d.lineTo(x2, H);
+          ctx2d.stroke();
+        }
       }
 
       // ноты
@@ -353,6 +411,15 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
       return;
     }
 
+    // Shift+drag — выделение фразы по времени (для транспонирования)
+    if (e.shiftKey) {
+      const anchor = g.xToMs(x);
+      dragRef.current = { mode: 'range', id: -1, grabMs: anchor, grabMidi: 0 };
+      setRange({ aMs: anchor, bMs: anchor });
+      bump();
+      return;
+    }
+
     const hit = hitTest(x, y);
     if (hit) {
       select(hit.note.id);
@@ -379,6 +446,10 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
       seekTo(g.xToMs(x));
       return;
     }
+    if (d.mode === 'range') {
+      setRange({ aMs: d.grabMs, bMs: g.xToMs(x) });
+      return;
+    }
     const n = notesRef.current.find((v) => v.id === d.id);
     if (!n) return;
 
@@ -394,6 +465,12 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
 
   const onPointerUp = (e: React.PointerEvent) => {
     if (dragRef.current.mode !== 'none') {
+      // вырожденное выделение (клик с Shift без протяжки) — снимаем
+      if (dragRef.current.mode === 'range') {
+        const r = selRangeRef.current;
+        if (r && Math.abs(r.bMs - r.aMs) < 60) setRange(null);
+        else if (r) setRange({ aMs: Math.min(r.aMs, r.bMs), bMs: Math.max(r.aMs, r.bMs) });
+      }
       dragRef.current = { mode: 'none', id: -1, grabMs: 0, grabMidi: 0 };
       try {
         (e.target as Element).releasePointerCapture(e.pointerId);
@@ -464,6 +541,22 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
               {playing ? '⏸' : '▶'} {t('Vocals')}
             </button>
           )}
+          <button
+            className="btn tiny"
+            disabled={selRange === null && selected === null}
+            title={t('Octave down: selection (Shift+drag) or the selected note')}
+            onClick={() => transpose(-12)}
+          >
+            −12
+          </button>
+          <button
+            className="btn tiny"
+            disabled={selRange === null && selected === null}
+            title={t('Octave up: selection (Shift+drag) or the selected note')}
+            onClick={() => transpose(12)}
+          >
+            +12
+          </button>
           <button className="btn tiny danger" disabled={selected === null} onClick={deleteSelected}>
             🗑 {t('Delete note')}
           </button>
@@ -499,8 +592,10 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
 
         <p className="dim small editor-hint">
           {t('drag a note — move; drag its right edge — length; double-click — add; Delete — remove. Timeline on top seeks.')}
+          {' '}{t('Shift+drag selects a phrase; ±12 (or Shift+↑/↓) fixes a wrong octave.')}
           {selNote && ` · ${midiToName(selNote.midi)}, ${Math.round(selNote.durMs)} ms`}
         </p>
+        {notice && <p className="hint small">{notice}</p>}
         {!vocalOk && vocalUrl && <p className="hint small">{t('Vocals unavailable — edit along the contour.')}</p>}
         {error && <p className="error small">⚠️ {error}</p>}
 

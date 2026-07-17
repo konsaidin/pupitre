@@ -1,0 +1,55 @@
+# Тесты на каждый push/PR: юнит-тесты веба (vitest) + движковый e2e на
+# синтетических кадрах + сборка, юнит-тесты Rust-ядра (cargo).
+# Сборки пакетов живут отдельно в desktop.yml.
+
+name: ci
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - run: npm ci
+
+      - name: Unit tests (vitest)
+        run: npm test
+
+      - name: Engine e2e (synthetic frames, no browser)
+        run: |
+          npx esbuild e2e/vibrato-exercise.ts --bundle --format=esm --platform=node \
+            --banner:js="globalThis.localStorage={getItem:()=>null,setItem:()=>{}};" \
+            --outfile=/tmp/vibrato-exercise.mjs
+          node /tmp/vibrato-exercise.mjs
+
+      - name: Build (tsc + vite)
+        run: npm run build
+
+  dsp:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/dsp
+
+      - name: DSP core tests
+        run: cargo test --manifest-path packages/dsp/Cargo.toml

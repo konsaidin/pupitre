@@ -744,6 +744,25 @@ select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px
   background: linear-gradient(90deg, var(--accent), var(--cyan));
   pointer-events: none;
 }
+/* A/B-луп на полоске перемотки: рамка интервала (или метка точки A) */
+.seekbar-loop {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  min-width: 2px;
+  background: rgba(251, 191, 36, 0.18);
+  border-left: 2px solid var(--warm);
+  border-right: 2px solid var(--warm);
+  pointer-events: none;
+}
+/* кнопка лупа в шапке игры: поставлена точка A / луп активен */
+.loop-btn.armed { border-color: var(--warm); color: var(--warm); }
+.loop-btn.active {
+  border-color: var(--warm);
+  color: var(--warm);
+  background: rgba(251, 191, 36, 0.12);
+  box-shadow: 0 0 16px var(--warm-glow);
+}
 .seekbar-preview {
   position: absolute;
   bottom: calc(100% + 10px);

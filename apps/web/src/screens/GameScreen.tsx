@@ -42,6 +42,8 @@ export function GameScreen() {
   const [engine, setEngine] = useState<GameEngine | null>(null);
   const [hud, setHud] = useState({ score: 0, combo: 0, progress: 0, countdown: 0 });
   const [editing, setEditing] = useState(false);
+  // A/B-луп фразы: null → точка A поставлена → интервал активен
+  const [loop, setLoop] = useState<{ a: number; b: number | null } | null>(null);
   const [tuning, setTuning] = useState(false); // панель настроек извлечения
   const [lineMode, setLineMode] = useState(false); // экспериментально: петь по линии-контуру
   // вариант исполнения: минус / оригинал с вокалом / только извлечённый вокал
@@ -199,7 +201,26 @@ export function GameScreen() {
   const restart = () => {
     engine?.quit();
     setEngine(null);
+    setLoop(null);
     setStatus('setup');
+  };
+
+  /** Кнопка/клавиша лупа: первый раз — точка A, второй — точка B (луп пошёл), третий — сброс. */
+  const cycleLoop = () => {
+    if (!engine || (status !== 'running' && status !== 'paused')) return;
+    const ms = Math.max(0, engine.songMs());
+    if (!loop) {
+      setLoop({ a: ms, b: null });
+    } else if (loop.b === null) {
+      const a = Math.min(loop.a, ms);
+      const b = Math.max(loop.a, ms, a + 1000); // вырожденный интервал не ставим
+      engine.setLoop(a, b);
+      setLoop({ a, b });
+      engine.seekTo(a);
+    } else {
+      engine.setLoop(null, null);
+      setLoop(null);
+    }
   };
 
   const openEditor = () => {
@@ -226,6 +247,9 @@ export function GameScreen() {
       if (!engine || (status !== 'running' && status !== 'paused')) return;
       e.preventDefault();
       engine.seekTo(engine.songMs() + (e.code === 'ArrowRight' ? 5000 : -5000));
+    } else if (e.code === 'KeyL') {
+      e.preventDefault();
+      cycleLoop();
     } else if (e.code === 'Escape') {
       e.preventDefault();
       if (status === 'running') pause();
@@ -284,6 +308,15 @@ export function GameScreen() {
             {t('Roll')}
           </button>
         </div>
+        {(status === 'running' || status === 'paused') && (
+          <button
+            className={loop?.b != null ? 'btn tiny loop-btn active' : loop ? 'btn tiny loop-btn armed' : 'btn tiny loop-btn'}
+            onClick={cycleLoop}
+            title={t('Phrase loop (L): press at the start, again at the end, third press clears')}
+          >
+            {!loop ? t('Loop A') : loop.b === null ? t('Loop B') : t('Loop ✕')}
+          </button>
+        )}
         <div className="hud">
           <span className="hud-score">{hud.score}</span>
           {hud.combo > 1 && <span className="hud-combo">×{hud.combo}</span>}
@@ -436,7 +469,7 @@ export function GameScreen() {
       </div>
 
       {engine && (status === 'running' || status === 'paused') && (
-        <SeekBar engine={engine} window={window_} onSeek={(ms) => engine.seekTo(ms)} />
+        <SeekBar engine={engine} window={window_} loop={loop} onSeek={(ms) => engine.seekTo(ms)} />
       )}
     </div>
   );

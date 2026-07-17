@@ -7,6 +7,8 @@ import type { GameEngine } from '../game/engine';
 interface SeekBarProps {
   engine: GameEngine;
   window: { lowMidi: number; highMidi: number };
+  /** A/B-луп: точка A (b=null) или активный интервал — рисуем маркеры */
+  loop?: { a: number; b: number | null } | null;
   onSeek: (ms: number) => void;
 }
 
@@ -14,7 +16,7 @@ const PREVIEW_W = 260;
 const PREVIEW_H = 84;
 const PREVIEW_SPAN_MS = 6000; // сколько песни видно в превью
 
-export function SeekBar({ engine, window: win, onSeek }: SeekBarProps) {
+export function SeekBar({ engine, window: win, loop = null, onSeek }: SeekBarProps) {
   const barRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
@@ -136,6 +138,15 @@ export function SeekBar({ engine, window: win, onSeek }: SeekBarProps) {
         }}
       >
         <div ref={fillRef} className="seekbar-fill" />
+        {loop && (
+          <div
+            className="seekbar-loop"
+            style={{
+              left: `${(loop.a / engine.map.durationMs) * 100}%`,
+              width: loop.b !== null ? `${((loop.b - loop.a) / engine.map.durationMs) * 100}%` : undefined,
+            }}
+          />
+        )}
       </div>
     </div>
   );

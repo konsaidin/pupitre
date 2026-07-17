@@ -159,6 +159,23 @@ export const RU: Record<string, string> = {
   'Retry': 'Повторить',
   'Delete': 'Удалить',
   'Delete “{title}”?': 'Удалить «{title}»?',
+
+  // — A/B-луп фразы —
+  'Phrase loop (L): press at the start, again at the end, third press clears':
+    'Луп фразы (L): нажми в начале, ещё раз в конце, третье нажатие снимает',
+  'Loop A': 'Луп: А',
+  'Loop B': 'Луп: Б',
+  'Loop ✕': 'Луп ✕',
+
+  // — транспонирование в редакторе —
+  'Octave down: selection (Shift+drag) or the selected note':
+    'Октава вниз: выделение (Shift+drag) или выбранная нота',
+  'Octave up: selection (Shift+drag) or the selected note':
+    'Октава вверх: выделение (Shift+drag) или выбранная нота',
+  'Shift+drag selects a phrase; ±12 (or Shift+↑/↓) fixes a wrong octave.':
+    'Shift+drag выделяет фразу; ±12 (или Shift+↑/↓) чинит съехавшую октаву.',
+  'Shift would leave the roll window — nothing changed.':
+    'Сдвиг вышел бы за окно ролла — ничего не изменено.',
   '{n} notes': '{n} нот',
   'vocals not separated (full mix plays)': 'вокал не отделён (играет полный микс)',
   'Map is not ready yet': 'Карта нот ещё не готова',

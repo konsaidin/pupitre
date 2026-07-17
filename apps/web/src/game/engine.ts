@@ -81,6 +81,9 @@ export class GameEngine {
   lastFrame: { songMs: number; midi: number; voiced: boolean; cents: number | null } | null = null;
   /** последний полный кадр анализа — техники для бейджей ленты */
   lastAnalysis: AnalysisFrame | null = null;
+  /** A/B-луп фразы: при достижении loopB песня мотается на loopA (см. tick) */
+  loopA: number | null = null;
+  loopB: number | null = null;
   /** суммарное время техник за игру (в итоги) */
   readonly techStats: TechStats = { vibratoMs: 0, distortionMs: 0 };
 
@@ -199,11 +202,32 @@ export class GameEngine {
     this.unsubscribe = null;
   }
 
+  /**
+   * A/B-луп для отработки фразы. a=null выключает; b подтягивается в границы
+   * песни, вырожденный интервал (< 200 мс) игнорируется.
+   */
+  setLoop(a: number | null, b: number | null): void {
+    if (a === null || b === null) {
+      this.loopA = null;
+      this.loopB = null;
+      return;
+    }
+    const lo = Math.max(0, Math.min(a, b));
+    const hi = Math.min(this.map.durationMs, Math.max(a, b));
+    if (hi - lo < 200) return;
+    this.loopA = lo;
+    this.loopB = hi;
+  }
+
   /** Вызывать каждый кадр рендера: двигает фазы и финализирует ноты. */
   tick(): void {
     if (this.phase === 'countdown' && this.songMs() >= 0) this.phase = 'playing';
     if (this.phase !== 'playing') return;
     const ms = this.songMs();
+    if (this.loopA !== null && this.loopB !== null && ms >= this.loopB) {
+      this.seekTo(this.loopA);
+      return;
+    }
     this.finalizePassed(ms);
     if (ms >= this.map.durationMs + 300) this.finish();
   }
