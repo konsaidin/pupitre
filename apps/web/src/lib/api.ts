@@ -13,6 +13,8 @@ const API_BASE_KEY = 'slopsician.apiBase.v1';
 interface DesktopBridge {
   apiBase: string;
   onBackendStatus(cb: (s: { stage: string; detail?: string; progress?: number }) => void): () => void;
+  /** повторить развёртывание после ошибки (есть в сборках с ретраем) */
+  retrySetup?: () => void;
 }
 export function desktopBridge(): DesktopBridge | null {
   return (window as { desktop?: DesktopBridge }).desktop ?? null;

@@ -13,6 +13,9 @@ contextBridge.exposeInMainWorld('desktop', {
     ipcRenderer.send('backend-status-subscribe');
     return () => ipcRenderer.removeListener('backend-status', listener);
   },
+  retrySetup() {
+    ipcRenderer.send('backend-retry');
+  },
 });
 
 // нативный захват (этап 4): мост появляется только когда main загрузил аддон;

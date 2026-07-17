@@ -37,11 +37,29 @@ jobs:
           npm ci
           npm run build
 
+      - name: Install desktop deps
+        working-directory: apps/desktop
+        run: npm ci
+
+      # Нативный захват (этап 4) кладём только в Linux-сборку — там он проверен
+      # e2e. Windows-путь WASAPI не проверялся на железе: сборка остаётся на
+      # AudioWorklet-фолбэке, чтобы релиз был гарантированно рабочим.
+      - name: Rust toolchain (native audio)
+        if: matrix.os == 'ubuntu-latest'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Native audio module (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        working-directory: apps/desktop
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev
+          npm run build:native
+
       - name: Build desktop
         working-directory: apps/desktop
         # публикуем отдельным шагом ниже, поэтому electron-builder не публикует сам
         run: |
-          npm ci
           npm run copy-web
           npx electron-builder --publish never
 

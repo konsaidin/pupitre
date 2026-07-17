@@ -91,6 +91,7 @@ class Backend {
     this.proc = null;
     this.exitCode = null;
     this.exitTail = '';
+    this.busy = false;
   }
 
   get port() {
@@ -181,8 +182,9 @@ class Backend {
   }
 
   // Первый старт долгий: uvicorn импортирует torch/demucs/librosa, на холодном
-  // диске это заметно больше полуминуты.
-  async waitHealthy(timeoutMs = 180000) {
+  // диске это заметно больше полуминуты, а на Windows Defender ещё и сканирует
+  // каждую DLL torch при первом импорте — закладываем 5 минут.
+  async waitHealthy(timeoutMs = 300000) {
     const t0 = Date.now();
     while (Date.now() - t0 < timeoutMs) {
       if (this.exitCode != null) throw new Error(`uvicorn упал с кодом ${this.exitCode}: ${this.exitTail}`);
@@ -198,6 +200,9 @@ class Backend {
   }
 
   async start() {
+    // повторный вызов (ретрай из UI), пока идёт развёртывание — игнорируем
+    if (this.busy) return;
+    this.busy = true;
     try {
       // уже кем-то запущен (например, dev-uvicorn) — просто используем
       try {
@@ -215,7 +220,13 @@ class Backend {
       const ffDir = await this.ensureFfmpeg();
 
       this.onStatus({ stage: 'starting' });
-      const env = { ...process.env, SLOPSICIAN_DATA: path.join(this.root, 'data') };
+      const env = {
+        ...process.env,
+        SLOPSICIAN_DATA: path.join(this.root, 'data'),
+        // resources/api и каталог portable-exe могут быть только для чтения —
+        // __pycache__ туда не пишем
+        PYTHONDONTWRITEBYTECODE: '1',
+      };
       if (ffDir) {
         // На Windows переменная называется Path; добавив второй ключ PATH,
         // мы бы отдали дочернему процессу два разных значения одной переменной.
@@ -242,11 +253,20 @@ class Backend {
           this.onStatus({ stage: 'error', detail: `uvicorn exited ${code}: ${this.exitTail}` });
         }
       });
+      // без обработчика ошибка спауна (нет python.exe, битое окружение) роняет
+      // main-процесс; с ним — waitHealthy падает сразу с внятным текстом
+      this.proc.on('error', (err) => {
+        this.proc = null;
+        this.exitCode = -1;
+        this.exitTail = String(err.message || err);
+      });
       await this.waitHealthy();
       this.onStatus({ stage: 'ready' });
       fs.rmSync(path.join(this.root, 'tmp'), { recursive: true, force: true });
     } catch (e) {
       this.onStatus({ stage: 'error', detail: String(e && e.message ? e.message : e).slice(0, 300) });
+    } finally {
+      this.busy = false;
     }
   }
 

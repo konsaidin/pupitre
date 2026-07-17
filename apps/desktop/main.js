@@ -25,9 +25,9 @@ function createWindow() {
     height: 800,
     minWidth: 360,
     minHeight: 600,
-    backgroundColor: '#08080f',
+    backgroundColor: '#0a0a0d',
     autoHideMenuBar: true,
-    title: 'Slopsician',
+    title: 'Пюпитр',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       additionalArguments: [
@@ -53,6 +53,11 @@ app.whenReady().then(() => {
   ipcMain.on('backend-status-subscribe', (e) => {
     statusSubscribers.add(e.sender);
     e.sender.send('backend-status', lastStatus);
+  });
+
+  // повторить развёртывание после ошибки (сеть моргнула и т.п.) — без перезапуска
+  ipcMain.on('backend-retry', () => {
+    if (backend && lastStatus.stage === 'error') void backend.start();
   });
 
   // код бэкенда: в собранном приложении лежит в resources/api,

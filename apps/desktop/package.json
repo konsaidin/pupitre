@@ -1,7 +1,7 @@
 {
   "name": "slopsician-desktop",
   "productName": "Slopsician",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Slopsician — тренажёр вокала: пой в ноты, приложение слышит голос",
   "author": "konsaidin",

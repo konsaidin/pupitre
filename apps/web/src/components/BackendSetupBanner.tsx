@@ -36,6 +36,9 @@ export function BackendSetupBanner() {
         {status.progress != null && ` ${status.progress}%`}
         {status.detail && <span className="dim small"> · {status.detail}</span>}
       </span>
+      {isError && desktopBridge()?.retrySetup && (
+        <button className="btn tiny" onClick={() => desktopBridge()?.retrySetup?.()}>{t('Retry')}</button>
+      )}
       <span className="dim small">{t('Warm-ups and exercises already work')}</span>
     </div>
   );
