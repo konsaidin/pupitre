@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname
 ALLOWED_EXT = {".mp3", ".wav", ".flac", ".m4a", ".ogg", ".opus", ".aac"}
 MAX_UPLOAD_MB = 60
 
-app = FastAPI(title="Slopsician API")
+app = FastAPI(title="Pupitre API")
 
 # десктопное приложение ходит с file:// (opaque origin) — без CORS не сможет
 app.add_middleware(

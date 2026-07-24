@@ -35,7 +35,7 @@ export interface Profile {
   scores: ScoreRecord[];
 }
 
-const KEY = 'slopsician.profile.v1';
+const KEY = 'pupitre.profile.v1';
 
 const DEFAULTS: Profile = {
   range: null,

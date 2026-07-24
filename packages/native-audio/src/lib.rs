@@ -19,7 +19,7 @@ use napi::bindgen_prelude::*;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use napi::JsFunction;
 use napi_derive::napi;
-use slopsician_dsp::{Analyzer, FRAME_FLOATS};
+use pupitre_dsp::{Analyzer, FRAME_FLOATS};
 
 #[napi(object)]
 pub struct DeviceInfo {
@@ -185,7 +185,7 @@ pub fn start(
 
     let shared2 = shared.clone();
     let join = std::thread::Builder::new()
-        .name("slopsician-audio".into())
+        .name("pupitre-audio".into())
         .spawn(move || audio_thread(device_id, shared2, tsfn, tx))
         .map_err(napi_err)?;
 

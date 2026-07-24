@@ -25,8 +25,8 @@ const PROFILE = {
     page.on('pageerror', (e) => console.log('[pageerror]', e.message));
     await page.goto('http://localhost:5173/', { waitUntil: 'load' });
     await page.evaluate((profile) => {
-      localStorage.setItem('slopsician.lang.v1', 'en');
-      localStorage.setItem('slopsician.profile.v1', JSON.stringify(profile));
+      localStorage.setItem('pupitre.lang.v1', 'en');
+      localStorage.setItem('pupitre.profile.v1', JSON.stringify(profile));
     }, PROFILE);
     await page.goto('http://localhost:5173/#/exercises', { waitUntil: 'load' });
     await page.reload({ waitUntil: 'load' }); // профиль читается при инициализации

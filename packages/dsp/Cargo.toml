@@ -1,10 +1,10 @@
 [package]
-name = "slopsician-dsp"
+name = "pupitre-dsp"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "slopsician_dsp"
+name = "pupitre_dsp"
 crate-type = ["cdylib", "rlib"]
 
 [profile.release]

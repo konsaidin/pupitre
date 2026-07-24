@@ -3,10 +3,10 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-const apiArg = process.argv.find((a) => a.startsWith('--slopsician-api='));
+const apiArg = process.argv.find((a) => a.startsWith('--pupitre-api='));
 
 contextBridge.exposeInMainWorld('desktop', {
-  apiBase: apiArg ? apiArg.slice('--slopsician-api='.length) : 'http://127.0.0.1:8123',
+  apiBase: apiArg ? apiArg.slice('--pupitre-api='.length) : 'http://127.0.0.1:8123',
   onBackendStatus(cb) {
     const listener = (_e, status) => cb(status);
     ipcRenderer.on('backend-status', listener);
@@ -20,7 +20,7 @@ contextBridge.exposeInMainWorld('desktop', {
 
 // нативный захват (этап 4): мост появляется только когда main загрузил аддон;
 // рендерер по наличию window.nativeAudio выбирает бэкенд AudioInput
-if (process.argv.includes('--slopsician-native-audio')) {
+if (process.argv.includes('--pupitre-native-audio')) {
   contextBridge.exposeInMainWorld('nativeAudio', {
     listDevices: () => ipcRenderer.invoke('native-audio:list'),
     start: (opts) => ipcRenderer.invoke('native-audio:start', opts),

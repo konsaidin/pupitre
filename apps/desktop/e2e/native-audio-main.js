@@ -18,7 +18,7 @@ app.whenReady().then(() => {
     show: false,
     webPreferences: {
       preload: path.join(__dirname, '..', 'preload.js'),
-      additionalArguments: ['--slopsician-native-audio'],
+      additionalArguments: ['--pupitre-native-audio'],
     },
   });
   win.webContents.on('console-message', (_e, _level, message) => {

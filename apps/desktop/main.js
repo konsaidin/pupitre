@@ -1,4 +1,4 @@
-// Десктопный Slopsician: окно Chromium с фронтом + встроенный бэкенд.
+// Десктопный Pupitre: окно Chromium с фронтом + встроенный бэкенд.
 // При первом запуске бэкенд сам докачивает Python-окружение и ffmpeg
 // (см. backend.js) — приложение полноценно из одного установщика.
 
@@ -32,8 +32,8 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       additionalArguments: [
-        `--slopsician-api=http://127.0.0.1:${PORT}`,
-        ...(nativeAudioReady ? ['--slopsician-native-audio'] : []),
+        `--pupitre-api=http://127.0.0.1:${PORT}`,
+        ...(nativeAudioReady ? ['--pupitre-native-audio'] : []),
       ],
     },
   });

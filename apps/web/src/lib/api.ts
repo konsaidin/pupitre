@@ -7,7 +7,7 @@
 import { t } from './i18n';
 import type { ExtractSettings, MapNote, Pitchline, SongMap } from './songMap';
 
-const API_BASE_KEY = 'slopsician.apiBase.v1';
+const API_BASE_KEY = 'pupitre.apiBase.v1';
 
 /** Мост из Electron-preload: адрес встроенного бэкенда и его статус. */
 interface DesktopBridge {

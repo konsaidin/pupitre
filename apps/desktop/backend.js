@@ -222,7 +222,7 @@ class Backend {
       this.onStatus({ stage: 'starting' });
       const env = {
         ...process.env,
-        SLOPSICIAN_DATA: path.join(this.root, 'data'),
+        PUPITRE_DATA: path.join(this.root, 'data'),
         // resources/api и каталог portable-exe могут быть только для чтения —
         // __pycache__ туда не пишем
         PYTHONDONTWRITEBYTECODE: '1',

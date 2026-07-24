@@ -1,4 +1,4 @@
-// DSP-ядро Slopsician: f0 (YIN) + вокальные техники (вибрато, расщепление,
+// DSP-ядро Pupitre: f0 (YIN) + вокальные техники (вибрато, расщепление,
 // громкость, придыхание). Одно на все платформы:
 //   - wasm32-unknown-unknown → AudioWorklet (веб/Electron);
 //   - cdylib → нативный захват (Electron N-API, Android JNI).

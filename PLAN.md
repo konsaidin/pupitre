@@ -1,4 +1,4 @@
-# Slopsician — план (курс 2)
+# Pupitre — план (курс 2)
 
 Вокальный тренажёр: поёшь в микрофон, приложение в реальном времени показывает
 высоту тона, громкость и вокальные техники (вибрато, расщепление), сравнивает с
@@ -270,9 +270,9 @@ Canvas-компонент, замена PianoRoll как главного вид
 # бэкенд под wine из репо (данные приложения, ffmpeg из backend/bin):
 cd services/api && WINEDEBUG=-all KMP_AFFINITY=disabled \
   HF_HUB_DISABLE_SYMLINKS=1 HF_HUB_DISABLE_XET=1 \
-  SLOPSICIAN_DATA='C:\users\dead\AppData\Roaming\Slopsician\backend\data' \
-  WINEPATH='C:\users\dead\AppData\Roaming\Slopsician\backend\bin' \
-  wine ~/.wine/drive_c/users/dead/AppData/Roaming/Slopsician/backend/venv/Scripts/python.exe \
+  PUPITRE_DATA='C:\users\dead\AppData\Roaming\Pupitre\backend\data' \
+  WINEPATH='C:\users\dead\AppData\Roaming\Pupitre\backend\bin' \
+  wine ~/.wine/drive_c/users/dead/AppData/Roaming/Pupitre/backend/venv/Scripts/python.exe \
   -m uvicorn app.main:app --port 8010
 # сборка exe: apps/web npm run build → apps/desktop npm run copy-web →
 #   npx electron-builder --win --publish never   (native build не нужен для win)

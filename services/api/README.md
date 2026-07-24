@@ -1,4 +1,4 @@
-# Slopsician API
+# Pupitre API
 
 Обработка песен: Demucs (стемы) → pYIN (f0 вокала) → сегментация → карта нот.
 

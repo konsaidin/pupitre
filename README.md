@@ -1,4 +1,4 @@
-# Slopsician
+# Pupitre
 
 Тренажёр вокала в духе Yousician: пой в микрофон и попадай голосом в ноты.
 Распевки и упражнения генерируются под твой диапазон и работают целиком в
@@ -10,7 +10,7 @@
 ## Скачать приложение
 
 Готовые сборки для Windows (installer/portable `.exe`) и Linux (`.AppImage`) —
-на странице [Releases](https://github.com/konsaidin/slopsician/releases).
+на странице [Releases](https://github.com/konsaidin/pupitre/releases).
 CI собирает их автоматически по тегу `v*` (см. `.github/workflows/desktop.yml`).
 
 Приложение самодостаточно: распевки и упражнения работают сразу, а сервер

@@ -6,7 +6,7 @@ const path = require('node:path');
 
 /** Ищет и грузит .node-аддон; null, если не найден/не загрузился. */
 function loadAddon(isPackaged, resourcesPath) {
-  const file = `slopsician-native-audio.${process.platform}-${process.arch}.node`;
+  const file = `pupitre-native-audio.${process.platform}-${process.arch}.node`;
   const candidates = isPackaged
     ? [path.join(resourcesPath, 'native', file)]
     : [path.join(__dirname, '..', '..', 'packages', 'native-audio', file)];

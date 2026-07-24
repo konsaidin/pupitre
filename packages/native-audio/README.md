@@ -1,4 +1,4 @@
-# slopsician-native-audio
+# pupitre-native-audio
 
 Нативный захват звука для Electron (этап 4 курса 2): cpal (WASAPI на Windows,
 ALSA→PipeWire на Linux) + DSP-ядро `packages/dsp` прямо в аудиопотоке драйвера.
@@ -9,7 +9,7 @@ ALSA→PipeWire на Linux) + DSP-ядро `packages/dsp` прямо в ауди
 ## Сборка
 
 ```bash
-node build.mjs   # cargo build --release → slopsician-native-audio.<platform>-<arch>.node
+node build.mjs   # cargo build --release → pupitre-native-audio.<platform>-<arch>.node
 ```
 
 Linux: нужен `alsa-devel` (openSUSE) / `libasound2-dev` (Debian). Если dev-пакета
@@ -19,7 +19,7 @@ Linux: нужен `alsa-devel` (openSUSE) / `libasound2-dev` (Debian). Если 
 
 Windows: собирать на Windows-машине (`node build.mjs`, нужны Rust с таргетом
 `x86_64-pc-windows-msvc` и Build Tools/MSVC) — получится
-`slopsician-native-audio.win32-x64.node`, его подхватят dev-режим и
+`pupitre-native-audio.win32-x64.node`, его подхватят dev-режим и
 electron-builder (extraResources). Фича `win_delay_load_hook` в Cargo.toml
 обязательна: в Electron N-API-символы живут в electron.exe, не в node.exe.
 Кросс-сборка с Linux не настроена: дистрибутивный Rust без windows-std

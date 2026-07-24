@@ -1,7 +1,7 @@
 // Тесты ядра на синтетических сигналах: тон, тон+вибрато, тон+субгармоника
 // (расщепление), тишина, атака/спад громкости.
 
-use slopsician_dsp::{Analyzer, AnalysisFrame};
+use pupitre_dsp::{Analyzer, AnalysisFrame};
 
 const SR: f32 = 48000.0;
 

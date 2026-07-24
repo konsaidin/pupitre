@@ -1,9 +1,9 @@
 {
-  "name": "slopsician-desktop",
-  "productName": "Slopsician",
+  "name": "pupitre-desktop",
+  "productName": "Pupitre",
   "version": "0.2.0",
   "private": true,
-  "description": "Slopsician — тренажёр вокала: пой в ноты, приложение слышит голос",
+  "description": "Pupitre — тренажёр вокала: пой в ноты, приложение слышит голос",
   "author": "konsaidin",
   "license": "MIT",
   "main": "main.js",
@@ -19,8 +19,8 @@
     "electron-builder": "^25.1.8"
   },
   "build": {
-    "appId": "app.slopsician.desktop",
-    "productName": "Slopsician",
+    "appId": "app.pupitre.desktop",
+    "productName": "Pupitre",
     "directories": {
       "output": "release"
     },
@@ -56,19 +56,19 @@
         "AppImage"
       ],
       "category": "Audio",
-      "artifactName": "Slopsician-${version}-linux-${arch}.${ext}"
+      "artifactName": "Pupitre-${version}-linux-${arch}.${ext}"
     },
     "win": {
       "target": [
         "nsis",
         "portable"
       ],
-      "artifactName": "Slopsician-${version}-win-${arch}.${ext}",
+      "artifactName": "Pupitre-${version}-win-${arch}.${ext}",
       "signAndEditExecutable": false
     },
     "nsis": {
       "oneClick": true,
-      "artifactName": "Slopsician-Setup-${version}.${ext}"
+      "artifactName": "Pupitre-Setup-${version}.${ext}"
     }
   },
   "dependencies": {

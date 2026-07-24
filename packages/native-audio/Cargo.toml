@@ -1,10 +1,10 @@
 [package]
-name = "slopsician-native-audio"
+name = "pupitre-native-audio"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
-name = "slopsician_native_audio"
+name = "pupitre_native_audio"
 crate-type = ["cdylib"]
 
 [dependencies]
@@ -16,7 +16,7 @@ crate-type = ["cdylib"]
 napi = { version = "2", default-features = false, features = ["napi8"] }
 napi-derive = "2"
 cpal = "0.15"
-slopsician-dsp = { path = "../dsp" }
+pupitre-dsp = { path = "../dsp" }
 
 [build-dependencies]
 napi-build = "2"

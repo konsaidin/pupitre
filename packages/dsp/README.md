@@ -1,4 +1,4 @@
-# slopsician-dsp
+# pupitre-dsp
 
 DSP-ядро на Rust: f0 (YIN) + вокальные техники (вибрато, расщепление, громкость,
 придыхание). Одно на все платформы: WASM для веба/Electron, cdylib для

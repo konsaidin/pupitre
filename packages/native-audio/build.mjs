@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Сборка нативного аддона: cargo build --release → slopsician-native-audio.<platform>-<arch>.node
+// Сборка нативного аддона: cargo build --release → pupitre-native-audio.<platform>-<arch>.node
 //
 // Linux без alsa-devel: alsa-sys нужен лишь pkg-config для -lasound (биндинги
 // предгенерены), поэтому при отсутствии alsa.pc собираем локальный shim —
@@ -44,10 +44,10 @@ if (process.platform === 'linux') {
 execSync('cargo build --release', { cwd: dir, stdio: 'inherit', env });
 
 const libName = {
-  linux: 'libslopsician_native_audio.so',
-  darwin: 'libslopsician_native_audio.dylib',
-  win32: 'slopsician_native_audio.dll',
+  linux: 'libpupitre_native_audio.so',
+  darwin: 'libpupitre_native_audio.dylib',
+  win32: 'pupitre_native_audio.dll',
 }[process.platform];
-const out = `slopsician-native-audio.${process.platform}-${process.arch}.node`;
+const out = `pupitre-native-audio.${process.platform}-${process.arch}.node`;
 fs.copyFileSync(path.join(dir, 'target', 'release', libName), path.join(dir, out));
 console.log('[native-audio] готово:', out);

@@ -5,7 +5,7 @@
 
 export type Lang = 'en' | 'ru';
 
-const KEY = 'slopsician.lang.v1';
+const KEY = 'pupitre.lang.v1';
 
 export function getSavedLang(): Lang | null {
   const v = localStorage.getItem(KEY);

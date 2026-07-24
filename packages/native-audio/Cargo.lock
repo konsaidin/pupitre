@@ -599,6 +599,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "pupitre-dsp"
+version = "0.1.0"
+
+[[package]]
+name = "pupitre-native-audio"
+version = "0.1.0"
+dependencies = [
+ "cpal",
+ "napi",
+ "napi-build",
+ "napi-derive",
+ "pupitre-dsp",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -706,21 +721,6 @@ name = "slab"
 version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0c790de23124f9ab44544d7ac05d60440adc586479ce501c1d6d7da3cd8c9cf5"
-
-[[package]]
-name = "slopsician-dsp"
-version = "0.1.0"
-
-[[package]]
-name = "slopsician-native-audio"
-version = "0.1.0"
-dependencies = [
- "cpal",
- "napi",
- "napi-build",
- "napi-derive",
- "slopsician-dsp",
-]
 
 [[package]]
 name = "syn"
