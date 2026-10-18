@@ -25,7 +25,7 @@ export function BackendSetupBanner() {
 
   useEffect(() => desktopBridge()?.onBackendStatus(setStatus) ?? undefined, []);
 
-  if (!status || status.stage === 'ready') return null;
+  if (!status || status.stage === 'ready' || status.stage === 'idle') return null;
   const isError = status.stage === 'error';
 
   return (

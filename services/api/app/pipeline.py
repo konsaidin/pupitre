@@ -609,10 +609,8 @@ def process_song(store: SongStore, meta: SongMeta) -> None:
             "hasVocal": (d / "vocal.mp3").exists(),
             "extract": ExtractParams().to_api(),
         }
-        import json
-
-        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False), encoding="utf-8")
-        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False), encoding="utf-8")
+        store.save_json(meta.id, "map.json", song_map)
+        store.save_json(meta.id, "pitchline.json", pitchline)
 
         # промежуточные артефакты больше не нужны; vocals.wav оставляем — из него
         # делается превью и (в будущем) повторное извлечение без Demucs
@@ -641,8 +639,6 @@ def reextract_song(store: SongStore, meta: SongMeta, params: ExtractParams) -> N
     (старый трек или Demucs был недоступен) — декодируем оригинал заново.
     При неудаче старая карта не трогается, песня остаётся играбельной.
     """
-    import json
-
     d = store.song_dir(meta.id)
     old_status = meta.status
 
@@ -687,8 +683,8 @@ def reextract_song(store: SongStore, meta: SongMeta, params: ExtractParams) -> N
             encode_instrumental(vocal_wav, d / "vocal.mp3")
         song_map["hasVocal"] = (d / "vocal.mp3").exists()
 
-        (d / "map.json").write_text(json.dumps(song_map, ensure_ascii=False), encoding="utf-8")
-        (d / "pitchline.json").write_text(json.dumps(pitchline, ensure_ascii=False), encoding="utf-8")
+        store.save_json(meta.id, "map.json", song_map)
+        store.save_json(meta.id, "pitchline.json", pitchline)
 
         meta.duration_ms = duration_ms
         meta.note_count = len(notes)

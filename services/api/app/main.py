@@ -8,12 +8,15 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from fastapi import Body, FastAPI, HTTPException, UploadFile
+from fastapi import Body, FastAPI, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
 
 from .jobs import jobs
-from .store import store
+from .store import InvalidSongId, store
+from .security import ALLOWED_ORIGINS, API_TOKEN, check_access
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
 
@@ -22,13 +25,30 @@ MAX_UPLOAD_MB = 60
 
 app = FastAPI(title="Pupitre API")
 
-# десктопное приложение ходит с file:// (opaque origin) — без CORS не сможет
+app.middleware("http")(check_access)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_methods=["GET", "HEAD", "POST", "PUT", "DELETE"],
+    allow_headers=["Content-Type", "Authorization", "Range"],
 )
+
+
+@app.exception_handler(InvalidSongId)
+async def invalid_song_id(_request: Request, error: InvalidSongId) -> JSONResponse:
+    return JSONResponse({"detail": str(error)}, status_code=400)
+
+
+class MapNote(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    startMs: int = Field(ge=0)
+    durMs: int = Field(gt=0)
+    midi: int = Field(ge=0, le=127)
+    lyric: str | None = None
+    tech: Literal["vibrato"] | None = None
+    techWarmupMs: int | None = Field(default=None, ge=0, le=5000)
+    vibrato: bool | None = None
 
 
 @app.on_event("startup")
@@ -38,7 +58,7 @@ def _startup() -> None:
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"ok": True}
+    return {"ok": True, "service": "pupitre", "protected": bool(API_TOKEN)}
 
 
 @app.get("/api/songs")
@@ -52,7 +72,7 @@ async def upload_song(file: UploadFile) -> dict:
     ext = Path(name).suffix.lower()
     if ext not in ALLOWED_EXT:
         raise HTTPException(400, f"формат {ext or '(нет расширения)'} не поддерживается")
-    data = await file.read()
+    data = await file.read(MAX_UPLOAD_MB * 1024 * 1024 + 1)
     if len(data) > MAX_UPLOAD_MB * 1024 * 1024:
         raise HTTPException(413, f"файл больше {MAX_UPLOAD_MB} МБ")
     if not data:
@@ -130,38 +150,33 @@ def get_pitchline(song_id: str) -> FileResponse:
 
 
 @app.put("/api/songs/{song_id}/map")
-def save_map(song_id: str, notes: list[dict] = Body(..., embed=True)) -> dict:
+def save_map(song_id: str, notes: list[MapNote] = Body(..., embed=True)) -> dict:
     """Перезаписать ноты в карте (ручная правка в редакторе)."""
     meta = store.load_meta(song_id)
     if meta is None:
         raise HTTPException(404, "песня не найдена")
+    if meta.status not in ("done", "error"):
+        raise HTTPException(409, "песня уже в обработке")
     song_map = store.load_map(song_id)
     if song_map is None:
         raise HTTPException(409, "карта ещё не готова")
 
-    clean: list[dict] = []
-    for n in notes:
-        try:
-            note = {
-                "startMs": int(n["startMs"]),
-                "durMs": max(1, int(n["durMs"])),
-                "midi": int(n["midi"]),
-            }
-        except (KeyError, TypeError, ValueError):
-            raise HTTPException(400, "нота должна содержать целые startMs, durMs, midi")
-        if "lyric" in n and n["lyric"] is not None:
-            note["lyric"] = str(n["lyric"])
-        clean.append(note)
+    duration_ms = song_map["durationMs"]
+    if any(n.startMs + n.durMs > duration_ms for n in notes):
+        raise HTTPException(400, "нота выходит за длительность песни")
+    if any(n.techWarmupMs is not None and n.techWarmupMs >= n.durMs for n in notes):
+        raise HTTPException(400, "прогрев техники должен быть короче ноты")
+    clean = [n.model_dump(exclude_none=True) for n in notes]
     clean.sort(key=lambda x: x["startMs"])
 
     song_map["notes"] = clean
-    (store.song_dir(song_id) / "map.json").write_text(
-        __import__("json").dumps(song_map, ensure_ascii=False), encoding="utf-8"
-    )
+    store.save_json(song_id, "map.json", song_map)
     meta.note_count = len(clean)
     if clean:
         meta.low_midi = min(n["midi"] for n in clean)
         meta.high_midi = max(n["midi"] for n in clean)
+    else:
+        meta.low_midi = meta.high_midi = 0
     store.save_meta(meta)
     return {"ok": True, "noteCount": len(clean)}
 

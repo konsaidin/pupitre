@@ -31,10 +31,16 @@ jobs:
             apps/web/package-lock.json
             apps/desktop/package-lock.json
 
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
       - name: Build web
         working-directory: apps/web
         run: |
           npm ci
+          npm run build:dsp
+          npm test
           npm run build
 
       - name: Install desktop deps
@@ -44,10 +50,6 @@ jobs:
       # Нативный захват (этап 4) кладём только в Linux-сборку — там он проверен
       # e2e. Windows-путь WASAPI не проверялся на железе: сборка остаётся на
       # AudioWorklet-фолбэке, чтобы релиз был гарантированно рабочим.
-      - name: Rust toolchain (native audio)
-        if: matrix.os == 'ubuntu-latest'
-        uses: dtolnay/rust-toolchain@stable
-
       - name: Native audio module (Linux)
         if: matrix.os == 'ubuntu-latest'
         working-directory: apps/desktop

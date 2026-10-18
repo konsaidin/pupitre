@@ -19,7 +19,7 @@ use napi::bindgen_prelude::*;
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use napi::JsFunction;
 use napi_derive::napi;
-use pupitre_dsp::{Analyzer, FRAME_FLOATS};
+use pupitre_dsp::{Analyzer, FRAME_FLOATS, HOP};
 
 #[napi(object)]
 pub struct DeviceInfo {
@@ -34,6 +34,7 @@ pub struct StartInfo {
     pub channels: u32,
     /// имя фактически открытого устройства (запрошенное может не найтись)
     pub device: String,
+    pub analysis_latency_ms: f64,
 }
 
 #[napi(object)]
@@ -69,7 +70,15 @@ struct Active {
 
 static ACTIVE: Mutex<Option<Active>> = Mutex::new(None);
 
-type BatchFn = ThreadsafeFunction<FrameBatch, ErrorStrategy::Fatal>;
+// Каждый кусок входа <=HOP порождает не более одного кадра. Передаём его
+// по значению; JS-массив создаётся в N-API-колбэке, а не в потоке захвата.
+struct RawBatch {
+    frames: [f32; FRAME_FLOATS],
+    age_ms: f64,
+    posted_at_ms: f64,
+}
+
+type BatchFn = ThreadsafeFunction<RawBatch, ErrorStrategy::Fatal>;
 
 /// Обработчик сэмплов внутри аудиоколбэка cpal.
 struct Processor {
@@ -78,7 +87,7 @@ struct Processor {
     tsfn: BatchFn,
     rate: f64,
     total_samples: u64,
-    mono: Vec<f32>,
+    mono: [f32; HOP],
 }
 
 impl Processor {
@@ -89,44 +98,45 @@ impl Processor {
             tsfn,
             rate,
             total_samples: 0,
-            mono: Vec::new(),
+            mono: [0.0; HOP],
         }
     }
 
-    /// Свести interleaved-каналы в моно (среднее) во внутренний буфер.
-    fn downmix<T: Copy, F: Fn(T) -> f32>(&mut self, data: &[T], channels: usize, to_f32: F) {
-        let frames = data.len() / channels.max(1);
-        self.mono.clear();
-        self.mono.reserve(frames);
-        if channels <= 1 {
-            self.mono.extend(data.iter().map(|&s| to_f32(s)));
-            return;
-        }
-        for i in 0..frames {
-            let mut acc = 0.0f32;
-            for c in 0..channels {
-                acc += to_f32(data[i * channels + c]);
+    /// Любой размер драйверного буфера обрабатываем фиксированным scratch.
+    fn capture<T: Copy, F: Fn(T) -> f32>(&mut self, data: &[T], channels: usize, to_f32: F, age_last: f64) {
+        let channels = channels.max(1);
+        let total = data.len() / channels;
+        let mut processed = 0;
+        for chunk in data.chunks(HOP * channels) {
+            let frames = chunk.len() / channels;
+            for i in 0..frames {
+                let mut acc = 0.0f32;
+                for c in 0..channels {
+                    acc += to_f32(chunk[i * channels + c]);
+                }
+                self.mono[i] = acc / channels as f32;
             }
-            self.mono.push(acc / channels as f32);
+            processed += frames;
+            self.feed(frames, age_last + (total - processed) as f64 / self.rate);
         }
     }
 
     /// age_last_sec — возраст последнего сэмпла буфера на момент колбэка.
-    fn feed(&mut self, age_last_sec: f64) {
+    fn feed(&mut self, frames: usize, age_last_sec: f64) {
         let gr = f32::from_bits(self.shared.gate_rms.load(Ordering::Relaxed));
         let gc = f32::from_bits(self.shared.gate_clarity.load(Ordering::Relaxed));
         self.analyzer.set_gate(gr, gc);
 
-        let mut out: Vec<f32> = Vec::new();
+        let mut out = [0.0f32; FRAME_FLOATS];
+        let mut ready = false;
         let mut last_t = 0.0f64;
-        let mut buf = [0.0f32; FRAME_FLOATS];
-        self.analyzer.process(&self.mono, |frame| {
-            frame.write(&mut buf);
-            out.extend_from_slice(&buf);
+        self.analyzer.process(&self.mono[..frames], |frame| {
+            frame.write(&mut out);
+            ready = true;
             last_t = frame.t as f64;
         });
-        self.total_samples += self.mono.len() as u64;
-        if out.is_empty() {
+        self.total_samples += frames as u64;
+        if !ready {
             return;
         }
         let total_sec = self.total_samples as f64 / self.rate;
@@ -135,7 +145,7 @@ impl Processor {
             .duration_since(UNIX_EPOCH)
             .map(|d| d.as_secs_f64() * 1000.0)
             .unwrap_or(0.0);
-        let batch = FrameBatch { frames: out.into(), age_ms, posted_at_ms };
+        let batch = RawBatch { frames: out, age_ms, posted_at_ms };
         self.tsfn.call(batch, ThreadsafeFunctionCallMode::NonBlocking);
     }
 }
@@ -179,7 +189,14 @@ pub fn start(
     on_batch: JsFunction,
 ) -> Result<StartInfo> {
     stop_active();
-    let tsfn: BatchFn = on_batch.create_threadsafe_function(64, |ctx| Ok(vec![ctx.value]))?;
+    let tsfn: BatchFn = on_batch.create_threadsafe_function(64, |ctx| {
+        let batch: RawBatch = ctx.value;
+        Ok(vec![FrameBatch {
+            frames: batch.frames.to_vec().into(),
+            age_ms: batch.age_ms,
+            posted_at_ms: batch.posted_at_ms,
+        }])
+    })?;
     let shared = Arc::new(Shared::new(gate_rms as f32, gate_clarity as f32));
     let (tx, rx) = sync_channel::<std::result::Result<StartInfo, String>>(1);
 
@@ -289,8 +306,7 @@ fn build_stream(
             cpal::SampleFormat::F32 => device.build_input_stream(
                 &config,
                 move |data: &[f32], info| {
-                    p.downmix(data, channels, |s| s);
-                    p.feed(age_last_sec(info, p.mono.len() as f64 / p.rate));
+                    p.capture(data, channels, |s| s, age_last_sec(info, data.len() as f64 / channels as f64 / p.rate));
                 },
                 err_cb,
                 None,
@@ -298,8 +314,7 @@ fn build_stream(
             cpal::SampleFormat::I16 => device.build_input_stream(
                 &config,
                 move |data: &[i16], info| {
-                    p.downmix(data, channels, |s| s as f32 / 32768.0);
-                    p.feed(age_last_sec(info, p.mono.len() as f64 / p.rate));
+                    p.capture(data, channels, |s| s as f32 / 32768.0, age_last_sec(info, data.len() as f64 / channels as f64 / p.rate));
                 },
                 err_cb,
                 None,
@@ -307,8 +322,7 @@ fn build_stream(
             cpal::SampleFormat::U16 => device.build_input_stream(
                 &config,
                 move |data: &[u16], info| {
-                    p.downmix(data, channels, |s| (s as f32 - 32768.0) / 32768.0);
-                    p.feed(age_last_sec(info, p.mono.len() as f64 / p.rate));
+                    p.capture(data, channels, |s| (s as f32 - 32768.0) / 32768.0, age_last_sec(info, data.len() as f64 / channels as f64 / p.rate));
                 },
                 err_cb,
                 None,
@@ -322,6 +336,7 @@ fn build_stream(
                     sample_rate: rate,
                     channels: channels as u32,
                     device: device_name,
+                    analysis_latency_ms: Analyzer::new(rate as f32).latency_ms() as f64,
                 };
                 return Ok((stream, info));
             }

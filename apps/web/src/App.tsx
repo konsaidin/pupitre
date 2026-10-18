@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ProfileProvider } from './state/ProfileContext';
 import { BackendSetupBanner } from './components/BackendSetupBanner';
 import { TopBar } from './components/TopBar';
+import { MobileLandscape } from './components/MobileLandscape';
 import { getSavedLang } from './lib/i18n';
 import { HomeScreen } from './screens/HomeScreen';
 import { LanguagePicker } from './screens/LanguagePicker';
@@ -18,11 +19,18 @@ const BARE_ROUTES = new Set(['/play', '/range']);
 
 function Chrome({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    mainRef.current?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
+  }, [pathname]);
   return (
-    <>
+    <div className={BARE_ROUTES.has(pathname) ? 'app-shell bare' : 'app-shell'}>
       {!BARE_ROUTES.has(pathname) && <TopBar />}
-      {children}
-    </>
+      <main className="app-main" id="main-content" ref={mainRef}>
+        {children}
+      </main>
+    </div>
   );
 }
 
@@ -32,26 +40,28 @@ export default function App() {
 
   return (
     <ProfileProvider>
-      {lang === null ? (
-        <LanguagePicker onPick={setLangState} />
-      ) : (
-        <>
-          <BackendSetupBanner />
-          <HashRouter>
-            <Chrome>
-              <Routes>
-                <Route path="/" element={<HomeScreen />} />
-                <Route path="/range" element={<RangeWizard />} />
-                <Route path="/exercises" element={<ExercisesScreen />} />
-                <Route path="/songs" element={<LibraryScreen />} />
-                <Route path="/play" element={<GameScreen />} />
-                <Route path="/results" element={<ResultsScreen />} />
-                <Route path="/settings" element={<SettingsScreen />} />
-              </Routes>
-            </Chrome>
-          </HashRouter>
-        </>
-      )}
+      <MobileLandscape>
+        {lang === null ? (
+          <LanguagePicker onPick={setLangState} />
+        ) : (
+          <>
+            <BackendSetupBanner />
+            <HashRouter>
+              <Chrome>
+                <Routes>
+                  <Route path="/" element={<HomeScreen />} />
+                  <Route path="/range" element={<RangeWizard />} />
+                  <Route path="/exercises" element={<ExercisesScreen />} />
+                  <Route path="/songs" element={<LibraryScreen />} />
+                  <Route path="/play" element={<GameScreen />} />
+                  <Route path="/results" element={<ResultsScreen />} />
+                  <Route path="/settings" element={<SettingsScreen />} />
+                </Routes>
+              </Chrome>
+            </HashRouter>
+          </>
+        )}
+      </MobileLandscape>
     </ProfileProvider>
   );
 }

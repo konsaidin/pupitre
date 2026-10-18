@@ -161,3 +161,23 @@ fn frame_rate_matches_hop() {
     let dt = frames[1].t - frames[0].t;
     assert!((dt - 256.0 / SR).abs() < 1e-6, "шаг кадров {} сек", dt);
 }
+
+#[test]
+fn high_sample_rates_keep_low_pitch_and_original_clock() {
+    for sr in [96000.0f32, 192000.0] {
+        let signal: Vec<f32> = (0..sr as usize)
+            .map(|i| 0.3 * (2.0 * std::f32::consts::PI * 80.0 * i as f32 / sr).sin())
+            .collect();
+        let mut analyzer = Analyzer::new(sr);
+        let mut frames = Vec::new();
+        for chunk in signal.chunks(128) { analyzer.process(chunk, |f| frames.push(f)); }
+        let stable: Vec<_> = frames.iter().filter(|f| f.t > 0.25).collect();
+        assert!(!stable.is_empty());
+        for f in stable {
+            assert!(f.voiced, "80 Hz lost at sr={} t={}", sr, f.t);
+            assert!((f.f0 - 80.0).abs() < 1.0, "f0={} at sr={}", f.f0, sr);
+        }
+        assert!(frames.last().unwrap().t > 0.99);
+        assert!((frames[1].t - frames[0].t - 256.0 / 48000.0).abs() < 1e-6);
+    }
+}

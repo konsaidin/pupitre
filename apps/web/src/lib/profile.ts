@@ -32,6 +32,8 @@ export interface Profile {
   headphonesWarned: boolean;
   /** главный вид игры: лента вокала (курс 2) или классический пиано-ролл */
   vocalView: 'ribbon' | 'roll';
+  /** Неподвижные страницы нот вместо непрерывной прокрутки. */
+  reduceMotion: boolean;
   scores: ScoreRecord[];
 }
 
@@ -53,6 +55,7 @@ const DEFAULTS: Profile = {
   // пиано-ролл по умолчанию: привычный вид с клавиатурой и плашками;
   // лента доступна переключателем в шапке игры
   vocalView: 'roll',
+  reduceMotion: true,
   scores: [],
 };
 
@@ -60,7 +63,8 @@ export function loadProfile(): Profile {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return { ...DEFAULTS };
-    return { ...DEFAULTS, ...(JSON.parse(raw) as Partial<Profile>) };
+    const saved = JSON.parse(raw) as Partial<Profile> | null;
+    return { ...DEFAULTS, ...saved, reduceMotion: typeof saved?.reduceMotion === 'boolean' ? saved.reduceMotion : true };
   } catch {
     return { ...DEFAULTS };
   }

@@ -4,9 +4,12 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 const apiArg = process.argv.find((a) => a.startsWith('--pupitre-api='));
+const tokenArg = process.argv.find((a) => a.startsWith('--pupitre-api-token='));
 
 contextBridge.exposeInMainWorld('desktop', {
   apiBase: apiArg ? apiArg.slice('--pupitre-api='.length) : 'http://127.0.0.1:8123',
+  apiToken: tokenArg ? tokenArg.slice('--pupitre-api-token='.length) : '',
+  ensureBackend: () => ipcRenderer.invoke('backend-ensure'),
   onBackendStatus(cb) {
     const listener = (_e, status) => cb(status);
     ipcRenderer.on('backend-status', listener);

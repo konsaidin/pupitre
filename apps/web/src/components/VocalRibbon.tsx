@@ -10,17 +10,18 @@ import type { GameEngine } from '../game/engine';
 import { t } from '../lib/i18n';
 import { midiToName } from '../lib/music';
 import { contourMidiAt } from '../lib/pitchline';
+import { timelineView } from '../lib/timeline';
 
 interface Props {
   engine: GameEngine;
   window: { lowMidi: number; highMidi: number };
-  /** сколько мс видно на экране справа от линии "сейчас" */
+  /** Масштаб: столько мс впереди при прокрутке; страница вдвое длиннее. */
   lookaheadMs?: number;
   /** режим «петь по линии»: цель — контур, сегменты нот не рисуются */
   lineMode?: boolean;
+  reduceMotion?: boolean;
 }
 
-const NOW_FRAC = 0.3;
 const PAD_L = 10;
 /** толщина ленты: лог-громкость [-45..-10] dBFS → пиксели */
 const LOUD_MIN_DB = -45;
@@ -37,30 +38,30 @@ const AGE_BUCKETS = 3;
 const TRAIL_BREAK_SEMIS = 6;
 
 const C = {
-  bg: '#0d1117',
+  bg: '#1d1f25',
   octaveLine: 'rgba(255,255,255,0.10)',
   octaveText: 'rgba(230,235,245,0.35)',
-  guide: 'rgba(90,111,168,0.9)',
-  guideDim: 'rgba(90,111,168,0.45)',
-  guideActive: '#5a79c9',
+  guide: 'rgba(185,165,207,0.9)',
+  guideDim: 'rgba(185,165,207,0.45)',
+  guideActive: '#b9a5cf',
   ghost: 'rgba(160,170,200,0.30)',
-  hitFill: '#2ea86f',
-  perfect: '#38d98c',
-  good: '#e8c34a',
-  miss: '#e05f5f',
-  contour: 'rgba(34,211,238,0.65)',
-  contourDim: 'rgba(34,211,238,0.25)',
+  hitFill: '#708c7a',
+  perfect: '#b2d2bb',
+  good: '#ddc091',
+  miss: '#dda09d',
+  contour: 'rgba(185,172,205,0.65)',
+  contourDim: 'rgba(185,172,205,0.25)',
   nowLine: 'rgba(255,255,255,0.35)',
   text: 'rgba(230,235,245,0.85)',
-  badgeBg: 'rgba(20,26,38,0.85)',
-  vibBadge: '#22d3ee',
+  badgeBg: 'rgba(31,29,37,0.95)',
+  vibBadge: '#b9accd',
   distBadge: '#ff9840',
 };
 
 /** Цвет ленты: мимо — серо-голубой, в допуске — зелёный, расщепление — тёплый. */
 function ribbonColor(inTol: boolean, dist: number): [number, number, number] {
-  const base: [number, number, number] = inTol ? [56, 217, 140] : [165, 175, 200];
-  const warm: [number, number, number] = [255, 152, 64];
+  const base: [number, number, number] = inTol ? [178, 210, 187] : [165, 175, 200];
+  const warm: [number, number, number] = [218, 172, 123];
   const k = Math.min(1, dist);
   return [
     Math.round(base[0] + (warm[0] - base[0]) * k),
@@ -74,7 +75,7 @@ function jag(i: number): number {
   return (((i * 7919) % 13) / 13 - 0.5) * 2;
 }
 
-export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode = false }: Props) {
+export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode = false, reduceMotion = true }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -135,12 +136,11 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
 
     const draw = () => {
       raf = requestAnimationFrame(draw);
-      engine.tick();
       const songMs = engine.songMs();
-      const nowX = PAD_L + (W - PAD_L) * NOW_FRAC;
-      const pxPerMs = (W - nowX) / lookaheadMs;
-      const msToX = (ms: number) => nowX + (ms - songMs) * pxPerMs;
-      const trailMs = (nowX - PAD_L) / pxPerMs; // сколько истории помещается слева
+      const cursorMs = reduceMotion ? songMs + engine.countdownRemaining() * 1000 : songMs;
+      const { leftMs, rightMs, nowX, pxPerMs } = timelineView(cursorMs, PAD_L, W - 12, lookaheadMs, reduceMotion);
+      const msToX = (ms: number) => PAD_L + (ms - leftMs) * pxPerMs;
+      const trailMs = reduceMotion ? rightMs - leftMs : Math.max(1, cursorMs - leftMs);
 
       ctx2d.setTransform(1, 0, 0, 1, 0, 0);
       ctx2d.drawImage(staticLayer, 0, 0);
@@ -210,8 +210,6 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
       // контур извлечённого вокала (режим линии: он и есть цель)
       const line = engine.map.pitchline;
       if (lineMode && line && line.midi.length > 0) {
-        const leftMs = songMs - trailMs;
-        const rightMs = songMs + lookaheadMs;
         const i0 = Math.max(0, Math.floor(leftMs / line.hopMs) - 1);
         const i1 = Math.min(line.midi.length - 1, Math.ceil(rightMs / line.hopMs) + 1);
         const path = new Path2D();
@@ -245,7 +243,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
         ctx2d.lineWidth = 1;
 
         // шарик-ориентир на линии «сейчас»
-        const cm = contourMidiAt(line, Math.max(0, songMs));
+        const cm = contourMidiAt(line, Math.max(0, cursorMs));
         if (cm !== null) {
           const y = midiToY(cm);
           if (y >= -4 && y <= H + 4) {
@@ -271,7 +269,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
       for (let i = trail.length - 1; i >= 0; i--) {
         const p = trail[i];
         const age = songMs - p.songMs;
-        if (age > trailMs) break;
+        if (p.songMs < leftMs) break;
         const x = msToX(p.songMs);
         if (x < PAD_L) break;
         const wiggle = Math.max(-WIGGLE_CLAMP_SEMIS, Math.min(WIGGLE_CLAMP_SEMIS, p.rawOffset));
@@ -279,7 +277,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
         const w = loudToW(p.loudDb);
         const j = p.distortion > 0.25 ? jag(i) * (2 + 4 * p.distortion) : 0;
         if (hasPrev && Math.abs(px - x) < 40 && Math.abs(pMidi - p.midi) < TRAIL_BREAK_SEMIS) {
-          const ageB = Math.min(AGE_BUCKETS - 1, Math.floor((age / trailMs) * AGE_BUCKETS));
+          const ageB = reduceMotion ? 0 : Math.min(AGE_BUCKETS - 1, Math.max(0, Math.floor((age / trailMs) * AGE_BUCKETS)));
           const bucket =
             ageB + (p.inTolerance ? AGE_BUCKETS : 0) + (p.distortion > 0.4 ? AGE_BUCKETS * 2 : 0);
           const path = (ribbonPaths[bucket] ??= new Path2D());
@@ -361,8 +359,8 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
         if (age < 0 || age > 800) continue;
         const n = notes[jd.noteIndex];
         const x = msToX(n.startMs + n.durMs);
-        const y = midiToY(n.midi) - 14 - (age / 800) * 22;
-        ctx2d.globalAlpha = 1 - age / 800;
+        const y = midiToY(n.midi) - 14 - (reduceMotion ? 0 : (age / 800) * 22);
+        ctx2d.globalAlpha = reduceMotion ? 1 : 1 - age / 800;
         ctx2d.font = 'bold 14px system-ui, sans-serif';
         ctx2d.fillStyle = jd.judgement === 'perfect' ? C.perfect : jd.judgement === 'good' ? C.good : C.miss;
         const label = jd.judgement === 'perfect' ? 'Perfect!' : jd.judgement === 'good' ? 'Good' : 'Miss';
@@ -375,7 +373,7 @@ export function VocalRibbon({ engine, window: win, lookaheadMs = 4000, lineMode 
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [engine, win.lowMidi, win.highMidi, lookaheadMs, lineMode]);
+  }, [engine, win.lowMidi, win.highMidi, lookaheadMs, lineMode, reduceMotion]);
 
   return (
     <div ref={wrapRef} className="pianoroll-wrap">
@@ -389,7 +387,7 @@ function drawBadge(ctx: CanvasRenderingContext2D, x: number, y: number, label: s
   ctx.font = '12px system-ui, sans-serif';
   const w = ctx.measureText(label).width + 14;
   const h = 20;
-  ctx.fillStyle = 'rgba(20,26,38,0.85)';
+  ctx.fillStyle = 'rgba(31,29,37,0.95)';
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, 10);
   ctx.fill();
@@ -404,7 +402,7 @@ function drawBadge(ctx: CanvasRenderingContext2D, x: number, y: number, label: s
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, dir: 'up' | 'down') {
-  ctx.fillStyle = '#e8c34a';
+  ctx.fillStyle = '#ddc091';
   ctx.beginPath();
   const s = dir === 'up' ? -1 : 1;
   ctx.moveTo(x, y + 8 * s);

@@ -83,6 +83,11 @@ export class Synth {
     };
   }
 
+  dispose(): void {
+    this.cancelAll();
+    this.master.disconnect();
+  }
+
   /** Отменить всё запланированное (пауза/выход). */
   cancelAll(): void {
     const now = this.ctx.currentTime;

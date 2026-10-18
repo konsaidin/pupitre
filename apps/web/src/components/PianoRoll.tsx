@@ -1,4 +1,4 @@
-// Пиано-ролл: canvas с бегущими нотами, окном по диапазону пользователя,
+// Пиано-ролл: canvas с неподвижными страницами (или прокруткой), окном по диапазону пользователя,
 // линией голоса и мини-клавиатурой слева. Рендер — собственный rAF-цикл,
 // читающий состояние движка напрямую (без ре-рендеров React).
 
@@ -6,20 +6,22 @@ import { useEffect, useRef } from 'react';
 import type { GameEngine } from '../game/engine';
 import { isBlackKey, midiToName } from '../lib/music';
 import { contourMidiAt } from '../lib/pitchline';
+import { timelineView } from '../lib/timeline';
 
 interface Props {
   engine: GameEngine;
   window: { lowMidi: number; highMidi: number };
-  /** сколько мс видно на экране справа от линии "сейчас" */
+  /** Масштаб: столько мс впереди при прокрутке; страница вдвое длиннее. */
   lookaheadMs?: number;
   /** показывать контур извлечённого вокала (дорожку + шарик-ориентир) */
   showPitchline?: boolean;
   /** режим «петь по линии»: цель — контур, плашки нот не рисуются */
   lineMode?: boolean;
+  /** Ноты неподвижны внутри страницы, движется только маркер времени. */
+  reduceMotion?: boolean;
 }
 
 const KEYBOARD_W = 56;
-const NOW_FRAC = 0.3;
 const TRAIL_MS = 3000;
 /** перепад между соседними точками хвоста, при котором линию рвём:
  *  голос не прыгает на пол-октавы за кадр ~5 мс — это октавный телепорт
@@ -27,28 +29,28 @@ const TRAIL_MS = 3000;
 const TRAIL_BREAK_SEMIS = 6;
 
 const C = {
-  bg: '#0d1117',
+  bg: '#1d1f25',
   rowWhite: 'rgba(255,255,255,0.030)',
   rowLine: 'rgba(255,255,255,0.055)',
   octaveLine: 'rgba(255,255,255,0.16)',
-  note: '#3b4c7a',
-  noteBorder: '#5a6fa8',
-  noteActive: '#5a79c9',
+  note: '#776a8b',
+  noteBorder: '#a99ab9',
+  noteActive: '#b9a5cf',
   ghost: 'rgba(160,170,200,0.16)',
-  hit: '#2ea86f',
-  perfect: '#38d98c',
-  good: '#e8c34a',
-  miss: '#e05f5f',
-  trailHit: '#38d98c',
+  hit: '#708c7a',
+  perfect: '#b2d2bb',
+  good: '#ddc091',
+  miss: '#dda09d',
+  trailHit: '#b2d2bb',
   trailMiss: 'rgba(200,205,215,0.55)',
-  pitch: '#22d3ee',
-  pitchDim: 'rgba(34,211,238,0.35)',
+  pitch: '#b9accd',
+  pitchDim: 'rgba(185,172,205,0.35)',
   nowLine: 'rgba(255,255,255,0.35)',
   text: 'rgba(230,235,245,0.85)',
   textDim: 'rgba(230,235,245,0.45)',
 };
 
-export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchline = true, lineMode = false }: Props) {
+export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchline = true, lineMode = false, reduceMotion = true }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
 
@@ -90,10 +92,10 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         s.lineTo(W, y + rowH);
         s.stroke();
         // клавиша
-        s.fillStyle = isBlackKey(m) ? '#1a1f2b' : '#e8eaf0';
+        s.fillStyle = isBlackKey(m) ? '#282832' : '#f0ece6';
         s.fillRect(0, y + 0.5, KEYBOARD_W - 6, rowH - 1);
         if (m % 12 === 0 || rowH > 16) {
-          s.fillStyle = isBlackKey(m) ? C.textDim : '#333a4d';
+          s.fillStyle = isBlackKey(m) ? C.textDim : '#4f4751';
           s.font = `${Math.min(11, rowH - 3)}px system-ui, sans-serif`;
           s.textBaseline = 'middle';
           s.fillText(midiToName(m), 4, y + rowH / 2 + 0.5);
@@ -117,12 +119,11 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
 
     const draw = () => {
       raf = requestAnimationFrame(draw);
-      engine.tick();
       const songMs = engine.songMs();
+      const cursorMs = reduceMotion ? songMs + engine.countdownRemaining() * 1000 : songMs;
       const rowH = H / semis;
-      const nowX = KEYBOARD_W + (W - KEYBOARD_W) * NOW_FRAC;
-      const pxPerMs = (W - nowX) / lookaheadMs;
-      const msToX = (ms: number) => nowX + (ms - songMs) * pxPerMs;
+      const { leftMs, rightMs, nowX, pxPerMs } = timelineView(cursorMs, KEYBOARD_W, W - 12, lookaheadMs, reduceMotion);
+      const msToX = (ms: number) => KEYBOARD_W + (ms - leftMs) * pxPerMs;
 
       ctx2d.setTransform(1, 0, 0, 1, 0, 0);
       ctx2d.drawImage(staticLayer, 0, 0);
@@ -161,7 +162,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         let border = C.noteBorder;
         if (res) {
           border = res.judgement === 'perfect' ? C.perfect : res.judgement === 'good' ? C.good : C.miss;
-          fill = res.judgement === 'miss' ? 'rgba(224,95,95,0.25)' : 'rgba(46,168,111,0.35)';
+          fill = res.judgement === 'miss' ? 'rgba(221,160,157,0.25)' : 'rgba(112,140,122,0.35)';
         }
         // левый край обрезается клавиатурой, правый — настоящий x2 (ширина
         // x2−x1 от обрезанного края «растягивала» уезжающую ноту)
@@ -197,8 +198,6 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       // контур извлечённого вокала — «дорожка», по которой едет шарик-ориентир
       const line = engine.map.pitchline;
       if (showPitchline && line && line.midi.length > 0) {
-        const leftMs = songMs + (KEYBOARD_W - nowX) / pxPerMs;
-        const rightMs = songMs + lookaheadMs;
         const i0 = Math.max(0, Math.floor(leftMs / line.hopMs) - 1);
         const i1 = Math.min(line.midi.length - 1, Math.ceil(rightMs / line.hopMs) + 1);
         // «свечение» — вторым широким полупрозрачным штрихом того же пути:
@@ -234,7 +233,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         ctx2d.lineWidth = 1;
 
         // шарик-ориентир на линии «сейчас»
-        const cm = contourMidiAt(line, Math.max(0, songMs));
+        const cm = contourMidiAt(line, Math.max(0, cursorMs));
         if (cm !== null) {
           const y = midiToY(cm);
           if (y >= -4 && y <= H + 4) {
@@ -261,12 +260,12 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       for (let i = trail.length - 1; i >= 0; i--) {
         const p = trail[i];
         const age = songMs - p.songMs;
-        if (age > TRAIL_MS) break;
+        if (reduceMotion ? p.songMs < leftMs : age > TRAIL_MS) break;
         const x = msToX(p.songMs);
         if (x < KEYBOARD_W) break;
         const y = midiToY(p.midi);
         if (hasPrev && Math.abs(prevX - x) < 40 && Math.abs(prevMidi - p.midi) < TRAIL_BREAK_SEMIS) {
-          const bucket = Math.min(3, Math.floor((age / TRAIL_MS) * 4)) + (p.inTolerance ? 4 : 0);
+          const bucket = (reduceMotion ? 0 : Math.min(3, Math.max(0, Math.floor((age / TRAIL_MS) * 4)))) + (p.inTolerance ? 4 : 0);
           const path = (trailPaths[bucket] ??= new Path2D());
           path.moveTo(prevX, prevY);
           path.lineTo(x, y);
@@ -303,7 +302,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         if (y < -4) drawArrow(ctx2d, nowX, 14, 'up');
         else if (y > H + 4) drawArrow(ctx2d, nowX, H - 14, 'down');
         else {
-          ctx2d.fillStyle = lf.cents !== null && Math.abs(lf.cents) <= 100 ? C.trailHit : '#e8eaf0';
+          ctx2d.fillStyle = lf.cents !== null && Math.abs(lf.cents) <= 100 ? C.trailHit : '#f0ece6';
           ctx2d.beginPath();
           ctx2d.arc(nowX, y, 6, 0, Math.PI * 2);
           ctx2d.fill();
@@ -318,8 +317,8 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         if (age < 0 || age > 800) continue;
         const n = notes[j.noteIndex];
         const x = msToX(n.startMs + n.durMs);
-        const y = midiToY(n.midi) - 14 - (age / 800) * 22;
-        ctx2d.globalAlpha = 1 - age / 800;
+        const y = midiToY(n.midi) - 14 - (reduceMotion ? 0 : (age / 800) * 22);
+        ctx2d.globalAlpha = reduceMotion ? 1 : 1 - age / 800;
         ctx2d.font = 'bold 14px system-ui, sans-serif';
         ctx2d.fillStyle = j.judgement === 'perfect' ? C.perfect : j.judgement === 'good' ? C.good : C.miss;
         const label = j.judgement === 'perfect' ? 'Perfect!' : j.judgement === 'good' ? 'Good' : 'Miss';
@@ -332,7 +331,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
       cancelAnimationFrame(raf);
       ro.disconnect();
     };
-  }, [engine, win.lowMidi, win.highMidi, lookaheadMs, showPitchline, lineMode]);
+  }, [engine, win.lowMidi, win.highMidi, lookaheadMs, showPitchline, lineMode, reduceMotion]);
 
   return (
     <div ref={wrapRef} className="pianoroll-wrap">
@@ -353,7 +352,7 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, dir: 'up' | 'down') {
-  ctx.fillStyle = '#e8c34a';
+  ctx.fillStyle = '#ddc091';
   ctx.beginPath();
   const s = dir === 'up' ? -1 : 1;
   ctx.moveTo(x, y + 8 * s);

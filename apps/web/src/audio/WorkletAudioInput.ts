@@ -12,7 +12,6 @@ import dspWasmDataUri from '../assets/dsp.wasm?inline';
 import {
   DEFAULT_MIC,
   FRAME_FLOATS,
-  YIN_WIN,
   decodeFrame,
   type AudioDevice,
   type AudioInput,
@@ -51,6 +50,7 @@ export class WorkletAudioInput implements AudioInput {
   private constraintsKey = '';
   /** задержка драйвер→граф из настроек трека, мс (браузер может не отдать) */
   private captureMs = 0;
+  private analysisMs = NaN;
   /** EMA задержки доставки кадра worklet→main, мс */
   private deliveryMs = NaN;
   private static workletLoaded = new WeakSet<AudioContext>();
@@ -74,12 +74,11 @@ export class WorkletAudioInput implements AudioInput {
 
   /**
    * Задержка тракта захват→кадр: capture (драйвер→граф, если браузер отдал)
-   * + пол-окна YIN (оценка усреднена по окну) + измеренная доставка кадра.
+   * + оценка DSP (YIN, медиана, EMA, ресемплинг) + измеренная доставка кадра.
    */
   latencyMs(): number {
     if (Number.isNaN(this.deliveryMs)) return NaN;
-    const analysisMs = (YIN_WIN / 2 / this.ctx.sampleRate) * 1000;
-    return this.captureMs + analysisMs + this.deliveryMs;
+    return this.captureMs + this.analysisMs + this.deliveryMs;
   }
 
   async start(deviceId: string | null, opts: MicOptions = DEFAULT_MIC): Promise<void> {
@@ -119,7 +118,8 @@ export class WorkletAudioInput implements AudioInput {
       processorOptions: { module, gateRms: this.gateRms, gateClarity: this.gateClarity },
     });
     this.node.port.onmessage = (e) => {
-      const d = e.data as { t0: number; frames: Float32Array };
+      const d = e.data as { t0: number; frames: Float32Array; analysisLatencyMs: number };
+      this.analysisMs = d.analysisLatencyMs;
       this.onBatch(d.t0, d.frames);
     };
     this.source.connect(this.node);
@@ -134,6 +134,7 @@ export class WorkletAudioInput implements AudioInput {
     this.stream = null;
     this.constraintsKey = '';
     this.deliveryMs = NaN;
+    this.analysisMs = NaN;
   }
 
   onFrame(fn: FrameListener): () => void {
@@ -143,6 +144,7 @@ export class WorkletAudioInput implements AudioInput {
 
   /** Раскладка кадра — контракт с AnalysisFrame::write в packages/dsp. */
   private onBatch(t0: number, flat: Float32Array): void {
+    if (flat.length < FRAME_FLOATS || flat.length % FRAME_FLOATS !== 0) return;
     for (let o = 0; o + FRAME_FLOATS <= flat.length; o += FRAME_FLOATS) {
       const frame = decodeFrame(flat, o, t0);
       this.listeners.forEach((fn) => fn(frame));

@@ -10,6 +10,7 @@ import {
   judge,
   notePoints,
   summarize,
+  scoringDuration,
   type GameSummary,
   type NoteResult,
   type Judgement,
@@ -90,6 +91,10 @@ export class GameEngine {
   private synth: Synth;
   private backingSource: AudioBufferSourceNode | null = null;
   private startCtxTime = 0; // ctx-время, соответствующее songMs = 0
+  private playStartCtxTime = 0; // конец разгона текущего запуска/резюма
+  private fromMs = 0;
+  private timer: ReturnType<typeof setInterval> | null = null;
+  private generation = 0;
   private pausedAtMs = 0;
   private noteStates: NoteState[];
   private unsubscribe: (() => void) | null = null;
@@ -117,30 +122,33 @@ export class GameEngine {
   }
 
   countdownRemaining(): number {
-    return Math.max(0, -this.songMs() / 1000);
+    return this.phase === 'countdown' ? Math.max(0, this.playStartCtxTime - this.ctxNow) : 0;
   }
 
   /** Накопленная доля попадания по ноте (для заливки прогресса на ролле). */
   noteHitRatio(index: number): number {
     const st = this.noteStates[index];
     const n = this.map.notes[index];
-    return st && n ? Math.min(1, st.inTolMs / n.durMs) : 0;
+    const duration = n ? scoringDuration(n) : 0;
+    return st && duration > 0 ? Math.min(1, st.inTolMs / duration) : 0;
   }
 
   async start(): Promise<void> {
     if (this.phase !== 'idle') return;
     await this.opts.ctx.resume();
+    if (this.phase !== 'idle') return;
     this.beginAt(0);
   }
 
   pause(): void {
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
-    this.pausedAtMs = Math.max(0, this.songMs());
+    this.pausedAtMs = Math.max(this.fromMs, this.songMs());
     this.phase = 'paused';
     this.synth.cancelAll();
     this.stopBacking();
     this.unsubscribe?.();
     this.unsubscribe = null;
+    this.stopClock();
   }
 
   resume(): void {
@@ -195,6 +203,7 @@ export class GameEngine {
     this.stopBacking();
     this.unsubscribe?.();
     this.unsubscribe = null;
+    this.stopClock();
   }
 
   /**
@@ -205,6 +214,7 @@ export class GameEngine {
     if (a === null || b === null) {
       this.loopA = null;
       this.loopB = null;
+      this.rescheduleBacking();
       return;
     }
     const lo = Math.max(0, Math.min(a, b));
@@ -212,57 +222,78 @@ export class GameEngine {
     if (hi - lo < 200) return;
     this.loopA = lo;
     this.loopB = hi;
+    this.rescheduleBacking();
   }
 
-  /** Вызывать каждый кадр рендера: двигает фазы и финализирует ноты. */
+  /** Часы движка независимы от Canvas/rAF; также вызываются на аудиокадрах. */
   tick(): void {
-    if (this.phase === 'countdown' && this.songMs() >= 0) this.phase = 'playing';
+    if (this.phase === 'countdown' && this.ctxNow >= this.playStartCtxTime) this.phase = 'playing';
     if (this.phase !== 'playing') return;
     const ms = this.songMs();
     if (this.loopA !== null && this.loopB !== null && ms >= this.loopB) {
       this.seekTo(this.loopA);
       return;
     }
-    this.finalizePassed(ms);
-    if (ms >= this.map.durationMs + 300) this.finish();
+    this.finalizePassed(ms - Math.max(0, this.opts.latencyMs));
+    if (ms >= this.map.durationMs + Math.max(300, this.opts.latencyMs + 100)) this.finish();
+  }
+
+  private stopClock(): void {
+    if (this.timer !== null) clearInterval(this.timer);
+    this.timer = null;
+  }
+
+  private rescheduleBacking(): void {
+    if (this.phase !== 'playing' && this.phase !== 'countdown') return;
+    this.synth.cancelAll();
+    this.stopBacking();
+    this.scheduleBacking(Math.max(this.fromMs, this.songMs()));
   }
 
   private beginAt(fromMs: number, leadSec: number = COUNTDOWN_SEC): void {
     const ctx = this.opts.ctx;
     this.startCtxTime = ctx.currentTime + leadSec - fromMs / 1000;
+    this.playStartCtxTime = ctx.currentTime + leadSec;
+    this.fromMs = fromMs;
+    this.generation++;
     this.phase = 'countdown';
     // после паузы/перемотки кадры шли мимо нас — шаг статистики техник заново
     this.lastVoicedT = null;
+    for (const state of this.noteStates) state.lastFrameT = null;
     this.scheduleBacking(fromMs);
     this.unsubscribe = this.opts.input.onFrame((f) => this.onPitchFrame(f));
+    this.stopClock();
+    this.timer = setInterval(() => this.tick(), 20);
   }
 
   private scheduleBacking(fromMs: number): void {
     const { map, ctx, guideNotes, metronome, backingBuffer } = this.opts;
     const startAt = this.startCtxTime; // ctx-время songMs=0
+    const endMs = this.loopB ?? map.durationMs;
+    if (fromMs >= endMs) return;
     if (map.backing.kind === 'url' && backingBuffer) {
       const src = ctx.createBufferSource();
       src.buffer = backingBuffer;
       const gain = ctx.createGain();
       gain.gain.value = 0.9;
       src.connect(gain).connect(ctx.destination);
-      if (fromMs <= 0) src.start(startAt, 0);
-      else src.start(startAt + fromMs / 1000, fromMs / 1000);
+      src.start(startAt + fromMs / 1000, fromMs / 1000, (endMs - fromMs) / 1000);
       this.backingSource = src;
     }
     if (map.backing.kind === 'synth') {
       if (guideNotes) {
         for (const n of map.guideEvents ?? map.notes) {
           if (n.startMs + n.durMs <= fromMs) continue;
+          if (n.startMs >= endMs) break;
           const t = startAt + Math.max(n.startMs, fromMs) / 1000;
-          const dur = (n.startMs + n.durMs - Math.max(n.startMs, fromMs)) / 1000;
+          const dur = (Math.min(n.startMs + n.durMs, endMs) - Math.max(n.startMs, fromMs)) / 1000;
           this.synth.playNote(n.midi, Math.max(t, ctx.currentTime + 0.02), dur, 0.7);
         }
       }
       if (metronome && map.bpm) {
         const beatMs = 60000 / map.bpm;
         const firstBeat = Math.ceil(fromMs / beatMs);
-        for (let b = firstBeat; b * beatMs < this.map.durationMs; b++) {
+        for (let b = firstBeat; b * beatMs < endMs; b++) {
           this.synth.playClick(startAt + (b * beatMs) / 1000, b % 4 === 0);
         }
       }
@@ -279,11 +310,14 @@ export class GameEngine {
   }
 
   private onPitchFrame(f: AnalysisFrame): void {
+    const generation = this.generation;
+    this.tick();
+    if (generation !== this.generation) return;
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
     this.lastAnalysis = f;
     // компенсация задержки тракта: голос "звучал" чуть раньше, чем дошёл до нас
     const songMs = (f.t - this.startCtxTime) * 1000 - this.opts.latencyMs;
-    if (songMs < 0) return;
+    if (songMs < this.fromMs || songMs >= this.map.durationMs || !Number.isFinite(songMs)) return;
 
     const noteIdx = this.findActiveNote(songMs);
     const note = noteIdx >= 0 ? this.map.notes[noteIdx] : null;
@@ -296,7 +330,7 @@ export class GameEngine {
     }
     // статистика техник: время с активным вибрато/расщеплением
     const techDt =
-      this.lastVoicedT !== null ? Math.min((f.t - this.lastVoicedT) * 1000, MAX_FRAME_DT_MS) : 11;
+      this.lastVoicedT !== null ? Math.max(0, Math.min((f.t - this.lastVoicedT) * 1000, MAX_FRAME_DT_MS)) : 0;
     this.lastVoicedT = f.t;
     if (f.vibrato.active) this.techStats.vibratoMs += techDt;
     if (f.distortion.active) this.techStats.distortionMs += techDt;
@@ -319,9 +353,11 @@ export class GameEngine {
         // и в счёте времени, и в цвете ленты (обратная связь честная)
         const techOk = note.tech !== 'vibrato' || f.vibrato.active;
         inTol = m.inTolerance && techOk;
-        const dt = st.lastFrameT !== null ? Math.min((f.t - st.lastFrameT) * 1000, MAX_FRAME_DT_MS) : 11;
+        const elapsed = st.lastFrameT !== null ? Math.max(0, Math.min((f.t - st.lastFrameT) * 1000, MAX_FRAME_DT_MS)) : 0;
+        const scoringStart = note.startMs + (note.tech ? note.techWarmupMs ?? 0 : 0);
+        const dt = Math.max(0, Math.min(elapsed, songMs - Math.max(scoringStart, this.fromMs)));
         st.lastFrameT = f.t;
-        if (inTol) st.inTolMs += dt;
+        if (inTol && !st.finalized) st.inTolMs += dt;
       } else {
         // разрыв контура внутри фразы: время не считаем ни в плюс, ни в минус
         st.lastFrameT = f.t;
@@ -366,7 +402,8 @@ export class GameEngine {
       const st = this.noteStates[i];
       if (st.finalized) continue;
       st.finalized = true;
-      const hitRatio = Math.min(1, st.inTolMs / n.durMs);
+      const duration = scoringDuration(n);
+      const hitRatio = duration > 0 ? Math.min(1, st.inTolMs / duration) : 0;
       const j = judge(hitRatio);
       if (j === 'miss') this.combo = 0;
       else this.combo++;
@@ -389,6 +426,7 @@ export class GameEngine {
     this.stopBacking();
     this.unsubscribe?.();
     this.unsubscribe = null;
+    this.stopClock();
     const results = this.results.filter((r): r is NoteResult => r !== null);
     this.opts.onFinish(summarize(results, this.score, this.maxCombo, this.techStats));
   }

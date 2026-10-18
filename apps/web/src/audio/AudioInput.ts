@@ -69,14 +69,12 @@ export interface AudioInput {
   onFrame(fn: FrameListener): () => void;
   /** Пороги гейта применяются на лету, без перезапуска потока. */
   setGate(gateRms: number, gateClarity: number): void;
-  /** Фактическая задержка тракта захват→кадр, мс; NaN пока не измерена. */
+  /** Оценка задержки сглаженного контура с учётом доставки; NaN пока нет данных. */
   latencyMs(): number;
 }
 
 /** Число f32 на кадр — контракт с AnalysisFrame::write в packages/dsp. */
 export const FRAME_FLOATS = 15;
-/** Окно YIN ядра: оценка усреднена по окну — врождённая задержка анализа. */
-export const YIN_WIN = 1024;
 
 /** Декодирование кадра из плоской укладки ядра; tBase прибавляется к t кадра. */
 export function decodeFrame(flat: Float32Array, o: number, tBase: number): AnalysisFrame {

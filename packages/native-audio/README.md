@@ -20,8 +20,8 @@ Linux: нужен `alsa-devel` (openSUSE) / `libasound2-dev` (Debian). Если 
 Windows: собирать на Windows-машине (`node build.mjs`, нужны Rust с таргетом
 `x86_64-pc-windows-msvc` и Build Tools/MSVC) — получится
 `pupitre-native-audio.win32-x64.node`, его подхватят dev-режим и
-electron-builder (extraResources). Фича `win_delay_load_hook` в Cargo.toml
-обязательна: в Electron N-API-символы живут в electron.exe, не в node.exe.
+electron-builder (extraResources). Windows-релизы CI пока используют Worklet:
+загрузка N-API-модуля в Electron на реальной Windows ещё не проверена.
 Кросс-сборка с Linux не настроена: дистрибутивный Rust без windows-std
 (нужны rustup + cargo-xwin), а замер задержки всё равно возможен только
 на реальной Windows. Без `.node` приложение честно падает на worklet-путь.
@@ -38,8 +38,12 @@ electron-builder (extraResources). Фича `win_delay_load_hook` в Cargo.toml
 `t` кадров — секунды от старта потока (счётчик сэмплов). Батч несёт `ageMs`
 (возраст последнего кадра по таймстампам драйвера) и `postedAtMs` (epoch-мс) —
 рендерер привязывает кадры к AudioContext-времени EMA-якорем
-(`NativeAudioInput`). Замер на linux/pipewire: ~12.9 мс захват→кадр
-(буфер 256 сэмплов, ~169 кадров/с при 44.1 кГц).
+(`NativeAudioInput`). `StartInfo.analysisLatencyMs` включает оценку задержки
+YIN, медианы/EMA и ФНЧ из ядра; UI добавляет возраст доставки. Старый замер
+~12.9 мс не учитывал сглаживание и не отражал задержку видимого контура.
+
+Моно-буфер захвата фиксированного размера, без выделения `Vec` на каждый
+аудиоколбэк. Преобразование кадра в JS-массив выполняется в N-API-колбэке.
 
 ## E2E
 

@@ -39,7 +39,7 @@ class PitchProcessor extends AudioWorkletProcessor {
       // копия обязательна: выходной буфер ядра переиспользуется
       const flat = new Float32Array(len);
       flat.set(new Float32Array(this.dsp.memory.buffer, this.outPtr, len));
-      this.port.postMessage({ t0: this.startTime, frames: flat }, [flat.buffer]);
+      this.port.postMessage({ t0: this.startTime, frames: flat, analysisLatencyMs: this.dsp.dsp_latency_ms() }, [flat.buffer]);
     }
     return true;
   }

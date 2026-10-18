@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import threading
 import time
@@ -21,6 +22,10 @@ DATA_DIR = (Path(_data_root) if _data_root else Path(__file__).resolve().parents
 
 # Этапы обработки в порядке следования; progress — сквозной 0..100
 STAGES = ("queued", "decode", "separate", "analyze", "done", "error")
+
+
+class InvalidSongId(ValueError):
+    pass
 
 
 @dataclass
@@ -64,12 +69,27 @@ class SongMeta:
 
 class SongStore:
     def __init__(self, root: Path = DATA_DIR):
-        self.root = root
+        self.root = root.resolve()
         self.root.mkdir(parents=True, exist_ok=True)
         self._lock = threading.Lock()
 
     def song_dir(self, song_id: str) -> Path:
-        return self.root / song_id
+        if not re.fullmatch(r"[0-9a-f]{12}", song_id):
+            raise InvalidSongId("некорректный ID песни")
+        path = self.root / song_id
+        if path.is_symlink() or path.resolve().parent != self.root:
+            raise InvalidSongId("путь песни выходит за каталог хранилища")
+        return path
+
+    def save_json(self, song_id: str, name: str, value: dict) -> None:
+        """Читатель видит либо предыдущий, либо полностью записанный JSON."""
+        if name not in ("map.json", "pitchline.json"):
+            raise ValueError("неизвестный артефакт песни")
+        with self._lock:
+            path = self.song_dir(song_id) / name
+            tmp = path.with_suffix(".json.tmp")
+            tmp.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
+            tmp.replace(path)
 
     def create(self, original_name: str, title: str, artist: str) -> SongMeta:
         song_id = uuid.uuid4().hex[:12]
@@ -101,18 +121,20 @@ class SongStore:
     def list_meta(self) -> list[SongMeta]:
         metas = []
         for d in self.root.iterdir():
-            if (d / "meta.json").exists():
-                try:
-                    metas.append(SongMeta(**json.loads((d / "meta.json").read_text(encoding="utf-8"))))
-                except (json.JSONDecodeError, TypeError):
-                    continue
+            try:
+                meta = self.load_meta(d.name)
+                if meta is not None and meta.id == d.name:
+                    metas.append(meta)
+            except InvalidSongId:
+                continue
         return sorted(metas, key=lambda m: m.created_at, reverse=True)
 
     def load_map(self, song_id: str) -> dict | None:
         path = self.song_dir(song_id) / "map.json"
-        if not path.exists():
+        try:
+            return json.loads(path.read_text(encoding="utf-8"))
+        except (FileNotFoundError, json.JSONDecodeError):
             return None
-        return json.loads(path.read_text(encoding="utf-8"))
 
     def delete(self, song_id: str) -> bool:
         d = self.song_dir(song_id)

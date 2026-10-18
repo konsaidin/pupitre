@@ -8,10 +8,13 @@ import { t } from './i18n';
 import type { ExtractSettings, MapNote, Pitchline, SongMap } from './songMap';
 
 const API_BASE_KEY = 'pupitre.apiBase.v1';
+const API_TOKEN_KEY = 'pupitre.apiToken.v1';
 
 /** Мост из Electron-preload: адрес встроенного бэкенда и его статус. */
 interface DesktopBridge {
   apiBase: string;
+  apiToken?: string;
+  ensureBackend?: () => Promise<void>;
   onBackendStatus(cb: (s: { stage: string; detail?: string; progress?: number }) => void): () => void;
   /** повторить развёртывание после ошибки (есть в сборках с ретраем) */
   retrySetup?: () => void;
@@ -28,11 +31,69 @@ export function getApiBase(): string {
 
 /** Пустая строка = «как у сайта»; null/пусто в десктопе вернёт дефолт при чтении. */
 export function setApiBase(url: string | null): void {
+  const previous = getApiBase();
   if (url == null || url.trim() === '') localStorage.removeItem(API_BASE_KEY);
   else localStorage.setItem(API_BASE_KEY, url.trim().replace(/\/+$/, ''));
+  if (getApiBase() !== previous) localStorage.removeItem(API_TOKEN_KEY);
+}
+
+export function getExternalApiToken(): string {
+  try {
+    const saved = JSON.parse(localStorage.getItem(API_TOKEN_KEY) ?? 'null') as {base: string; token: string} | null;
+    return saved?.base === getApiBase() && typeof saved.token === 'string' ? saved.token : '';
+  } catch {
+    return '';
+  }
+}
+
+export function setExternalApiToken(token: string): void {
+  const base = getApiBase();
+  if (token.trim() && base !== desktopBridge()?.apiBase) {
+    localStorage.setItem(API_TOKEN_KEY, JSON.stringify({base, token: token.trim()}));
+  } else localStorage.removeItem(API_TOKEN_KEY);
 }
 
 const api = (path: string): string => `${getApiBase()}${path}`;
+
+function builtinBridge(url: string): DesktopBridge | null {
+  const bridge = desktopBridge();
+  return bridge && url.startsWith(`${bridge.apiBase.replace(/\/+$/, '')}/api/`) ? bridge : null;
+}
+
+let backendReady: Promise<void> | null = null;
+
+function requestToken(url: string): string | undefined {
+  const bridge = builtinBridge(url);
+  if (bridge) return bridge.apiToken;
+  return url.startsWith(`${getApiBase()}/api/`) ? getExternalApiToken() : undefined;
+}
+
+/** Ключ встроенного сервера не передаётся внешнему адресу. */
+export async function apiFetch(url: string, init: RequestInit = {}, startBackend = true): Promise<Response> {
+  const bridge = builtinBridge(url);
+  if (startBackend && bridge?.ensureBackend) {
+    backendReady ??= bridge.ensureBackend().catch((error: unknown) => {
+      backendReady = null;
+      throw error;
+    });
+    await backendReady;
+  }
+  const headers = new Headers(init.headers);
+  const token = requestToken(url);
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  try {
+    return await fetch(url, { ...init, headers });
+  } catch (error) {
+    if (bridge) backendReady = null;
+    throw error;
+  }
+}
+
+function mediaUrl(path: string): string {
+  const url = api(path);
+  const token = requestToken(url);
+  return token ? `${url}?token=${encodeURIComponent(token)}` : url;
+}
 
 export type SongStatus = 'queued' | 'processing' | 'done' | 'error';
 export type SongStage = 'queued' | 'decode' | 'separate' | 'analyze' | 'done' | 'error';
@@ -77,44 +138,44 @@ async function jsonOrThrow<T>(resp: Response): Promise<T> {
   return resp.json() as Promise<T>;
 }
 
-export async function listSongs(): Promise<SongInfo[]> {
-  return jsonOrThrow(await fetch(api('/api/songs')));
+export async function listSongs(startBackend = true): Promise<SongInfo[]> {
+  return jsonOrThrow(await apiFetch(api('/api/songs'), {}, startBackend));
 }
 
 export async function uploadSong(file: File): Promise<SongInfo> {
   const form = new FormData();
   form.append('file', file);
-  return jsonOrThrow(await fetch(api('/api/songs'), { method: 'POST', body: form }));
+  return jsonOrThrow(await apiFetch(api('/api/songs'), { method: 'POST', body: form }));
 }
 
 export async function getSong(id: string): Promise<SongDetail> {
-  return jsonOrThrow(await fetch(api(`/api/songs/${id}`)));
+  return jsonOrThrow(await apiFetch(api(`/api/songs/${id}`)));
 }
 
 export async function deleteSong(id: string): Promise<void> {
-  await jsonOrThrow(await fetch(api(`/api/songs/${id}`), { method: 'DELETE' }));
+  await jsonOrThrow(await apiFetch(api(`/api/songs/${id}`), { method: 'DELETE' }));
 }
 
 export async function retrySong(id: string): Promise<SongInfo> {
-  return jsonOrThrow(await fetch(api(`/api/songs/${id}/retry`), { method: 'POST' }));
+  return jsonOrThrow(await apiFetch(api(`/api/songs/${id}/retry`), { method: 'POST' }));
 }
 
 export function instrumentalUrl(id: string): string {
-  return api(`/api/songs/${id}/instrumental`);
+  return mediaUrl(`/api/songs/${id}/instrumental`);
 }
 
 export function vocalUrl(id: string): string {
-  return api(`/api/songs/${id}/vocal`);
+  return mediaUrl(`/api/songs/${id}/vocal`);
 }
 
 /** Оригинальный трек с вокалом (вариант исполнения «с вокалом»). */
 export function mixUrl(id: string): string {
-  return api(`/api/songs/${id}/mix`);
+  return mediaUrl(`/api/songs/${id}/mix`);
 }
 
 /** Контур высоты вокала. null — если бэкенд его не сохранил (старые карты). */
 export async function getPitchline(id: string): Promise<Pitchline | null> {
-  const resp = await fetch(api(`/api/songs/${id}/pitchline`));
+  const resp = await apiFetch(api(`/api/songs/${id}/pitchline`));
   if (resp.status === 404) return null;
   return jsonOrThrow<Pitchline>(resp);
 }
@@ -139,7 +200,7 @@ export async function loadSongMap(id: string): Promise<SongMap> {
 /** Переснять мелодию с новыми настройками (без Demucs); дальше — поллинг статуса. */
 export async function reextractSong(id: string, params: ExtractSettings): Promise<SongInfo> {
   return jsonOrThrow(
-    await fetch(api(`/api/songs/${id}/reextract`), {
+    await apiFetch(api(`/api/songs/${id}/reextract`), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(params),
@@ -154,9 +215,12 @@ export async function saveMap(id: string, notes: MapNote[]): Promise<{ noteCount
     durMs: Math.round(n.durMs),
     midi: Math.round(n.midi),
     ...(n.lyric ? { lyric: n.lyric } : {}),
+    ...(n.tech !== undefined ? { tech: n.tech } : {}),
+    ...(n.techWarmupMs !== undefined ? { techWarmupMs: n.techWarmupMs } : {}),
+    ...(n.vibrato !== undefined ? { vibrato: n.vibrato } : {}),
   }));
   return jsonOrThrow(
-    await fetch(api(`/api/songs/${id}/map`), {
+    await apiFetch(api(`/api/songs/${id}/map`), {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ notes: body }),

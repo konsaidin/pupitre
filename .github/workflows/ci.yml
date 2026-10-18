@@ -27,6 +27,13 @@ jobs:
 
       - run: npm ci
 
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Build DSP from Rust sources
+        run: npm run build:dsp
+
       - name: Unit tests (vitest)
         run: npm test
 
@@ -39,6 +46,9 @@ jobs:
 
       - name: Build (tsc + vite)
         run: npm run build
+
+      - name: Desktop backend lifecycle tests
+        run: node --test ../desktop/tests/backend.test.cjs
 
   dsp:
     runs-on: ubuntu-latest
@@ -53,3 +63,18 @@ jobs:
 
       - name: DSP core tests
         run: cargo test --manifest-path packages/dsp/Cargo.toml
+
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/api
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: services/api/requirements-test.txt
+      - run: pip install -r requirements-test.txt
+      - run: python -m unittest discover -s tests -v

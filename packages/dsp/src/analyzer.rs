@@ -4,10 +4,11 @@
 // f0-контур; медиана+EMA — только для сглаженного центра ленты.
 
 use crate::distortion::Distortion;
+use crate::decimate::Decimator;
 use crate::loudness::Loudness;
 use crate::smooth::Smoother;
 use crate::vibrato::Vibrato;
-use crate::yin::{Yin, BUF_SIZE};
+use crate::yin::{Yin, BUF_SIZE, WIN};
 
 /// шаг анализа в сэмплах: 256 при 48 кГц ≈ 5.3 мс на кадр
 pub const HOP: usize = 256;
@@ -60,6 +61,8 @@ impl AnalysisFrame {
 
 pub struct Analyzer {
     sample_rate: f32,
+    decimator: Decimator,
+    input_rate: f32,
     yin: Yin,
     smoother: Smoother,
     vibrato: Vibrato,
@@ -75,10 +78,15 @@ pub struct Analyzer {
 
 impl Analyzer {
     pub fn new(sample_rate: f32) -> Self {
+        let input_rate = sample_rate;
+        let decimator = Decimator::new(sample_rate);
+        let sample_rate = sample_rate / decimator.factor as f32;
         let frame_rate = sample_rate / HOP as f32;
         let frame_ms = 1000.0 / frame_rate;
         Self {
             sample_rate,
+            input_rate,
+            decimator,
             yin: Yin::new(sample_rate),
             smoother: Smoother::new(frame_rate),
             vibrato: Vibrato::new(frame_rate),
@@ -96,8 +104,28 @@ impl Analyzer {
         self.smoother.set_gate(gate_rms, gate_clarity);
     }
 
+    /// Оценка задержки сглаженного контура: окно YIN + медиана/EMA + ФНЧ.
+    /// Захват, доставка и дополнительные 85 мс при смене октавы сюда не входят.
+    pub fn latency_ms(&self) -> f32 {
+        ((BUF_SIZE - WIN / 2) as f32 / self.sample_rate
+            + self.smoother.latency_frames() * HOP as f32 / self.sample_rate
+            + self.decimator.delay_samples() as f32 / self.input_rate) * 1000.0
+    }
+
     /// Прогнать порцию сэмплов; на каждый готовый кадр зовётся emit.
     pub fn process<F: FnMut(AnalysisFrame)>(&mut self, samples: &[f32], mut emit: F) {
+        if self.decimator.factor == 1 {
+            self.process_analysis_samples(samples, &mut emit);
+        } else {
+            for &sample in samples {
+                if let Some(value) = self.decimator.push(sample) {
+                    self.process_analysis_samples(&[value], &mut emit);
+                }
+            }
+        }
+    }
+
+    fn process_analysis_samples<F: FnMut(AnalysisFrame)>(&mut self, samples: &[f32], emit: &mut F) {
         let mut offset = 0usize;
         while offset < samples.len() {
             let take = (BUF_SIZE - self.filled).min(samples.len() - offset);

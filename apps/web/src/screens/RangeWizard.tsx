@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { ensureMic, stopMic } from '../audio/audioSession';
 import { LiveKeyboard } from '../components/LiveKeyboard';
 import { ScreenHeader } from '../components/ScreenHeader';
+import { Icon } from '../components/Icon';
+import { StudioArtwork } from '../components/StudioArtwork';
 import { t } from '../lib/i18n';
 import { classifyRange, midiToName, type VocalRange } from '../lib/music';
 import { micOptions } from '../lib/profile';
@@ -110,7 +112,9 @@ export function RangeWizard() {
     },
     low: {
       title: t('Step 2 · Down to the limit'),
-      hint: t('Walk your voice down in steps. Pause on each low note — the yellow line will move. Creaks don’t count :)'),
+      hint: t(
+        'Walk your voice down in steps. Pause on each low note — the yellow line will move. Creaks don’t count :)',
+      ),
     },
     high: {
       title: t('Step 3 · Up to the limit'),
@@ -124,17 +128,37 @@ export function RangeWizard() {
       <div className="screen wizard">
         <ScreenHeader
           title={t('Let’s find your range')}
-          subtitle={t('The app adapts exercises and songs to your voice: it shows only your band of notes and moves melodies into your octave. Measure your range once — it takes a minute.')}
+          subtitle={t(
+            'The app adapts exercises and songs to your voice: it shows only your band of notes and moves melodies into your octave. Measure your range once — it takes a minute.',
+          )}
         />
-        <ul className="tips">
-          <li>{t('🎧 Put on headphones if music is playing nearby')}</li>
-          <li>{t('🤫 Find a quiet spot')}</li>
-          <li>{t('🎤 Allow microphone access')}</li>
-        </ul>
-        {micError && <p className="error">⚠️ {micError}</p>}
-        <button className="btn primary big" onClick={() => setStep('comfort')}>
-          {t('Start')}
-        </button>
+        <section className="wizard-intro">
+          <div>
+            <span className="overline">{t('Before the first note')}</span>
+            <h2>{t('Meet your instrument.')}</h2>
+            <p className="dim small">{t('Three simple steps. Nothing to prove. Just sing comfortably.')}</p>
+            <ul className="tips">
+              <li>
+                <Icon name="headphones" size={20} />
+                {t('Use headphones')}
+              </li>
+              <li>
+                <Icon name="ear" size={20} />
+                {t('Find a quiet spot')}
+              </li>
+              <li>
+                <Icon name="mic" size={20} />
+                {t('Allow microphone access')}
+              </li>
+            </ul>
+            {micError && <p className="error">{micError}</p>}
+            <button className="btn primary big" onClick={() => setStep('comfort')}>
+              {t('Find my range')}
+              <Icon name="arrow" size={18} />
+            </button>
+          </div>
+          <StudioArtwork />
+        </section>
       </div>
     );
   }
@@ -147,11 +171,23 @@ export function RangeWizard() {
           <span className="range-notes">
             {midiToName(low)} – {midiToName(high)}
           </span>
-          <span className="range-class">{t(classifyRange(low, high))} · {t('{n} semitones', { n: high - low })}</span>
+          <span className="range-class">
+            {t(classifyRange(low, high))} · {t('{n} semitones', { n: high - low })}
+          </span>
         </div>
-        <p className="lead">{t('Exercises and songs are now tuned to this zone. You can remeasure anytime.')}</p>
+        <p className="lead">
+          {t('Exercises and songs are now tuned to this zone. You can remeasure anytime.')}
+        </p>
         <div className="btn-row">
-          <button className="btn" onClick={() => { setLow(null); setHigh(null); setComfort(null); setStep('comfort'); }}>
+          <button
+            className="btn"
+            onClick={() => {
+              setLow(null);
+              setHigh(null);
+              setComfort(null);
+              setStep('comfort');
+            }}
+          >
             {t('Remeasure')}
           </button>
           <button className="btn primary" onClick={save}>
@@ -167,13 +203,25 @@ export function RangeWizard() {
   return (
     <div className="screen wizard wizard-live">
       <div className="wizard-panel">
+        <div
+          className="wizard-steps"
+          aria-label={t('Step {n} of 3', { n: step === 'comfort' ? 1 : step === 'low' ? 2 : 3 })}
+        >
+          {[0, 1, 2].map((n) => (
+            <i key={n} className={n <= (step === 'comfort' ? 0 : step === 'low' ? 1 : 2) ? 'active' : ''} />
+          ))}
+        </div>
         <ScreenHeader title={stepInfo[step].title} />
         <p className="lead">{stepInfo[step].hint}</p>
         {micError && <p className="error">⚠️ {micError}</p>}
         <div className="wizard-status">
-          {step === 'comfort' && comfort != null && <span>{t('Comfort note: {note} ✓', { note: midiToName(comfort) })}</span>}
+          {step === 'comfort' && comfort != null && (
+            <span>{t('Comfort note: {note} ✓', { note: midiToName(comfort) })}</span>
+          )}
           {step === 'low' && low != null && <span>{t('Low bound: {note}', { note: midiToName(low) })}</span>}
-          {step === 'high' && high != null && <span>{t('High bound: {note}', { note: midiToName(high) })}</span>}
+          {step === 'high' && high != null && (
+            <span>{t('High bound: {note}', { note: midiToName(high) })}</span>
+          )}
         </div>
         <div className="btn-row">
           <button

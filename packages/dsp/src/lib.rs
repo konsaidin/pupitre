@@ -8,6 +8,7 @@
 // in_ptr, зовёт dsp_process(n), читает n_frames × FRAME_FLOATS f32 из out_ptr.
 
 mod analyzer;
+mod decimate;
 mod distortion;
 mod loudness;
 mod smooth;
@@ -59,6 +60,11 @@ pub extern "C" fn dsp_out_ptr() -> *const f32 {
 #[no_mangle]
 pub extern "C" fn dsp_frame_floats() -> usize {
     FRAME_FLOATS
+}
+
+#[no_mangle]
+pub extern "C" fn dsp_latency_ms() -> f32 {
+    unsafe { state().as_ref().map_or(0.0, |s| s.analyzer.latency_ms()) }
 }
 
 #[no_mangle]

@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { loadProfile, saveProfile, addScore, type Profile, type ScoreRecord } from '../lib/profile';
 
 interface ProfileApi {
@@ -11,6 +11,11 @@ const Ctx = createContext<ProfileApi | null>(null);
 
 export function ProfileProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile>(() => loadProfile());
+
+  useEffect(() => {
+    document.documentElement.dataset.reducedMotion = String(profile.reduceMotion);
+    return () => { delete document.documentElement.dataset.reducedMotion; };
+  }, [profile.reduceMotion]);
 
   const update = useCallback((patch: Partial<Profile>) => {
     setProfile((p) => {

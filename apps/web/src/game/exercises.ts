@@ -185,7 +185,7 @@ function buildLongTones(range: VocalRange, opts: ExerciseOptions): SongMap {
 /**
  * Удержание вибрато: длинная нота (~4 с), время в допуске идёт только
  * при активном вибрато (детектор ядра: ≥20 центов, 4–8 Гц). Perfect ≈
- * «держал вибрато ≥80% ноты», т.е. ≥3 с — приёмка этапа 6.
+ * «держал вибрато ≥80% оцениваемого интервала»; первые 1.2 с — подготовка.
  */
 function buildVibratoHold(range: VocalRange, opts: ExerciseOptions): SongMap {
   const zone = comfortZone(range);
@@ -197,7 +197,7 @@ function buildVibratoHold(range: VocalRange, opts: ExerciseOptions): SongMap {
   let t = 0;
   for (let rep = 0; rep < opts.repeats; rep++) {
     const midi = Math.min(zone.highMidi, Math.max(zone.lowMidi, center + degrees[rep % degrees.length]));
-    notes.push({ startMs: Math.round(t), durMs: holdMs, midi, lyric: 'a〜', tech: 'vibrato' });
+    notes.push({ startMs: Math.round(t), durMs: holdMs, midi, lyric: 'a〜', tech: 'vibrato', techWarmupMs: 1200 });
     t += holdMs + 2 * beatMs;
   }
   const leadInMs = Math.round(4 * beatMs);
@@ -295,7 +295,7 @@ export const EXERCISES: ExerciseDef[] = [
   {
     id: 'vibrato-hold',
     title: 'Vibrato hold',
-    description: 'Hold a long note with vibrato — only the time with active vibrato counts.',
+    description: 'Hold a long note with vibrato. The first 1.2 seconds are preparation; then active vibrato counts.',
     icon: '〰️',
     category: 'Techniques',
     defaultBpm: 60,

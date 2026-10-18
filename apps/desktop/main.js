@@ -1,15 +1,17 @@
 // Десктопный Pupitre: окно Chromium с фронтом + встроенный бэкенд.
-// При первом запуске бэкенд сам докачивает Python-окружение и ffmpeg
+// При первом открытии песен бэкенд докачивает Python-окружение и ffmpeg
 // (см. backend.js) — приложение полноценно из одного установщика.
 
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
 const path = require('node:path');
+const { randomBytes } = require('node:crypto');
 const { Backend, PORT } = require('./backend');
 const { initNativeAudio } = require('./native-audio');
 
 let backend = null;
 let nativeAudioReady = false;
-let lastStatus = { stage: 'starting' };
+let lastStatus = { stage: 'idle' };
+const apiToken = randomBytes(32).toString('hex');
 const statusSubscribers = new Set();
 
 function broadcastStatus(status) {
@@ -33,6 +35,7 @@ function createWindow() {
       preload: path.join(__dirname, 'preload.js'),
       additionalArguments: [
         `--pupitre-api=http://127.0.0.1:${PORT}`,
+        `--pupitre-api-token=${apiToken}`,
         ...(nativeAudioReady ? ['--pupitre-native-audio'] : []),
       ],
     },
@@ -61,16 +64,16 @@ app.whenReady().then(() => {
 
   // повторить развёртывание после ошибки (сеть моргнула и т.п.) — без перезапуска
   ipcMain.on('backend-retry', () => {
-    if (backend && lastStatus.stage === 'error') void backend.start();
+    if (backend && lastStatus.stage === 'error') void backend.start().catch(() => {});
   });
+  ipcMain.handle('backend-ensure', () => backend.start());
 
   // код бэкенда: в собранном приложении лежит в resources/api,
   // при разработке — из репозитория
   const apiDir = app.isPackaged
     ? path.join(process.resourcesPath, 'api')
     : path.join(__dirname, '..', '..', 'services', 'api');
-  backend = new Backend(app.getPath('userData'), apiDir, broadcastStatus);
-  void backend.start();
+  backend = new Backend(app.getPath('userData'), apiDir, broadcastStatus, apiToken);
 
   createWindow();
   app.on('activate', () => {

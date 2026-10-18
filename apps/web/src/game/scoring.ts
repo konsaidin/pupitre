@@ -5,6 +5,10 @@ import { DIFFICULTY_META, type Difficulty, type MapNote } from '../lib/songMap';
 
 export type Judgement = 'perfect' | 'good' | 'miss';
 
+export function scoringDuration(note: MapNote): number {
+  return Math.max(0, note.durMs - (note.tech ? note.techWarmupMs ?? 0 : 0));
+}
+
 export interface NoteResult {
   note: MapNote;
   hitRatio: number; // 0..1 — доля длительности в допуске
@@ -85,8 +89,9 @@ export function summarize(
   let good = 0;
   let miss = 0;
   for (const r of results) {
-    inTol += r.hitRatio * r.note.durMs;
-    total += r.note.durMs;
+    const duration = scoringDuration(r.note);
+    inTol += r.hitRatio * duration;
+    total += duration;
     if (r.judgement === 'perfect') perfect++;
     else if (r.judgement === 'good') good++;
     else miss++;

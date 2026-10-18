@@ -2,7 +2,7 @@
 // синтетически. Главные инварианты: точка голоса не телепортирует на ±12 при
 // непрерывном звучании; октаво-независимый скоринг работает; A/B-луп мотает.
 
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GameEngine } from './engine';
 import { FakeCtx, FakeInput, frame, unvoiced } from '../test/fakeAudio';
 import type { SongMap } from '../lib/songMap';
@@ -31,6 +31,7 @@ async function startAt(songSec: number) {
 }
 
 beforeEach(() => {
+  vi.useFakeTimers();
   ctx = new FakeCtx();
   input = new FakeInput();
   engine = new GameEngine({
@@ -42,6 +43,83 @@ beforeEach(() => {
     guideNotes: false,
     metronome: false,
     onFinish: () => {},
+  });
+});
+
+afterEach(() => {
+  engine.quit();
+  vi.useRealTimers();
+});
+
+describe('часы и подготовительный интервал', () => {
+  it('резюм не оценивает голос до конца разгона и не начисляет время паузы', async () => {
+    await startAt(0);
+    for (let s = 0; s <= 0.5; s += 0.01) {
+      ctx.currentTime = COUNTDOWN + s;
+      input.push(frame(ctx.currentTime, 60));
+    }
+    ctx.currentTime = 3.5;
+    engine.pause();
+    const before = engine.noteHitRatio(0);
+    ctx.currentTime += 10;
+    engine.resume();
+    expect(engine.countdownRemaining()).toBeCloseTo(3);
+    for (let s = 0; s < 3; s += 0.01) {
+      ctx.currentTime = 13.5 + s;
+      input.push(frame(ctx.currentTime, 60));
+    }
+    expect(engine.phase).toBe('countdown');
+    expect(engine.noteHitRatio(0)).toBe(before);
+    ctx.currentTime = 16.5;
+    input.push(frame(ctx.currentTime, 60));
+    expect(engine.phase).toBe('playing');
+    expect(engine.noteHitRatio(0)).toBe(before);
+  });
+
+  it('перемотка далеко в песню сохраняет разгон и не добавляет хвост голоса', async () => {
+    engine = new GameEngine({ ctx: ctx as unknown as AudioContext, input,
+      map: { ...map, durationMs: 10000, notes: [{ startMs: 4000, durMs: 5000, midi: 60 }] },
+      difficulty: 'medium', latencyMs: 0, guideNotes: false, metronome: false, onFinish: () => {},
+    });
+    await startAt(0);
+    engine.seekTo(5000);
+    expect(engine.countdownRemaining()).toBeCloseTo(0.8);
+    ctx.currentTime += 0.7;
+    input.push(frame(ctx.currentTime, 60));
+    expect(engine.phase).toBe('countdown');
+    expect(engine.trail).toHaveLength(0);
+    expect(engine.noteHitRatio(0)).toBe(0);
+  });
+
+  it('завершает игру без вызова tick из отрисовки', async () => {
+    await engine.start();
+    ctx.currentTime = COUNTDOWN + map.durationMs / 1000 + 0.4;
+    vi.advanceTimersByTime(20);
+    expect(engine.phase).toBe('finished');
+    expect(vi.getTimerCount()).toBe(0);
+  });
+
+  it('луп срабатывает по аудиокадру без Canvas', async () => {
+    await engine.start();
+    engine.setLoop(500, 1500);
+    ctx.currentTime = COUNTDOWN + 1.6;
+    input.push(unvoiced(ctx.currentTime));
+    expect(engine.phase).toBe('countdown');
+    expect(engine.countdownRemaining()).toBeCloseTo(0.8);
+    expect(engine.trail).toHaveLength(0);
+  });
+
+  it('не финализирует ноту до прихода кадров с настроенной задержкой', async () => {
+    engine = new GameEngine({ctx: ctx as unknown as AudioContext, input, map,
+      difficulty: 'medium', latencyMs: 200, guideNotes: false, metronome: false, onFinish: () => {},
+    });
+    await engine.start();
+    ctx.currentTime = 4.1;
+    input.push(frame(ctx.currentTime, 60));
+    expect(engine.results[0]).toBeNull();
+    ctx.currentTime = 4.3;
+    vi.advanceTimersByTime(20);
+    expect(engine.results[0]).not.toBeNull();
   });
 });
 

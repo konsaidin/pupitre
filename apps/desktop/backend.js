@@ -1,6 +1,6 @@
 // Развёртывание и запуск встроенного бэкенда обработки песен.
 //
-// При первом запуске в профиль пользователя (userData) докачиваются:
+// При первом открытии библиотеки в профиль пользователя (userData) докачиваются:
 //   1) uv — менеджер Python-окружений (один статический бинарник);
 //   2) сам Python 3.11 + виртуальное окружение с зависимостями
 //      (fastapi/librosa/torch-cpu/demucs, ~2.5 ГБ);
@@ -13,6 +13,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { pipeline } = require('node:stream/promises');
 const { Readable } = require('node:stream');
+const { createHash } = require('node:crypto');
 
 const PORT = 8123;
 const UV_VERSION = '0.7.13';
@@ -84,14 +85,16 @@ class Backend {
    * @param {string} apiDir каталог с кодом бэкенда (resources/api)
    * @param {(status: {stage: string, detail?: string, progress?: number}) => void} onStatus
    */
-  constructor(userData, apiDir, onStatus) {
+  constructor(userData, apiDir, onStatus, apiToken = '') {
     this.root = path.join(userData, 'backend');
     this.apiDir = apiDir;
     this.onStatus = onStatus;
     this.proc = null;
     this.exitCode = null;
     this.exitTail = '';
-    this.busy = false;
+    this.apiToken = apiToken;
+    this.startPromise = null;
+    this.setupProc = null;
   }
 
   get port() {
@@ -144,6 +147,7 @@ class Backend {
           UV_PYTHON_PREFERENCE: 'only-managed',
         },
       });
+      this.setupProc = p;
       let tail = '';
       const onData = (buf) => {
         const line = buf.toString().trim().split('\n').pop() ?? '';
@@ -154,7 +158,10 @@ class Backend {
       };
       p.stdout.on('data', onData);
       p.stderr.on('data', onData);
-      p.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`uv ${args[0]} завершился с кодом ${code}: ${tail}`))));
+      p.on('close', (code) => {
+        if (this.setupProc === p) this.setupProc = null;
+        code === 0 ? resolve() : reject(new Error(`uv ${args[0]} завершился с кодом ${code}: ${tail}`));
+      });
       p.on('error', reject);
     });
   }
@@ -162,11 +169,13 @@ class Backend {
   async ensureEnv(uvBin) {
     const venv = path.join(this.root, 'venv');
     const marker = path.join(this.root, 'deps-ok');
+    const requirements = path.join(this.apiDir, 'requirements.txt');
+    const fingerprint = createHash('sha256').update(fs.readFileSync(requirements)).digest('hex');
     const pythonBin = IS_WIN ? path.join(venv, 'Scripts', 'python.exe') : path.join(venv, 'bin', 'python');
-    if (fs.existsSync(marker) && fs.existsSync(pythonBin)) return pythonBin;
+    if (fs.existsSync(marker) && fs.existsSync(pythonBin) && fs.readFileSync(marker, 'utf8') === fingerprint) return pythonBin;
 
     this.onStatus({ stage: 'install-python' });
-    await this.runUv(uvBin, ['venv', '--python', '3.11', venv], 'install-python');
+    if (!fs.existsSync(pythonBin)) await this.runUv(uvBin, ['venv', '--python', '3.11', venv], 'install-python');
 
     this.onStatus({ stage: 'install-deps' });
     await this.runUv(
@@ -177,7 +186,7 @@ class Backend {
         '--index-strategy', 'unsafe-best-match'],
       'install-deps',
     );
-    fs.writeFileSync(marker, new Date().toISOString());
+    fs.writeFileSync(marker, fingerprint);
     return pythonBin;
   }
 
@@ -189,8 +198,7 @@ class Backend {
     while (Date.now() - t0 < timeoutMs) {
       if (this.exitCode != null) throw new Error(`uvicorn упал с кодом ${this.exitCode}: ${this.exitTail}`);
       try {
-        const r = await fetch(`http://127.0.0.1:${PORT}/api/health`);
-        if (r.ok) return;
+        if (await this.isHealthy()) return;
       } catch {
         // ещё поднимается
       }
@@ -199,15 +207,28 @@ class Backend {
     throw new Error('бэкенд не ответил на /api/health');
   }
 
-  async start() {
-    // повторный вызов (ретрай из UI), пока идёт развёртывание — игнорируем
-    if (this.busy) return;
-    this.busy = true;
+  async isHealthy() {
+    const r = await fetch(`http://127.0.0.1:${PORT}/api/health`, {
+      headers: this.apiToken ? { Authorization: `Bearer ${this.apiToken}` } : {},
+      signal: AbortSignal.timeout(2000),
+    });
+    if (!r.ok) return false;
+    const body = await r.json();
+    return body.service === 'pupitre' && body.protected === Boolean(this.apiToken);
+  }
+
+  start() {
+    if (!this.startPromise) {
+      this.startPromise = this.startOnce().finally(() => { this.startPromise = null; });
+    }
+    return this.startPromise;
+  }
+
+  async startOnce() {
     try {
       // уже кем-то запущен (например, dev-uvicorn) — просто используем
       try {
-        const r = await fetch(`http://127.0.0.1:${PORT}/api/health`);
-        if (r.ok) {
+        if (await this.isHealthy()) {
           this.onStatus({ stage: 'ready' });
           return;
         }
@@ -223,6 +244,7 @@ class Backend {
       const env = {
         ...process.env,
         PUPITRE_DATA: path.join(this.root, 'data'),
+        PUPITRE_API_TOKEN: this.apiToken,
         // resources/api и каталог portable-exe могут быть только для чтения —
         // __pycache__ туда не пишем
         PYTHONDONTWRITEBYTECODE: '1',
@@ -250,7 +272,7 @@ class Backend {
       }
       this.exitCode = null;
       this.exitTail = '';
-      this.proc = spawn(pythonBin, ['-m', 'uvicorn', 'app.main:app', '--port', String(PORT)], {
+      this.proc = spawn(pythonBin, ['-m', 'uvicorn', 'app.main:app', '--host', '127.0.0.1', '--port', String(PORT), '--no-access-log'], {
         cwd: this.apiDir,
         env,
         windowsHide: true,
@@ -280,12 +302,12 @@ class Backend {
       fs.rmSync(path.join(this.root, 'tmp'), { recursive: true, force: true });
     } catch (e) {
       this.onStatus({ stage: 'error', detail: String(e && e.message ? e.message : e).slice(0, 300) });
-    } finally {
-      this.busy = false;
+      throw e;
     }
   }
 
   stop() {
+    this.setupProc?.kill();
     this.proc?.kill();
     this.proc = null;
   }

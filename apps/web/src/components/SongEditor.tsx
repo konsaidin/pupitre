@@ -36,15 +36,15 @@ const NEW_NOTE_MS = 400;
 const RULER_H = 18;
 
 const C = {
-  bg: '#0d1117',
+  bg: '#1d1f25',
   rowWhite: 'rgba(255,255,255,0.030)',
   rowLine: 'rgba(255,255,255,0.055)',
   octaveLine: 'rgba(255,255,255,0.16)',
-  note: '#3b4c7a',
-  noteBorder: '#5a6fa8',
+  note: '#776a8b',
+  noteBorder: '#a99ab9',
   noteSel: '#6d8ad4',
   noteSelBorder: '#a9c0ff',
-  pitch: '#22d3ee',
+  pitch: '#b9accd',
   selRange: 'rgba(251,191,36,0.10)',
   selRangeEdge: 'rgba(251,191,36,0.6)',
   playhead: 'rgba(255,255,255,0.5)',
@@ -60,7 +60,10 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
   const audioRef = useRef<HTMLAudioElement>(null);
 
   // ноты живут в ref (канвас читает каждый кадр), version — чтобы обновлять UI
-  const notesRef = useRef<ENote[]>(map.notes.map((n, i) => ({ ...n, id: i })));
+  const notesRef = useRef<ENote[]>(map.notes.map((n, i) => {
+    const startMs = Math.max(0, Math.min(n.startMs, map.durationMs - 1));
+    return { ...n, id: i, startMs, durMs: Math.max(1, Math.min(n.durMs, map.durationMs - startMs)) };
+  }));
   const nextId = useRef(map.notes.length);
   const centerMsRef = useRef(0);
   const selectedRef = useRef<number | null>(null);
@@ -212,10 +215,10 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         ctx2d.moveTo(KEYBOARD_W, y + rowH);
         ctx2d.lineTo(W, y + rowH);
         ctx2d.stroke();
-        ctx2d.fillStyle = isBlackKey(m) ? '#1a1f2b' : '#e8eaf0';
+        ctx2d.fillStyle = isBlackKey(m) ? '#282832' : '#f0ece6';
         ctx2d.fillRect(0, y + 0.5, KEYBOARD_W - 6, rowH - 1);
         if (m % 12 === 0 || rowH > 16) {
-          ctx2d.fillStyle = isBlackKey(m) ? C.textDim : '#333a4d';
+          ctx2d.fillStyle = isBlackKey(m) ? C.textDim : '#4f4751';
           ctx2d.font = `${Math.min(11, rowH - 3)}px system-ui, sans-serif`;
           ctx2d.textBaseline = 'middle';
           ctx2d.fillText(midiToName(m), 4, y + rowH / 2 + 0.5);
@@ -344,7 +347,7 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         }
       }
       // playhead-маркер на линейке
-      ctx2d.fillStyle = '#e8eaf0';
+      ctx2d.fillStyle = '#f0ece6';
       ctx2d.beginPath();
       ctx2d.moveTo(playX - 5, 0);
       ctx2d.lineTo(playX + 5, 0);
@@ -455,11 +458,11 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
     if (!n) return;
 
     if (d.mode === 'move') {
-      n.startMs = Math.max(0, Math.round(g.xToMs(x) - d.grabMs));
+      n.startMs = Math.max(0, Math.min(map.durationMs - n.durMs, Math.round(g.xToMs(x) - d.grabMs)));
       n.midi = Math.round(g.yToMidi(y) - d.grabMidi);
       n.midi = Math.max(win.lowMidi, Math.min(win.highMidi, n.midi));
     } else {
-      n.durMs = Math.max(MIN_DUR_MS, Math.round(g.xToMs(x) - n.startMs));
+      n.durMs = Math.min(map.durationMs - n.startMs, Math.max(MIN_DUR_MS, Math.round(g.xToMs(x) - n.startMs)));
     }
     setDirty(true);
   };
@@ -490,10 +493,11 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
     const g = geom();
     const note: ENote = {
       id: nextId.current++,
-      startMs: Math.max(0, Math.round(g.xToMs(x))),
-      durMs: NEW_NOTE_MS,
+      startMs: Math.max(0, Math.min(map.durationMs - Math.min(MIN_DUR_MS, map.durationMs), Math.round(g.xToMs(x)))),
+      durMs: Math.min(NEW_NOTE_MS, map.durationMs),
       midi: Math.max(win.lowMidi, Math.min(win.highMidi, Math.round(g.yToMidi(y)))),
     };
+    note.durMs = Math.min(note.durMs, map.durationMs - note.startMs);
     notesRef.current = [...notesRef.current, note];
     select(note.id);
     setDirty(true);

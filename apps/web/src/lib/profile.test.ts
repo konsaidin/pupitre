@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { practiceStreak, type ScoreRecord } from './profile';
+import { loadProfile, practiceStreak, saveProfile, type ScoreRecord } from './profile';
 
 const DAY = 86400000;
 const rec = (playedAt: number): ScoreRecord => ({
@@ -35,5 +35,19 @@ describe('practiceStreak', () => {
 
   it('несколько занятий в день считаются одним днём', () => {
     expect(practiceStreak([rec(NOW.getTime()), rec(NOW.getTime() - 3600e3)], NOW)).toBe(1);
+  });
+});
+
+describe('настройка движения', () => {
+  it('старый профиль получает неподвижные страницы без потери настроек', () => {
+    localStorage.setItem('pupitre.profile.v1', JSON.stringify({difficulty: 'pro', latencyMs: 80, scores: [rec(123)]}));
+    expect(loadProfile()).toMatchObject({reduceMotion: true, difficulty: 'pro', latencyMs: 80, scores: [rec(123)]});
+    localStorage.clear();
+  });
+
+  it('ручной выбор прокрутки сохраняется между запусками', () => {
+    saveProfile({...loadProfile(), reduceMotion: false});
+    expect(loadProfile().reduceMotion).toBe(false);
+    localStorage.clear();
   });
 });

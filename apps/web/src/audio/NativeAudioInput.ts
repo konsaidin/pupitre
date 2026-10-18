@@ -10,7 +10,6 @@
 import {
   DEFAULT_MIC,
   FRAME_FLOATS,
-  YIN_WIN,
   decodeFrame,
   type AudioDevice,
   type AudioInput,
@@ -37,6 +36,7 @@ export interface NativeAudioBridge {
     sampleRate: number;
     channels: number;
     device: string;
+    analysisLatencyMs: number;
   }>;
   stop(): Promise<void>;
   setGate(gateRms: number, gateClarity: number): void;
@@ -58,7 +58,7 @@ export class NativeAudioInput implements AudioInput {
   private running = false;
   /** ключ запуска: смена устройства требует перезапуска потока */
   private startedKey = '';
-  private sampleRate = 48000;
+  private analysisMs = NaN;
   /** ctx-время старта нативного потока (EMA-якорь) */
   private startCtx = NaN;
   /** EMA возраста кадра на момент прихода в рендерер (драйвер + IPC), мс */
@@ -77,11 +77,10 @@ export class NativeAudioInput implements AudioInput {
     this.bridge.setGate(gateRms, gateClarity);
   }
 
-  /** Задержка тракта: возраст кадра при доставке + пол-окна YIN. */
+  /** Оценка задержки сглаженного контура из ядра + возраст кадра при доставке. */
   latencyMs(): number {
     if (Number.isNaN(this.deliveryMs)) return NaN;
-    const analysisMs = (YIN_WIN / 2 / this.sampleRate) * 1000;
-    return analysisMs + this.deliveryMs;
+    return this.analysisMs + this.deliveryMs;
   }
 
   async start(deviceId: string | null, opts: MicOptions = DEFAULT_MIC): Promise<void> {
@@ -98,7 +97,7 @@ export class NativeAudioInput implements AudioInput {
       gateRms: opts.gateRms,
       gateClarity: opts.gateClarity,
     });
-    this.sampleRate = info.sampleRate;
+    this.analysisMs = info.analysisLatencyMs;
     this.startCtx = NaN;
     this.deliveryMs = NaN;
     this.unsub = this.bridge.onFrames((b) => this.onBatch(b));

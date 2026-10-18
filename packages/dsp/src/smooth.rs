@@ -75,6 +75,10 @@ impl Smoother {
         self.clarity_hold = (gate_clarity - 0.12).max(0.3);
     }
 
+    pub fn latency_frames(&self) -> f32 {
+        (self.median_win / 2) as f32 + (1.0 - self.ema_alpha) / self.ema_alpha
+    }
+
     pub fn process(&mut self, freq: f32, clarity: f32, rms: f32) -> Smoothed {
         // гистерезис: войти в voiced сложнее, чем удержаться — кружок не мерцает
         let clarity_min = if self.was_voiced { self.clarity_hold } else { self.clarity_enter };

@@ -56,7 +56,7 @@ export function SeekBar({ engine, window: win, loop = null, onSeek }: SeekBarPro
     // контур, если есть (в режиме линии он и есть цель)
     const line = engine.map.pitchline;
     if (line && line.midi.length > 0) {
-      g.strokeStyle = 'rgba(34,211,238,0.8)';
+      g.strokeStyle = 'rgba(185,172,205,0.8)';
       g.lineWidth = 1.5;
       g.beginPath();
       let pen = false;
@@ -78,7 +78,7 @@ export function SeekBar({ engine, window: win, loop = null, onSeek }: SeekBarPro
       g.stroke();
     }
 
-    g.fillStyle = 'rgba(122,146,213,0.9)';
+    g.fillStyle = 'rgba(185,165,207,0.9)';
     for (const n of engine.map.notes) {
       const x1 = (n.startMs - leftMs) * pxPerMs;
       const x2 = (n.startMs + n.durMs - leftMs) * pxPerMs;

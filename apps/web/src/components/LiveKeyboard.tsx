@@ -44,14 +44,14 @@ export function LiveKeyboard({ lowMidi, highMidi, liveMidiRef, markLow, markHigh
       for (let m = lowMidi; m <= highMidi; m++) {
         const y = midiToY(m) - rowH / 2;
         const inRange = markLow != null && markHigh != null && m >= markLow && m <= markHigh;
-        g.fillStyle = isBlackKey(m) ? '#1a1f2b' : '#e8eaf0';
+        g.fillStyle = isBlackKey(m) ? '#282832' : '#f0ece6';
         g.fillRect(0, y + 0.5, keyW, rowH - 1);
         if (inRange) {
-          g.fillStyle = 'rgba(56,217,140,0.18)';
+          g.fillStyle = 'rgba(185,172,205,0.12)';
           g.fillRect(keyW + 2, y + 0.5, W - keyW - 2, rowH - 1);
         }
         if (m % 12 === 0) {
-          g.fillStyle = isBlackKey(m) ? '#aab' : '#333a4d';
+          g.fillStyle = isBlackKey(m) ? '#aab' : '#4f4751';
           g.font = `${Math.min(12, rowH)}px system-ui, sans-serif`;
           g.textBaseline = 'middle';
           g.fillText(midiToName(m), 4, y + rowH / 2);
@@ -60,8 +60,8 @@ export function LiveKeyboard({ lowMidi, highMidi, liveMidiRef, markLow, markHigh
 
       // границы
       for (const [mark, color] of [
-        [markLow, '#e8c34a'],
-        [markHigh, '#38d98c'],
+        [markLow, '#ddc091'],
+        [markHigh, '#b2d2bb'],
       ] as const) {
         if (mark == null) continue;
         const y = midiToY(mark);
@@ -80,8 +80,8 @@ export function LiveKeyboard({ lowMidi, highMidi, liveMidiRef, markLow, markHigh
       const live = liveMidiRef.current;
       if (!Number.isNaN(live) && live >= lowMidi - 1 && live <= highMidi + 1) {
         const y = midiToY(live);
-        g.fillStyle = '#5a79c9';
-        g.strokeStyle = '#8ba3e8';
+        g.fillStyle = '#b9a5cf';
+        g.strokeStyle = '#d2c2df';
         g.lineWidth = 2;
         g.beginPath();
         g.arc(keyW + 24, y, 9, 0, Math.PI * 2);
@@ -90,13 +90,13 @@ export function LiveKeyboard({ lowMidi, highMidi, liveMidiRef, markLow, markHigh
         // кольцо прогресса удержания
         const hold = holdProgressRef?.current ?? 0;
         if (hold > 0) {
-          g.strokeStyle = '#38d98c';
+          g.strokeStyle = '#b2d2bb';
           g.lineWidth = 3;
           g.beginPath();
           g.arc(keyW + 24, y, 14, -Math.PI / 2, -Math.PI / 2 + hold * Math.PI * 2);
           g.stroke();
         }
-        g.fillStyle = '#e8eaf0';
+        g.fillStyle = '#f0ece6';
         g.font = 'bold 13px system-ui, sans-serif';
         g.fillText(midiToName(live), keyW + 44, y + 4);
       }
