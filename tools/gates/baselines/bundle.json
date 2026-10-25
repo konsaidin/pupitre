@@ -1,0 +1,18 @@
+{
+  "entry": "assets/index-DXUd-5Xq.js",
+  "entryGzip": 136097,
+  "entryRaw": 389368,
+  "chunks": [
+    {
+      "name": "assets/index-BXLbnFjN.css",
+      "raw": 93335,
+      "gzip": 19793
+    },
+    {
+      "name": "assets/index-DXUd-5Xq.js",
+      "raw": 389368,
+      "gzip": 136097
+    }
+  ],
+  "date": "2026-10-23T23:11:55.579Z"
+}

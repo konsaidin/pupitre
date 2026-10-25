@@ -1,0 +1,6 @@
+\title "Tempo changes"
+\tempo 120
+\track "Guitar"
+\staff {tabs}
+\tuning (E4 B3 G3 D3 A2 E2)
+0.6.4 0.6.4 0.6.4 0.6.4 | \tempo 60 0.6.4 0.6.4 0.6.4 0.6.4 | \tempo 180 0.6.4 0.6.4 0.6.4 0.6.4

@@ -1,0 +1,6972 @@
+{
+  "map": {
+    "id": "voice-golden2",
+    "title": "Эталон v2",
+    "durationMs": 3000,
+    "bpm": 120,
+    "notes": [
+      {
+        "startMs": 200,
+        "durMs": 600,
+        "midi": 60
+      },
+      {
+        "startMs": 1000,
+        "durMs": 800,
+        "midi": 64
+      },
+      {
+        "startMs": 2000,
+        "durMs": 800,
+        "midi": 67
+      }
+    ],
+    "backing": {
+      "kind": "synth",
+      "guideNotes": false
+    }
+  },
+  "options": {
+    "latencyMs": 0,
+    "difficulty": "medium",
+    "guideNotes": true,
+    "metronome": true
+  },
+  "steps": [
+    {
+      "action": "construct",
+      "args": [],
+      "ctxTime": 0,
+      "songMs": 0,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "idle",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": null,
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "start",
+      "args": [],
+      "ctxTime": 0,
+      "songMs": -3000,
+      "countdownRemaining": 3,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": null,
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 127
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 0.25,
+          "hz": 440,
+          "midi": 59.5,
+          "midiRaw": 59.5,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 0.25,
+      "songMs": -2750,
+      "countdownRemaining": 2.75,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": {
+        "t": 0.25,
+        "hz": 440,
+        "midi": 59.5,
+        "midiRaw": 59.5,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 127
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.2,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.2,
+      "songMs": 200.00000000000017,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 200.00000000000017,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.2,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 127
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.4,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.4,
+      "songMs": 399.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 127
+    },
+    {
+      "action": "pause",
+      "args": [],
+      "ctxTime": 3.4,
+      "songMs": 399.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "paused",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 163
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4,
+      "songMs": 399.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "paused",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 163
+    },
+    {
+      "action": "deliverEnded",
+      "args": [],
+      "ctxTime": 4,
+      "songMs": 399.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "paused",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 184
+    },
+    {
+      "action": "resume",
+      "args": [],
+      "ctxTime": 4,
+      "songMs": -2599.9999999999995,
+      "countdownRemaining": 3,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 297
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 7,
+      "songMs": 400.00000000000034,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 297
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 7.02,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 7.02,
+      "songMs": 419.99999999999994,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 297
+    },
+    {
+      "action": "setLoop",
+      "args": [
+        200,
+        1900
+      ],
+      "ctxTime": 7.02,
+      "songMs": 419.99999999999994,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        200,
+        1900
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 402
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 8.52,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 8.52,
+      "songMs": -600.0000000000014,
+      "countdownRemaining": 0.8000000000000007,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        200,
+        1900
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 495
+    },
+    {
+      "action": "setLoop",
+      "args": [
+        null,
+        null
+      ],
+      "ctxTime": 8.52,
+      "songMs": -600.0000000000014,
+      "countdownRemaining": 0.8000000000000007,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 629
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 12.5,
+      "songMs": 3000,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "finished",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 662
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 12.6,
+      "songMs": 3000,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "finished",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 662
+    },
+    {
+      "action": "deliverEnded",
+      "args": [],
+      "ctxTime": 12.6,
+      "songMs": 3000,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "finished",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 724
+    }
+  ],
+  "graph": [
+    {
+      "at": 0,
+      "id": "destination-0",
+      "action": "create",
+      "args": [
+        "destination"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-1",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-1",
+      "action": "gain.value",
+      "args": [
+        0.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-1",
+      "action": "connect",
+      "args": [
+        "destination-0"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-2",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-2",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-3",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-3",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-3",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-4",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-4",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-4",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-5",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-5",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-4",
+      "action": "connect",
+      "args": [
+        "gain-5"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-5",
+      "action": "connect",
+      "args": [
+        "gain-2"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-3",
+      "action": "connect",
+      "args": [
+        "gain-2"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-2",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        3.2
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-2",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        3.22
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-2",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        3.68
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-2",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        3.8000000000000003
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-3",
+      "action": "start",
+      "args": [
+        3.2
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-4",
+      "action": "start",
+      "args": [
+        3.2
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-3",
+      "action": "stop",
+      "args": [
+        3.85
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-4",
+      "action": "stop",
+      "args": [
+        3.85
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-6",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-6",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-7",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-7",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-7",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-8",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-8",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-8",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-9",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-9",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-8",
+      "action": "connect",
+      "args": [
+        "gain-9"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-9",
+      "action": "connect",
+      "args": [
+        "gain-6"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-7",
+      "action": "connect",
+      "args": [
+        "gain-6"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-6",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-6",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        4.02
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-6",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        4.68
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-6",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        4.8
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-7",
+      "action": "start",
+      "args": [
+        4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-8",
+      "action": "start",
+      "args": [
+        4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-7",
+      "action": "stop",
+      "args": [
+        4.85
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-8",
+      "action": "stop",
+      "args": [
+        4.85
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-10",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-10",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-11",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-11",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-11",
+      "action": "frequency.value",
+      "args": [
+        391.99543598174927
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-12",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-12",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-12",
+      "action": "frequency.value",
+      "args": [
+        391.99543598174927
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-13",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-13",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-12",
+      "action": "connect",
+      "args": [
+        "gain-13"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-13",
+      "action": "connect",
+      "args": [
+        "gain-10"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-11",
+      "action": "connect",
+      "args": [
+        "gain-10"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-10",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-10",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        5.02
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-10",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        5.68
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-10",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        5.8
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-11",
+      "action": "start",
+      "args": [
+        5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-12",
+      "action": "start",
+      "args": [
+        5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-11",
+      "action": "stop",
+      "args": [
+        5.85
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-12",
+      "action": "stop",
+      "args": [
+        5.85
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-14",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-14",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-14",
+      "action": "frequency.value",
+      "args": [
+        1600
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-15",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-15",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.25,
+        3
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-15",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        3.05
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-14",
+      "action": "connect",
+      "args": [
+        "gain-15"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-15",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-14",
+      "action": "start",
+      "args": [
+        3
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-14",
+      "action": "stop",
+      "args": [
+        3.06
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-16",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-16",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-16",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-17",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-17",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        3.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-17",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        3.55
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-16",
+      "action": "connect",
+      "args": [
+        "gain-17"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-17",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-16",
+      "action": "start",
+      "args": [
+        3.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-16",
+      "action": "stop",
+      "args": [
+        3.56
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-18",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-18",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-18",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-19",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-19",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-19",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        4.05
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-18",
+      "action": "connect",
+      "args": [
+        "gain-19"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-19",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-18",
+      "action": "start",
+      "args": [
+        4
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-18",
+      "action": "stop",
+      "args": [
+        4.06
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-20",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-20",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-20",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-21",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-21",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        4.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-21",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        4.55
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-20",
+      "action": "connect",
+      "args": [
+        "gain-21"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-21",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-20",
+      "action": "start",
+      "args": [
+        4.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-20",
+      "action": "stop",
+      "args": [
+        4.56
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-22",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-22",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-22",
+      "action": "frequency.value",
+      "args": [
+        1600
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-23",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-23",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.25,
+        5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-23",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        5.05
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-22",
+      "action": "connect",
+      "args": [
+        "gain-23"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-23",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-22",
+      "action": "start",
+      "args": [
+        5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-22",
+      "action": "stop",
+      "args": [
+        5.06
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-24",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-24",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-24",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-25",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-25",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        5.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-25",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        5.55
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-24",
+      "action": "connect",
+      "args": [
+        "gain-25"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-25",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-24",
+      "action": "start",
+      "args": [
+        5.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "oscillator-24",
+      "action": "stop",
+      "args": [
+        5.56
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-2",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-2",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-3",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-2",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-2",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-4",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-6",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-6",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-7",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-6",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-6",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-8",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-10",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-10",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-11",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-10",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-10",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-12",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-15",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-15",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-14",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-17",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-17",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-16",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-19",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-19",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-18",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-21",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-21",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-20",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-23",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-23",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-22",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-25",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        3.4
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "gain-25",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        3.4,
+        0.01
+      ]
+    },
+    {
+      "at": 3.4,
+      "id": "oscillator-24",
+      "action": "stop",
+      "args": [
+        3.4499999999999997
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-3",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-2",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-4",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-7",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-6",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-8",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-11",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-10",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-12",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-14",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-15",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-16",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-17",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-18",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-19",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-20",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-21",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-22",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-23",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "oscillator-24",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-25",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 4,
+      "id": "gain-26",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-26",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-27",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-27",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-27",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-28",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-28",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-28",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-29",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-29",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-28",
+      "action": "connect",
+      "args": [
+        "gain-29"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-29",
+      "action": "connect",
+      "args": [
+        "gain-26"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-27",
+      "action": "connect",
+      "args": [
+        "gain-26"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-26",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        7
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-26",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        7.02
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-26",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        7.28
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-26",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        7.4
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-27",
+      "action": "start",
+      "args": [
+        7
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-28",
+      "action": "start",
+      "args": [
+        7
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-27",
+      "action": "stop",
+      "args": [
+        7.45
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-28",
+      "action": "stop",
+      "args": [
+        7.45
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-30",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-30",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-31",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-31",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-31",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-32",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-32",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-32",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-33",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-33",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-32",
+      "action": "connect",
+      "args": [
+        "gain-33"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-33",
+      "action": "connect",
+      "args": [
+        "gain-30"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-31",
+      "action": "connect",
+      "args": [
+        "gain-30"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-30",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        7.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-30",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        7.619999999999999
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-30",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        8.280000000000001
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-30",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        8.4
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-31",
+      "action": "start",
+      "args": [
+        7.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-32",
+      "action": "start",
+      "args": [
+        7.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-31",
+      "action": "stop",
+      "args": [
+        8.450000000000001
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-32",
+      "action": "stop",
+      "args": [
+        8.450000000000001
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-34",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-34",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-35",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-35",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-35",
+      "action": "frequency.value",
+      "args": [
+        391.99543598174927
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-36",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-36",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-36",
+      "action": "frequency.value",
+      "args": [
+        391.99543598174927
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-37",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-37",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-36",
+      "action": "connect",
+      "args": [
+        "gain-37"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-37",
+      "action": "connect",
+      "args": [
+        "gain-34"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-35",
+      "action": "connect",
+      "args": [
+        "gain-34"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-34",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        8.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-34",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        8.62
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-34",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        9.280000000000001
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-34",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        9.4
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-35",
+      "action": "start",
+      "args": [
+        8.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-36",
+      "action": "start",
+      "args": [
+        8.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-35",
+      "action": "stop",
+      "args": [
+        9.450000000000001
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-36",
+      "action": "stop",
+      "args": [
+        9.450000000000001
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-38",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-38",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-38",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-39",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-39",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        7.1
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-39",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        7.1499999999999995
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-38",
+      "action": "connect",
+      "args": [
+        "gain-39"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-39",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-38",
+      "action": "start",
+      "args": [
+        7.1
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-38",
+      "action": "stop",
+      "args": [
+        7.159999999999999
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-40",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-40",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-40",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-41",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-41",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        7.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-41",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        7.6499999999999995
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-40",
+      "action": "connect",
+      "args": [
+        "gain-41"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-41",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-40",
+      "action": "start",
+      "args": [
+        7.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-40",
+      "action": "stop",
+      "args": [
+        7.659999999999999
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-42",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-42",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-42",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-43",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-43",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        8.1
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-43",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        8.15
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-42",
+      "action": "connect",
+      "args": [
+        "gain-43"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-43",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-42",
+      "action": "start",
+      "args": [
+        8.1
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-42",
+      "action": "stop",
+      "args": [
+        8.16
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-44",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-44",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-44",
+      "action": "frequency.value",
+      "args": [
+        1600
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-45",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-45",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.25,
+        8.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-45",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        8.65
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-44",
+      "action": "connect",
+      "args": [
+        "gain-45"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-45",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-44",
+      "action": "start",
+      "args": [
+        8.6
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-44",
+      "action": "stop",
+      "args": [
+        8.66
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-46",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-46",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-46",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-47",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-47",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        9.1
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-47",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        9.15
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-46",
+      "action": "connect",
+      "args": [
+        "gain-47"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "gain-47",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-46",
+      "action": "start",
+      "args": [
+        9.1
+      ]
+    },
+    {
+      "at": 4,
+      "id": "oscillator-46",
+      "action": "stop",
+      "args": [
+        9.16
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-26",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-26",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-27",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-26",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-26",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-28",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-30",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-30",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-31",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-30",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-30",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-32",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-34",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-34",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-35",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-34",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-34",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-36",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-39",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-39",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-38",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-41",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-41",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-40",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-43",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-43",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-42",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-45",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-45",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-44",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-47",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        7.02
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-47",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        7.02,
+        0.01
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-46",
+      "action": "stop",
+      "args": [
+        7.069999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-48",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-48",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-49",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-49",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-49",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-50",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-50",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-50",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-51",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-51",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-50",
+      "action": "connect",
+      "args": [
+        "gain-51"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-51",
+      "action": "connect",
+      "args": [
+        "gain-48"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-49",
+      "action": "connect",
+      "args": [
+        "gain-48"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-48",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        7.039999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-48",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        7.059999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-48",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        7.305999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-48",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        7.419999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-49",
+      "action": "start",
+      "args": [
+        7.039999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-50",
+      "action": "start",
+      "args": [
+        7.039999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-49",
+      "action": "stop",
+      "args": [
+        7.469999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-50",
+      "action": "stop",
+      "args": [
+        7.469999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-52",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-52",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-53",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-53",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-53",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-54",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-54",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-54",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-55",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-55",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-54",
+      "action": "connect",
+      "args": [
+        "gain-55"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-55",
+      "action": "connect",
+      "args": [
+        "gain-52"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-53",
+      "action": "connect",
+      "args": [
+        "gain-52"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-52",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        7.6
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-52",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        7.619999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-52",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        8.280000000000001
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-52",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        8.4
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-53",
+      "action": "start",
+      "args": [
+        7.6
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-54",
+      "action": "start",
+      "args": [
+        7.6
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-53",
+      "action": "stop",
+      "args": [
+        8.450000000000001
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-54",
+      "action": "stop",
+      "args": [
+        8.450000000000001
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-56",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-56",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-56",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-57",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-57",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        7.1
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-57",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        7.1499999999999995
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-56",
+      "action": "connect",
+      "args": [
+        "gain-57"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-57",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-56",
+      "action": "start",
+      "args": [
+        7.1
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-56",
+      "action": "stop",
+      "args": [
+        7.159999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-58",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-58",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-58",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-59",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-59",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        7.6
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-59",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        7.6499999999999995
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-58",
+      "action": "connect",
+      "args": [
+        "gain-59"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-59",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-58",
+      "action": "start",
+      "args": [
+        7.6
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-58",
+      "action": "stop",
+      "args": [
+        7.659999999999999
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-60",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-60",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-60",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-61",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-61",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        8.1
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-61",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        8.15
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-60",
+      "action": "connect",
+      "args": [
+        "gain-61"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "gain-61",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-60",
+      "action": "start",
+      "args": [
+        8.1
+      ]
+    },
+    {
+      "at": 7.02,
+      "id": "oscillator-60",
+      "action": "stop",
+      "args": [
+        8.16
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-48",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-48",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-49",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-48",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-48",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-50",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-52",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-52",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-53",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-52",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-52",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-54",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-57",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-57",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-56",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-59",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-59",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-58",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-61",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-61",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-60",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-65",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-65",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "connect",
+      "args": [
+        "gain-65"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-65",
+      "action": "connect",
+      "args": [
+        "gain-62"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "connect",
+      "args": [
+        "gain-62"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        9.32
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        9.34
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        9.8
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        9.92
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "start",
+      "args": [
+        9.32
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "start",
+      "args": [
+        9.32
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "stop",
+      "args": [
+        9.97
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "stop",
+      "args": [
+        9.97
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-69",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-69",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "connect",
+      "args": [
+        "gain-69"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-69",
+      "action": "connect",
+      "args": [
+        "gain-66"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "connect",
+      "args": [
+        "gain-66"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        10.14
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        10.800000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        10.920000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "start",
+      "args": [
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "start",
+      "args": [
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "stop",
+      "args": [
+        10.970000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "stop",
+      "args": [
+        10.970000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-71",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-71",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        9.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-71",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        9.670000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "connect",
+      "args": [
+        "gain-71"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-71",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "start",
+      "args": [
+        9.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "stop",
+      "args": [
+        9.680000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-73",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-73",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-73",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        10.170000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "connect",
+      "args": [
+        "gain-73"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-73",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "start",
+      "args": [
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "stop",
+      "args": [
+        10.180000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-75",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-75",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        10.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-75",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        10.670000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "connect",
+      "args": [
+        "gain-75"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-75",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "start",
+      "args": [
+        10.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "stop",
+      "args": [
+        10.680000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-63",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-62",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-64",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-67",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-66",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-68",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-71",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-71",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-70",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-73",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-73",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-72",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-75",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        8.52
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-75",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        8.52,
+        0.01
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-74",
+      "action": "stop",
+      "args": [
+        8.57
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-76",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-76",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-77",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-77",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-77",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-78",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-78",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-78",
+      "action": "frequency.value",
+      "args": [
+        261.6255653005986
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-79",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-79",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-78",
+      "action": "connect",
+      "args": [
+        "gain-79"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-79",
+      "action": "connect",
+      "args": [
+        "gain-76"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-77",
+      "action": "connect",
+      "args": [
+        "gain-76"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-76",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        9.32
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-76",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        9.34
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-76",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        9.8
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-76",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        9.92
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-77",
+      "action": "start",
+      "args": [
+        9.32
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-78",
+      "action": "start",
+      "args": [
+        9.32
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-77",
+      "action": "stop",
+      "args": [
+        9.97
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-78",
+      "action": "stop",
+      "args": [
+        9.97
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-80",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-80",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-81",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-81",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-81",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-82",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-82",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-82",
+      "action": "frequency.value",
+      "args": [
+        329.6275569128699
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-83",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-83",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-82",
+      "action": "connect",
+      "args": [
+        "gain-83"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-83",
+      "action": "connect",
+      "args": [
+        "gain-80"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-81",
+      "action": "connect",
+      "args": [
+        "gain-80"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-80",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-80",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        10.14
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-80",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        10.800000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-80",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        10.920000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-81",
+      "action": "start",
+      "args": [
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-82",
+      "action": "start",
+      "args": [
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-81",
+      "action": "stop",
+      "args": [
+        10.970000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-82",
+      "action": "stop",
+      "args": [
+        10.970000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-84",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-84",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-85",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-85",
+      "action": "type",
+      "args": [
+        "triangle"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-85",
+      "action": "frequency.value",
+      "args": [
+        391.99543598174927
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-86",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-86",
+      "action": "type",
+      "args": [
+        "sine"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-86",
+      "action": "frequency.value",
+      "args": [
+        391.99543598174927
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-87",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-87",
+      "action": "gain.value",
+      "args": [
+        0.4
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-86",
+      "action": "connect",
+      "args": [
+        "gain-87"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-87",
+      "action": "connect",
+      "args": [
+        "gain-84"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-85",
+      "action": "connect",
+      "args": [
+        "gain-84"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-84",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0,
+        11.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-84",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0.24499999999999997,
+        11.14
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-84",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.24499999999999997,
+        11.800000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-84",
+      "action": "gain.linearRampToValueAtTime",
+      "args": [
+        0,
+        11.920000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-85",
+      "action": "start",
+      "args": [
+        11.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-86",
+      "action": "start",
+      "args": [
+        11.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-85",
+      "action": "stop",
+      "args": [
+        11.970000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-86",
+      "action": "stop",
+      "args": [
+        11.970000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-88",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-88",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-88",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-89",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-89",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        9.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-89",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        9.670000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-88",
+      "action": "connect",
+      "args": [
+        "gain-89"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-89",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-88",
+      "action": "start",
+      "args": [
+        9.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-88",
+      "action": "stop",
+      "args": [
+        9.680000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-90",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-90",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-90",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-91",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-91",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-91",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        10.170000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-90",
+      "action": "connect",
+      "args": [
+        "gain-91"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-91",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-90",
+      "action": "start",
+      "args": [
+        10.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-90",
+      "action": "stop",
+      "args": [
+        10.180000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-92",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-92",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-92",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-93",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-93",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        10.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-93",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        10.670000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-92",
+      "action": "connect",
+      "args": [
+        "gain-93"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-93",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-92",
+      "action": "start",
+      "args": [
+        10.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-92",
+      "action": "stop",
+      "args": [
+        10.680000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-94",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-94",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-94",
+      "action": "frequency.value",
+      "args": [
+        1600
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-95",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-95",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.25,
+        11.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-95",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        11.170000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-94",
+      "action": "connect",
+      "args": [
+        "gain-95"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-95",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-94",
+      "action": "start",
+      "args": [
+        11.120000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-94",
+      "action": "stop",
+      "args": [
+        11.180000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-96",
+      "action": "create",
+      "args": [
+        "oscillator"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-96",
+      "action": "type",
+      "args": [
+        "square"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-96",
+      "action": "frequency.value",
+      "args": [
+        1100
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-97",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-97",
+      "action": "gain.setValueAtTime",
+      "args": [
+        0.15,
+        11.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-97",
+      "action": "gain.exponentialRampToValueAtTime",
+      "args": [
+        0.001,
+        11.670000000000002
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-96",
+      "action": "connect",
+      "args": [
+        "gain-97"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "gain-97",
+      "action": "connect",
+      "args": [
+        "gain-1"
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-96",
+      "action": "start",
+      "args": [
+        11.620000000000001
+      ]
+    },
+    {
+      "at": 8.52,
+      "id": "oscillator-96",
+      "action": "stop",
+      "args": [
+        11.680000000000001
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-76",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-76",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-77",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-76",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-76",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-78",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-80",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-80",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-81",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-80",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-80",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-82",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-84",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-84",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-85",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-84",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-84",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-86",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-89",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-89",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-88",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-91",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-91",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-90",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-93",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-93",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-92",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-95",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-95",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-94",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-97",
+      "action": "gain.cancelScheduledValues",
+      "args": [
+        12.5
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "gain-97",
+      "action": "gain.setTargetAtTime",
+      "args": [
+        0,
+        12.5,
+        0.01
+      ]
+    },
+    {
+      "at": 12.5,
+      "id": "oscillator-96",
+      "action": "stop",
+      "args": [
+        12.55
+      ]
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-27",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-26",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-28",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-31",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-30",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-32",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-35",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-34",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-36",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-38",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-39",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-40",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-41",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-42",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-43",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-44",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-45",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-46",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-47",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-49",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-48",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-50",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-53",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-52",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-54",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-56",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-57",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-58",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-59",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-60",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-61",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-63",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-62",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-64",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-67",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-66",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-68",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-70",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-71",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-72",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-73",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-74",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-75",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-77",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-76",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-78",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-81",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-80",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-82",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-85",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-84",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-86",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-88",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-89",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-90",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-91",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-92",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-93",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-94",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-95",
+      "action": "disconnect",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "oscillator-96",
+      "action": "ended",
+      "args": []
+    },
+    {
+      "at": 12.6,
+      "id": "gain-97",
+      "action": "disconnect",
+      "args": []
+    }
+  ],
+  "trail": [],
+  "judgements": [
+    {
+      "noteIndex": 0,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 3379.999999999999
+    },
+    {
+      "noteIndex": 1,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 3379.999999999999
+    },
+    {
+      "noteIndex": 2,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 3379.999999999999
+    }
+  ],
+  "techStats": {
+    "vibratoMs": 0,
+    "distortionMs": 0
+  },
+  "onFinish": [
+    {
+      "score": 0,
+      "accuracy": 0,
+      "stars": 0,
+      "perfect": 0,
+      "good": 0,
+      "miss": 3,
+      "maxCombo": 0,
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "tech": {
+        "vibratoMs": 0,
+        "distortionMs": 0
+      }
+    }
+  ]
+}

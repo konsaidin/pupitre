@@ -1,0 +1,7274 @@
+{
+  "map": {
+    "id": "voice-golden2",
+    "title": "Эталон v2",
+    "durationMs": 3000,
+    "bpm": 120,
+    "notes": [
+      {
+        "startMs": 200,
+        "durMs": 600,
+        "midi": 60
+      },
+      {
+        "startMs": 1000,
+        "durMs": 800,
+        "midi": 64
+      },
+      {
+        "startMs": 2000,
+        "durMs": 800,
+        "midi": 67
+      }
+    ],
+    "backing": {
+      "kind": "synth",
+      "guideNotes": false
+    }
+  },
+  "options": {
+    "latencyMs": 0,
+    "difficulty": "medium",
+    "guideNotes": false,
+    "metronome": false
+  },
+  "steps": [
+    {
+      "action": "construct",
+      "args": [],
+      "ctxTime": 0,
+      "songMs": 0,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "idle",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": null,
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "start",
+      "args": [],
+      "ctxTime": 0,
+      "songMs": -3000,
+      "countdownRemaining": 3,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": null,
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 0.25,
+          "hz": 440,
+          "midi": 59.5,
+          "midiRaw": 59.5,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 0.25,
+      "songMs": -2750,
+      "countdownRemaining": 2.75,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": {
+        "t": 0.25,
+        "hz": 440,
+        "midi": 59.5,
+        "midiRaw": 59.5,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 2.99,
+      "songMs": -9.999999999999787,
+      "countdownRemaining": 0.009999999999999787,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "countdown",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": {
+        "t": 0.25,
+        "hz": 440,
+        "midi": 59.5,
+        "midiRaw": 59.5,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3,
+      "songMs": 0,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": null,
+      "lastAnalysis": {
+        "t": 0.25,
+        "hz": 440,
+        "midi": 59.5,
+        "midiRaw": 59.5,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.14,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.14,
+      "songMs": 140.0000000000001,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 140.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.14,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.14,
+      "songMs": 140.0000000000001,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 140.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.14,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.19,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.19,
+      "songMs": 189.99999999999994,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 189.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.19,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.19,
+      "songMs": 189.99999999999994,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 189.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.19,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.21,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.21,
+      "songMs": 209.99999999999997,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 209.99999999999997,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.21,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.21,
+      "songMs": 209.99999999999997,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 209.99999999999997,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.21,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.26,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.26,
+      "songMs": 259.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 259.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.26,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.26,
+      "songMs": 259.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.06666666666666667,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 259.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.26,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.31,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.31,
+      "songMs": 310.00000000000006,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.13333333333333333,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 310.00000000000006,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.31,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.31,
+      "songMs": 310.00000000000006,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.13333333333333333,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 310.00000000000006,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.31,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.33,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.33,
+      "songMs": 330.00000000000006,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.16666666666666669,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 330.00000000000006,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.33,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.33,
+      "songMs": 330.00000000000006,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.16666666666666669,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 330.00000000000006,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.33,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.38,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.38,
+      "songMs": 379.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.23333333333333334,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 379.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.38,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.38,
+      "songMs": 379.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.23333333333333334,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 379.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.38,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.74,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.74,
+      "songMs": 740.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.3,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 740.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.74,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.74,
+      "songMs": 740.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.3,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 740.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.74,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.79,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.79,
+      "songMs": 790,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 790,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.79,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.79,
+      "songMs": 790,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 790,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 3.79,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.81,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.81,
+      "songMs": 810,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 810,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.81,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.81,
+      "songMs": 810,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 810,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.81,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        null,
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.86,
+          "hz": 440,
+          "midi": 60,
+          "midiRaw": 60,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.86,
+      "songMs": 859.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 859.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.86,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.86,
+      "songMs": 859.9999999999999,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 859.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.86,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.91,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.91,
+      "songMs": 910.0000000000001,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 910.0000000000001,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.91,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.91,
+      "songMs": 910.0000000000001,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 910.0000000000001,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.91,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.93,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.93,
+      "songMs": 930.0000000000001,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 930.0000000000001,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.93,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.93,
+      "songMs": 930.0000000000001,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 930.0000000000001,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.93,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.94,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.94,
+      "songMs": 940,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 940,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.94,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.94,
+      "songMs": 940,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 940,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.94,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.98,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.98,
+      "songMs": 980,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 980,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.98,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.98,
+      "songMs": 980,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 980,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.98,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 3.99,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 3.99,
+      "songMs": 990.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 990.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.99,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 3.99,
+      "songMs": 990.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 990.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 3.99,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.01,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.01,
+      "songMs": 1009.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1009.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.01,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.01,
+      "songMs": 1009.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1009.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.01,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.06,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.06,
+      "songMs": 1059.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.05,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1059.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.06,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.06,
+      "songMs": 1059.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.05,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1059.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.06,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.11,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.11,
+      "songMs": 1110.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.1,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1110.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.11,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.11,
+      "songMs": 1110.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.1,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1110.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.11,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.13,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.13,
+      "songMs": 1130,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.12499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1130,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.13,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.13,
+      "songMs": 1130,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.12499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1130,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.13,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.18,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.18,
+      "songMs": 1179.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.17499999999999946,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1179.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.18,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.18,
+      "songMs": 1179.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.17499999999999946,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1179.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.18,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.74,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.74,
+      "songMs": 1740.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.22499999999999948,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1740.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.74,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.74,
+      "songMs": 1740.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.22499999999999948,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1740.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.74,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.79,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.79,
+      "songMs": 1790,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1790,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.79,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.79,
+      "songMs": 1790,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1790,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 4.79,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.81,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.81,
+      "songMs": 1809.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1809.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.81,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.81,
+      "songMs": 1809.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1809.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.81,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        null,
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.86,
+          "hz": 440,
+          "midi": 64,
+          "midiRaw": 64,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.86,
+      "songMs": 1860.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1860.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.86,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.86,
+      "songMs": 1860.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1860.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.86,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.91,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.91,
+      "songMs": 1910.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1910.0000000000002,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.91,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.91,
+      "songMs": 1910.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1910.0000000000002,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.91,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.93,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.93,
+      "songMs": 1929.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1929.9999999999998,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.93,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.93,
+      "songMs": 1929.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1929.9999999999998,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.93,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.94,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.94,
+      "songMs": 1940.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1940.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.94,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.94,
+      "songMs": 1940.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1940.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.94,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.98,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.98,
+      "songMs": 1980.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1980.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.98,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.98,
+      "songMs": 1980.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1980.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.98,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 4.99,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 4.99,
+      "songMs": 1990.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1990.0000000000002,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.99,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 4.99,
+      "songMs": 1990.0000000000002,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 1990.0000000000002,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 4.99,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.01,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.01,
+      "songMs": 2009.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2009.9999999999998,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.01,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.01,
+      "songMs": 2009.9999999999998,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2009.9999999999998,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.01,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.06,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.06,
+      "songMs": 2059.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.05
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2059.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.06,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.06,
+      "songMs": 2059.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.05
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2059.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.06,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.11,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.11,
+      "songMs": 2110.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.1
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2110.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.11,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.11,
+      "songMs": 2110.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.1
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2110.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.11,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.13,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.13,
+      "songMs": 2130,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.12499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2130,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.13,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.13,
+      "songMs": 2130,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.12499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2130,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.13,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.18,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.18,
+      "songMs": 2179.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.17499999999999946
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2179.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.18,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.18,
+      "songMs": 2179.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.17499999999999946
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2179.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.18,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.74,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.74,
+      "songMs": 2740,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.22499999999999948
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2740,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.74,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.74,
+      "songMs": 2740,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.22499999999999948
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2740,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.74,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.79,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.79,
+      "songMs": 2790,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2790,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.79,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.79,
+      "songMs": 2790,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2790,
+        "midi": 67,
+        "voiced": true,
+        "cents": 0
+      },
+      "lastAnalysis": {
+        "t": 5.79,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.81,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.81,
+      "songMs": 2809.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2809.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.81,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.81,
+      "songMs": 2809.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2809.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.81,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        null
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.86,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.86,
+      "songMs": 2860.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2860.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.86,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.86,
+      "songMs": 2860.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2860.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.86,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.91,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.91,
+      "songMs": 2910,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2910,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.91,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.91,
+      "songMs": 2910,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2910,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.91,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.93,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.93,
+      "songMs": 2929.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2929.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.93,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.93,
+      "songMs": 2929.9999999999995,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2929.9999999999995,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.93,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 5.98,
+          "hz": 440,
+          "midi": 67,
+          "midiRaw": 67,
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": true,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 5.98,
+      "songMs": 2980.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2980.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.98,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 5.98,
+      "songMs": 2980.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2980.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 5.98,
+        "hz": 440,
+        "midi": 67,
+        "midiRaw": 67,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "frame",
+      "args": [
+        {
+          "t": 6.15,
+          "hz": 440,
+          "midi": "NaN",
+          "midiRaw": "NaN",
+          "clarity": 0.9,
+          "rms": 0.05,
+          "voiced": false,
+          "loudDb": -20,
+          "vibrato": {
+            "active": false,
+            "rateHz": 0,
+            "depthCents": 0,
+            "regularity": 0
+          },
+          "distortion": {
+            "active": false,
+            "score": 0
+          },
+          "breathiness": 0
+        }
+      ],
+      "ctxTime": 6.15,
+      "songMs": 3150.0000000000005,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "playing",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2980.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 6.15,
+        "hz": 440,
+        "midi": "NaN",
+        "midiRaw": "NaN",
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": false,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    },
+    {
+      "action": "tick",
+      "args": [],
+      "ctxTime": 6.4,
+      "songMs": 3000,
+      "countdownRemaining": 0,
+      "noteHitRatio": [
+        0.36666666666666664,
+        0.27499999999999947,
+        0.27499999999999947
+      ],
+      "phase": "finished",
+      "score": 0,
+      "combo": 0,
+      "maxCombo": 0,
+      "loop": [
+        null,
+        null
+      ],
+      "lastFrame": {
+        "songMs": 2980.0000000000005,
+        "midi": 67,
+        "voiced": true,
+        "cents": null
+      },
+      "lastAnalysis": {
+        "t": 6.15,
+        "hz": 440,
+        "midi": "NaN",
+        "midiRaw": "NaN",
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": false,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "graphLength": 4
+    }
+  ],
+  "graph": [
+    {
+      "at": 0,
+      "id": "destination-0",
+      "action": "create",
+      "args": [
+        "destination"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-1",
+      "action": "create",
+      "args": [
+        "gain"
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-1",
+      "action": "gain.value",
+      "args": [
+        0.5
+      ]
+    },
+    {
+      "at": 0,
+      "id": "gain-1",
+      "action": "connect",
+      "args": [
+        "destination-0"
+      ]
+    }
+  ],
+  "trail": [
+    {
+      "songMs": 140.0000000000001,
+      "midi": 60,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 189.99999999999994,
+      "midi": 60,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 209.99999999999997,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 259.9999999999998,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 310.00000000000006,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 330.00000000000006,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 379.9999999999999,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 740.0000000000002,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 790,
+      "midi": 60,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 810,
+      "midi": 60,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 859.9999999999999,
+      "midi": 60,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 910.0000000000001,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 930.0000000000001,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 940,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 980,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 990.0000000000002,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1009.9999999999998,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1059.9999999999995,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1110.0000000000002,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1130,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1179.9999999999998,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1740.0000000000002,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1790,
+      "midi": 64,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1809.9999999999995,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1860.0000000000002,
+      "midi": 64,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1910.0000000000002,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1929.9999999999998,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1940.0000000000005,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1980.0000000000005,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 1990.0000000000002,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2009.9999999999998,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2059.9999999999995,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2110.0000000000005,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2130,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2179.9999999999995,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2740,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2790,
+      "midi": 67,
+      "inTolerance": true,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2809.9999999999995,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2860.0000000000005,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2910,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2929.9999999999995,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    },
+    {
+      "songMs": 2980.0000000000005,
+      "midi": 67,
+      "inTolerance": false,
+      "rawOffset": 0,
+      "loudDb": -20,
+      "vibrato": false,
+      "distortion": 0
+    }
+  ],
+  "judgements": [
+    {
+      "noteIndex": 0,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 859.9999999999999
+    },
+    {
+      "noteIndex": 1,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 1860.0000000000002
+    },
+    {
+      "noteIndex": 2,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 2860.0000000000005
+    }
+  ],
+  "techStats": {
+    "vibratoMs": 0,
+    "distortionMs": 0
+  },
+  "onFinish": [
+    {
+      "score": 0,
+      "accuracy": 0.2999999999999996,
+      "stars": 0,
+      "perfect": 0,
+      "good": 0,
+      "miss": 3,
+      "maxCombo": 0,
+      "results": [
+        {
+          "note": {
+            "startMs": 200,
+            "durMs": 600,
+            "midi": 60
+          },
+          "hitRatio": 0.36666666666666664,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0.27499999999999947,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "tech": {
+        "vibratoMs": 0,
+        "distortionMs": 0
+      }
+    }
+  ]
+}

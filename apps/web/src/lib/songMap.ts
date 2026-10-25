@@ -75,7 +75,7 @@ export interface SongMap {
    *  - synth: опорные ноты играет встроенный синт (упражнения)
    *  - url: инструментал с бэкенда (песни)
    */
-  backing: { kind: 'synth'; guideNotes: boolean } | { kind: 'url'; url: string };
+  backing: { kind: 'synth'; guideNotes: boolean } | { kind: 'url'; url: string } | { kind: 'buffer' };
   /** темп для метронома (упражнения) */
   bpm?: number;
   /** мс тишины перед первой нотой (вступление для упражнений) */

@@ -1,0 +1,27 @@
+[
+  {
+    "rule": "effects",
+    "path": "apps/web/src/guitar/vendor/fretfall/perf.js",
+    "why": "вендор fretfall без изменений (этап 5): перф-счётчик только читает shadowBlur, сам эффект не рисует"
+  },
+  {
+    "rule": "effects",
+    "path": "apps/web/src/guitar/ui/rampa.css",
+    "why": "backdrop-filter у шапки .rp-topbar, плашек .rp-chip и подложки модалки .rp-backdrop — «блюр подложек только на статичных экранах» (ui-spec, раздел производительности); экран игры их не использует (инв. 19), shadowBlur в файле нет"
+  },
+  {
+    "rule": "effects",
+    "path": "apps/web/src/guitar/vendor/fretfall/VENDOR.md",
+    "why": "документация вендора, не код: описывает исключение shadowBlur для highway.js до этапа 10"
+  },
+  {
+    "rule": "url",
+    "path": "apps/web/src/guitar/vendor/fretfall/VENDOR.md",
+    "why": "документация вендора, не код: адрес апстрима fretfall/player (в сборку не попадает)"
+  },
+  {
+    "rule": "effects",
+    "path": "apps/web/src/guitar/screens/Song/song.css",
+    "why": "backdrop-filter у полосы секций и ссылки «назад» подготовки песни — статичный экран, «блюр подложек только на статичных экранах» (ui-spec); игра его не использует (инв. 19)"
+  }
+]

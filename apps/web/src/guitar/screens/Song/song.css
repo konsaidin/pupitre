@@ -1,0 +1,83 @@
+/* Подготовка песни (ui-spec §11.3): перенос design/mockups.html, строки 551–616 (раздел 9), селекторы под .rampa. Блюр подложек — статичный экран (ui-spec: блюр только на статичных экранах). */
+.rampa .prep { display: grid; grid-template-columns: minmax(0, 1fr) minmax(420px, 0.72fr); height: calc(100vh - var(--rp-topbar-h)); min-height: 520px; }
+.rampa .prep__stage { position: relative; overflow: hidden; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; padding: 22px var(--rp-gutter) 30px; isolation: isolate; }
+.rampa .prep__backdrop { position: absolute; inset: 0; z-index: -1; }
+.rampa .prep__backdrop .rp-poster { position: absolute; inset: 0; }
+.rampa .prep__backdrop::after { content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgb(7 8 13 / 0.2), rgb(7 8 13 / 0.35) 50%, var(--rp-bg) 100%), linear-gradient(180deg, rgb(7 8 13 / 0.5), rgb(7 8 13 / 0) 30%, rgb(7 8 13 / 0.6) 62%, var(--rp-bg) 100%); }
+.rampa .prep__title { align-self: end; display: grid; gap: 14px; padding-bottom: 28px; }
+.rampa .prep__title .rp-display { font-size: clamp(46px, 5.4vw, 84px); text-shadow: 0 2px 30px rgb(0 0 0 / 0.35); max-width: 12ch; }
+.rampa .prep__artist { font-size: 20px; font-weight: 560; font-stretch: 112%; color: var(--rp-fg-1); opacity: 0.9; }
+.rampa .prep__meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rampa .prep__sections { display: grid; gap: 12px; padding: 18px 20px; border-radius: var(--rp-r-md); background: rgb(7 8 13 / 0.62); border: 1px solid var(--rp-line-1); backdrop-filter: blur(12px); }
+.rampa .prep__sections-head { display: flex; align-items: center; gap: 12px; }
+.rampa .prep__sections-head .rp-btn { margin-left: auto; }
+.rampa .secbar { display: flex; gap: 3px; height: 46px; align-items: flex-end; }
+.rampa .secbar__seg { position: relative; flex: var(--w) 1 0; height: 100%; border-radius: 3px; background: rgb(255 255 255 / 0.06); overflow: hidden; cursor: pointer; }
+.rampa .secbar__seg::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--m) * 100%);
+  background: linear-gradient(180deg, rgb(245 247 255 / 0.85), rgb(245 247 255 / 0.35)); }
+.rampa .secbar__seg[data-mastered]::before { background: linear-gradient(180deg, #FFFFFF, rgb(245 247 255 / 0.6)); height: 100%; }
+.rampa .secbar__seg[data-mastered]::after { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--rp-foil-line); box-shadow: 0 0 10px rgb(255 225 245 / 0.5); }
+.rampa .secbar__seg:hover { box-shadow: inset 0 0 0 1px var(--rp-line-3); }
+.rampa .secbar__seg[aria-selected='true'] { box-shadow: inset 0 0 0 1.5px var(--rp-light), 0 0 14px var(--rp-beam); }
+.rampa .seclabels { display: flex; gap: 3px; font-size: 11.5px; color: var(--rp-fg-3); }
+.rampa .seclabels span { flex: var(--w) 1 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.rampa .seclabels b { color: var(--rp-fg-1); font-weight: 600; }
+.rampa .prep__panel { position: relative; display: grid; grid-template-rows: minmax(0, 1fr) auto; overflow: hidden; background: linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 30%), var(--rp-surface-1);
+  border-left: 1px solid var(--rp-line-1); min-height: 0; }
+.rampa .prep__scroll { overflow: auto; padding: 22px 28px 8px; display: grid; gap: 22px; align-content: start; }
+.rampa .prep__group { display: grid; gap: 12px; }
+.rampa .prep__group + .prep__group { padding-top: 22px; border-top: 1px solid var(--rp-line-1); }
+.rampa .arr-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.rampa .arr-card { position: relative; display: grid; gap: 7px; padding: 12px 12px 11px; border-radius: 9px; text-align: left; background: var(--rp-surface-2);
+  border: 1px solid var(--rp-line-1); transition: border-color var(--rp-dur-2), background var(--rp-dur-2); }
+.rampa .arr-card:hover { border-color: var(--rp-line-3); }
+.rampa .arr-card[aria-checked='true'] { background: var(--rp-surface-3); border-color: rgb(245 247 255 / 0.55); box-shadow: 0 0 0 1px rgb(245 247 255 / 0.2), 0 0 30px -10px var(--rp-beam); }
+.rampa .arr-card__top { display: flex; align-items: center; gap: 8px; }
+.rampa .arr-card__top .rp-i { color: var(--rp-fg-2); }
+.rampa .arr-card b { font-weight: 700; font-stretch: 112%; font-size: 14.5px; }
+.rampa .arr-card small { font-size: 11.5px; color: var(--rp-fg-3); }
+.rampa .arr-card .rp-ring { position: absolute; right: 10px; top: 10px; width: 26px; height: 26px; }
+.rampa .arr-card .rp-ring > span { font-size: 9px; }
+.rampa .arr-card .rp-ring::before { inset: 2.5px; background: var(--rp-surface-3); }
+.rampa .diffbar { display: flex; gap: 2px; } .rampa .diffbar i { width: 10px; height: 4px; border-radius: 1px; background: var(--rp-surface-4); }
+.rampa .diffbar i.on { background: var(--rp-fg-1); }
+.rampa .tune-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.rampa .tune-row .rp-tuning > span { min-width: 30px; height: 30px; font-size: 14px; }
+.rampa .tune-row__meta { display: grid; gap: 2px; font-size: 12.5px; color: var(--rp-fg-3); margin-right: auto; }
+.rampa .tune-row__meta b { color: var(--rp-fg-1); font-weight: 650; font-size: 14px; }
+.rampa .view-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rampa .view-opt { display: grid; gap: 8px; padding: 8px 8px 10px; border-radius: 9px; background: var(--rp-surface-2); border: 1px solid var(--rp-line-1); text-align: left; }
+.rampa .view-opt[aria-checked='true'] { border-color: rgb(245 247 255 / 0.55); background: var(--rp-surface-3); box-shadow: 0 0 0 1px rgb(245 247 255 / 0.18); }
+.rampa .view-opt svg.thumb { width: 100%; height: 64px; border-radius: 6px; background: var(--rp-hall); display: block; }
+.rampa .view-opt span { display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 620; padding: 0 2px; }
+.rampa .view-opt small { color: var(--rp-fg-3); font-weight: 500; font-size: 11.5px; }
+.rampa .prep__cta { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 16px 28px 20px; border-top: 1px solid var(--rp-line-1);
+  background: linear-gradient(180deg, rgb(13 15 21 / 0.6), var(--rp-surface-1)); }
+.rampa .prep__cta .rp-btn--xl { width: 100%; }
+.rampa .prep__cta-note { grid-column: 1 / -1; display: flex; gap: 14px; font-size: 12px; color: var(--rp-fg-3); }
+.rampa .prep__cta-note span { display: inline-flex; align-items: center; gap: 6px; }
+.rampa .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--rp-fg-2); font-size: 13.5px; font-weight: 560; height: 32px; padding: 0 10px 0 6px;
+  border-radius: 7px; background: rgb(7 8 13 / 0.45); border: 1px solid var(--rp-line-1); justify-self: start; backdrop-filter: blur(8px); }
+.rampa .back-link:hover { color: var(--rp-fg-1); border-color: var(--rp-line-2); }
+
+.rampa * { scrollbar-width: thin; scrollbar-color: var(--rp-surface-4) transparent; }
+
+/* ----- 9.5 Тюнер ----- */
+.rampa .page-head { display: flex; align-items: center; gap: var(--rp-s-4); flex-wrap: wrap; margin-bottom: 22px; }
+
+/* Пюпитр: подготовка песни среза 1 — шапка с постером, партии, настройки вида, CTA */
+.rampa .song-page { display: grid; gap: 26px; max-width: 1180px; }
+.rampa .song-page__head { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; align-items: end; }
+.rampa .song-page__poster { aspect-ratio: 16 / 10.5; border-radius: var(--rp-r-lg); }
+.rampa .song-page__title { margin: 8px 0 10px; }
+.rampa .song-page__group { display: grid; gap: 12px; }
+.rampa .song-page__arrs { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.rampa .song-page__arrs .arr-card { text-align: left; }
+.rampa .song-page__level { display: flex; gap: 3px; margin-top: 8px; }
+.rampa .song-page__level i { width: 18px; height: 4px; border-radius: 2px; background: var(--rp-surface-4); }
+.rampa .song-page__level i[data-on] { background: var(--rp-light); }
+.rampa .song-page__opts { grid-template-columns: repeat(auto-fit, minmax(240px, auto)); justify-content: start; gap: 18px 28px; }
+.rampa .song-page__opts > div { display: grid; gap: 8px; justify-items: start; }
+.rampa .song-page__cta { display: flex; align-items: center; gap: 18px; }
+@media (max-width: 900px) { .rampa .song-page__head { grid-template-columns: 180px 1fr; gap: 16px; } }

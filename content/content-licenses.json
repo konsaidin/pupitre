@@ -1,0 +1,220 @@
+[
+  {
+    "id": "Onest (cyrillic)",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/onest-cyrillic.woff2",
+    "sha256": "68e5e01d6265bd68967746d4f5a9d18d0e6cbb5d15583c7082d6384ab1229b27",
+    "author": "The Onest Project Authors",
+    "license": "OFL-1.1",
+    "url": "https://github.com/simpals/onest",
+    "version": "2.001",
+    "licenseText": "apps/web/public/licenses/Onest-OFL.txt"
+  },
+  {
+    "id": "Onest (latin)",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/onest-latin.woff2",
+    "sha256": "052df74533250c2e0ca0c4bdd32de594e107d99c1648e63820ef9c6142067828",
+    "author": "The Onest Project Authors",
+    "license": "OFL-1.1",
+    "url": "https://github.com/simpals/onest",
+    "version": "2.001",
+    "licenseText": "apps/web/public/licenses/Onest-OFL.txt"
+  },
+  {
+    "id": "Onest (symbols)",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/onest-symbols.woff2",
+    "sha256": "2ec2d45d2ec0770e2c18cba2dba5126cf2dcff181d23ad192e9fffeb4af4b0b6",
+    "author": "The Onest Project Authors",
+    "license": "OFL-1.1",
+    "url": "https://github.com/simpals/onest",
+    "version": "2.001",
+    "licenseText": "apps/web/public/licenses/Onest-OFL.txt"
+  },
+  {
+    "id": "Roboto regular",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/roboto-regular.woff2",
+    "sha256": "a349a3ad572a02513c049f1af75d5858fcffddc8abb643819f9210a6f243b1fa",
+    "author": "Google Inc.",
+    "license": "Apache-2.0",
+    "url": "https://github.com/googlefonts/roboto",
+    "version": "2.138",
+    "note": "Roboto 2.138 (2017) — Apache-2.0; ни один исходник не импортирует этот файл, в сборку он не попадает"
+  },
+  {
+    "id": "Roboto medium",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/roboto-medium.woff2",
+    "sha256": "241a8afdf6a981825b8f4e1004681715d1988f28698fe5a4362e33853f40d069",
+    "author": "Google Inc.",
+    "license": "Apache-2.0",
+    "url": "https://github.com/googlefonts/roboto",
+    "version": "2.138",
+    "note": "Roboto 2.138 (2017) — Apache-2.0; ни один исходник не импортирует этот файл, в сборку он не попадает"
+  },
+  {
+    "id": "Roboto bold",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/roboto-bold.woff2",
+    "sha256": "db28aa1e4d707e8e33b4f3482849909e10858bacd10837d08e943c1c79d9201b",
+    "author": "Google Inc.",
+    "license": "Apache-2.0",
+    "url": "https://github.com/googlefonts/roboto",
+    "version": "2.138",
+    "note": "Roboto 2.138 (2017) — Apache-2.0; ни один исходник не импортирует этот файл, в сборку он не попадает"
+  },
+  {
+    "id": "Roboto black",
+    "kind": "font",
+    "path": "apps/web/src/assets/fonts/roboto-black.woff2",
+    "sha256": "8751cdf17a4b7d32e5b8396e302a7f8245b9aa8e62ab0ecc409fc5e21335b4f4",
+    "author": "Google Inc.",
+    "license": "Apache-2.0",
+    "url": "https://github.com/googlefonts/roboto",
+    "version": "2.138",
+    "note": "Roboto 2.138 (2017) — Apache-2.0; ни один исходник не импортирует этот файл, в сборку он не попадает"
+  },
+  {
+    "id": "Noto Color Emoji",
+    "kind": "font",
+    "path": "apps/web/src/assets/emoji.woff2",
+    "sha256": "7114313c53a2bb6ec0cea50d78b059caf621bcefe67c6c96f26f5eb42e44f6d1",
+    "author": "Google Inc.",
+    "license": "OFL-1.1",
+    "url": "https://github.com/googlefonts/noto-emoji",
+    "version": "2.051",
+    "licenseText": "apps/web/public/licenses/NotoColorEmoji-OFL.txt",
+    "note": "ассет вокального UI до эпика; происхождение — по таблице name шрифта: «Noto Color Emoji», Version 2.051;GOOG;noto-emoji:20250818:e92753bfa55f"
+  },
+  {
+    "id": "Martian Grotesk VF",
+    "kind": "font",
+    "path": "apps/web/src/guitar/ui/fonts/MartianGrotesk-VF.woff2",
+    "sha256": "d2223e87b0f1020b98a1c376282d5d2da61cc8347f59052a934f11460d952b95",
+    "author": "The Martian Grotesk Project Authors (Evil Martians)",
+    "license": "OFL-1.1",
+    "url": "https://github.com/evilmartians/grotesk",
+    "version": "1.000",
+    "licenseText": "apps/web/public/licenses/MartianGrotesk-OFL.txt"
+  },
+  {
+    "id": "Martian Mono VF",
+    "kind": "font",
+    "path": "apps/web/src/guitar/ui/fonts/MartianMono-VF.woff2",
+    "sha256": "7cdf8e985a4872246d8c2a19333bcc5e8cbcf512746128823f35c1c43aac238a",
+    "author": "The Martian Mono Project Authors (Evil Martians)",
+    "license": "OFL-1.1",
+    "url": "https://github.com/evilmartians/mono",
+    "version": "1.100",
+    "licenseText": "apps/web/public/licenses/MartianMono-OFL.txt"
+  },
+  {
+    "id": "Noto Music (знаки альтерации)",
+    "kind": "font",
+    "path": "apps/web/src/guitar/ui/fonts/NotoMusic-accidentals.woff2",
+    "sha256": "93d654a500fb485e8a2af6710f194025a188b46d7b2d8b6846cbb0a7a806f01d",
+    "author": "The Noto Project Authors",
+    "license": "OFL-1.1",
+    "url": "https://github.com/notofonts/music",
+    "version": "2.004",
+    "licenseText": "apps/web/public/licenses/NotoMusic-OFL.txt",
+    "note": "подмножество Noto Music: только знаки альтерации (♯ ♭ ♮…); зарезервированных имён у шрифта нет"
+  },
+  {
+    "id": "Phosphor Icons",
+    "kind": "icons",
+    "path": "apps/web/src/components/Icon.tsx",
+    "sha256": "1e9ed631f7f5b689e2ce192eff2c14ae4cdb05e61fe782da523f2ef70e84bb53",
+    "author": "Phosphor Icons",
+    "license": "MIT",
+    "url": "https://github.com/phosphor-icons/core",
+    "licenseText": "apps/web/public/licenses/Phosphor-MIT.txt",
+    "note": "контуры иконок вокального UI встроены в код компонента"
+  },
+  {
+    "id": "Tabler Icons",
+    "kind": "icons",
+    "path": "apps/web/src/guitar/ui/GuitarIcon.tsx",
+    "sha256": "bcf11069ed50b8b7704c13c606b5c307aa3ce07c805a4f8919aa595756f1d2c3",
+    "author": "Paweł Kuna",
+    "license": "MIT",
+    "url": "https://github.com/tabler/tabler-icons",
+    "version": "3.49.0",
+    "licenseText": "apps/web/public/licenses/Tabler-MIT.txt",
+    "note": "пути 138 иконок из npm pack @tabler/icons@3.49.0 (tgz sha256 aa3042907eb0bdb079fd70733e2d75f785683d4726279128a0ca2343099f7074, сверен с dist.integrity); файл собирает tools/icons/build-guitar-icons.mjs, в нём же свои c-* и pt-*"
+  },
+  {
+    "id": "TinySoundFont",
+    "kind": "bundled",
+    "parent": "@coderline/alphatab",
+    "url": "https://github.com/schellingb/TinySoundFont",
+    "author": "Bernhard Schelling",
+    "license": "MIT",
+    "sha256": "7330a805eab246bd329927e895ac46eb8eae1da4d27375c66e223c91dd1a5817",
+    "note": "встроена в @coderline/alphatab 1.8.4; sha256 — файла dist/alphaTab.core.mjs, где её баннер (строки 1–45)"
+  },
+  {
+    "id": "SFZero",
+    "kind": "bundled",
+    "parent": "@coderline/alphatab",
+    "url": "https://github.com/stevefolta/SFZero",
+    "author": "Steve Folta",
+    "license": "MIT",
+    "sha256": "7330a805eab246bd329927e895ac46eb8eae1da4d27375c66e223c91dd1a5817",
+    "note": "встроена в @coderline/alphatab 1.8.4; sha256 — файла dist/alphaTab.core.mjs, где её баннер (строки 1–45)"
+  },
+  {
+    "id": "Haxe Standard Library",
+    "kind": "bundled",
+    "parent": "@coderline/alphatab",
+    "url": "https://github.com/HaxeFoundation/haxe/tree/development/std",
+    "author": "Haxe Foundation",
+    "license": "MIT",
+    "sha256": "7330a805eab246bd329927e895ac46eb8eae1da4d27375c66e223c91dd1a5817",
+    "note": "встроена в @coderline/alphatab 1.8.4; sha256 — файла dist/alphaTab.core.mjs, где её баннер (строки 1–45)"
+  },
+  {
+    "id": "SharpZipLib",
+    "kind": "bundled",
+    "parent": "@coderline/alphatab",
+    "url": "https://github.com/icsharpcode/SharpZipLib",
+    "author": "SharpZipLib Contributors",
+    "license": "MIT",
+    "sha256": "7330a805eab246bd329927e895ac46eb8eae1da4d27375c66e223c91dd1a5817",
+    "note": "встроена в @coderline/alphatab 1.8.4; sha256 — файла dist/alphaTab.core.mjs, где её баннер (строки 1–45)"
+  },
+  {
+    "id": "NVorbis",
+    "kind": "bundled",
+    "parent": "@coderline/alphatab",
+    "url": "https://github.com/NVorbis/NVorbis",
+    "author": "Andrew Ward",
+    "license": "MIT",
+    "sha256": "7330a805eab246bd329927e895ac46eb8eae1da4d27375c66e223c91dd1a5817",
+    "note": "встроена в @coderline/alphatab 1.8.4; sha256 — файла dist/alphaTab.core.mjs, где её баннер (строки 1–45)"
+  },
+  {
+    "id": "libvorbis",
+    "kind": "bundled",
+    "parent": "@coderline/alphatab",
+    "url": "https://github.com/xiph/vorbis",
+    "author": "Xiph.org Foundation",
+    "license": "BSD-3-Clause",
+    "sha256": "7330a805eab246bd329927e895ac46eb8eae1da4d27375c66e223c91dd1a5817",
+    "note": "встроена в @coderline/alphatab 1.8.4; sha256 — файла dist/alphaTab.core.mjs, где её баннер (строки 1–45)"
+  },
+  {
+    "id": "SONiVOX EAS GM",
+    "kind": "soundfont",
+    "parent": "@coderline/alphatab",
+    "author": "Sonic Network Inc.",
+    "license": "Apache-2.0",
+    "url": "https://android.googlesource.com/platform/external/sonivox/",
+    "version": "1.8.4",
+    "sha256": "d39beb7cd349278455b44e7689e35e3c1f5ed9ef80118485846537929df8f7c0",
+    "licenseText": "apps/web/public/licenses/SONiVOX-Apache-2.0.txt",
+    "note": "node_modules/@coderline/alphatab/dist/soundfont/sonivox.sf3, встроен в чанк воркера разбора (backing/render.ts); README пакета — репак из прошивок, musical-artifacts #1517 указывает CC-BY-3.0 — цепочка прав в HUMAN-CHECKLIST до публичного релиза"
+  }
+]

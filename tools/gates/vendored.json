@@ -1,0 +1,10 @@
+[
+  {
+    "path": "apps/web/src/guitar/vendor/fretfall",
+    "name": "@fretfall/player",
+    "version": "0.5.0",
+    "license": "MIT",
+    "upstream": "https://github.com/fretfall/player",
+    "commit": "ed2bc3bbb52e4ce7c840c28d8ffbd54d7e34670f"
+  }
+]

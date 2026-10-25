@@ -6,8 +6,12 @@ export default defineConfig({
   base: './',
   // DSP-ядро тянется как обычный ассет (data-URI через ?inline),
   // а не через встроенную wasm?init-магию Vite
-  assetsInclude: ['**/*.wasm'],
+  assetsInclude: ['**/*.wasm', '**/*.sf3'],
   plugins: [react()],
+  // воркер разбора гитарного раздела (?worker&inline) тянет alphaTab с import.meta.url — нужен ES-формат
+  worker: { format: 'es' },
+  // зависимости гитарного раздела Vite иначе находит на лету и перезагружает открытую страницу (dev)
+  optimizeDeps: { include: ['@coderline/alphatab', 'fflate', 'idb'] },
   server: {
     port: 5173,
     proxy: {

@@ -7,9 +7,11 @@ const path = require('node:path');
 const { randomBytes } = require('node:crypto');
 const { Backend, PORT } = require('./backend');
 const { initNativeAudio } = require('./native-audio');
+const { initEngine } = require('./engine');
 
 let backend = null;
 let nativeAudioReady = false;
+let engine = null; // нативный звуковой движок (этап 41) в своём процессе, если аддон собран
 let lastStatus = { stage: 'idle' };
 const apiToken = randomBytes(32).toString('hex');
 const statusSubscribers = new Set();
@@ -37,6 +39,7 @@ function createWindow() {
         `--pupitre-api=http://127.0.0.1:${PORT}`,
         `--pupitre-api-token=${apiToken}`,
         ...(nativeAudioReady ? ['--pupitre-native-audio'] : []),
+        ...(engine ? ['--pupitre-engine'] : []),
       ],
     },
   });
@@ -56,6 +59,7 @@ app.whenReady().then(() => {
   });
 
   nativeAudioReady = initNativeAudio(ipcMain, app.isPackaged, process.resourcesPath);
+  engine = initEngine(ipcMain, app.isPackaged, process.resourcesPath);
 
   ipcMain.on('backend-status-subscribe', (e) => {
     statusSubscribers.add(e.sender);
@@ -82,4 +86,5 @@ app.whenReady().then(() => {
 });
 
 app.on('window-all-closed', () => app.quit());
+app.on('before-quit', () => void engine?.close());
 app.on('quit', () => backend?.stop());

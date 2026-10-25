@@ -4,12 +4,14 @@ import { t } from '../lib/i18n';
 import { classifyRange, midiToName } from '../lib/music';
 import { practiceStreak } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
+import { GUITAR_ENABLED } from '../guitarFlag';
 import { Icon, type IconName } from './Icon';
 
 const LINKS: { to: string; label: string; icon: IconName }[] = [
   { to: '/', label: 'Overview', icon: 'home' },
   { to: '/exercises', label: 'Practice', icon: 'waves' },
   { to: '/songs', label: 'My songs', icon: 'note' },
+  ...(GUITAR_ENABLED ? [{ to: '/guitar', label: 'Guitar', icon: 'speaker' as const }] : []),
 ];
 
 export function TopBar() {

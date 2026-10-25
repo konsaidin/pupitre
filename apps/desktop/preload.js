@@ -36,3 +36,37 @@ if (process.argv.includes('--pupitre-native-audio')) {
     },
   });
 }
+
+// нативный звуковой движок (этап 41): мост появляется только когда main загрузил аддон packages/engine; рендерер по
+// наличию window.pupitreEngine выбирает захват движка (иначе — браузер). Ошибки — без префикса IPC: код (NO_ENGINE,
+// NOT_FOUND, FAILED) в начале сообщения.
+if (process.argv.includes('--pupitre-engine')) {
+  const invoke = (channel, ...args) =>
+    ipcRenderer.invoke(channel, ...args).catch((e) => {
+      throw new Error(String(e?.message ?? e).replace(/^Error invoking remote method '[^']+': (?:Error: )?/, ''));
+    });
+  contextBridge.exposeInMainWorld('pupitreEngine', {
+    available: () => invoke('engine:available'),
+    listDevices: () => invoke('engine:list'),
+    open: (options) => invoke('engine:open', options),
+    close: () => invoke('engine:close'),
+    set: (options) => ipcRenderer.send('engine:set', options),
+    measureRtl: (clicks) => invoke('engine:rtl', clicks),
+    status: () => invoke('engine:status'),
+    onMeters(cb) {
+      const listener = (_e, meters) => cb(meters);
+      ipcRenderer.on('engine:meters', listener);
+      return () => ipcRenderer.removeListener('engine:meters', listener);
+    },
+    onEvent(cb) {
+      const listener = (_e, event) => cb(event);
+      ipcRenderer.on('engine:event', listener);
+      return () => ipcRenderer.removeListener('engine:event', listener);
+    },
+    onFrames(cb) {
+      const listener = (_e, frames) => cb(frames);
+      ipcRenderer.on('engine:frames', listener);
+      return () => ipcRenderer.removeListener('engine:frames', listener);
+    },
+  });
+}

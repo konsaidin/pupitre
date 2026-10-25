@@ -1,0 +1,6 @@
+\title "Repeats and D.S. al Coda"
+\tempo 120
+\track "Guitar"
+\staff {tabs}
+\tuning (E4 B3 G3 D3 A2 E2)
+\section "Intro" \jump segno 0.6.4 0.6.4 0.6.4 0.6.4 | \ro 3.6.2 3.6.2 | \ae 1 \rc 2 5.6.1 | \ae 2 \jump dacoda 7.6.1 | \jump dalsegnoalcoda 8.6.1 | \section "Coda" \jump coda 10.6.1

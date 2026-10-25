@@ -8,11 +8,13 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
+    "build:web": "node build-web.mjs",
     "copy-web": "node copy-web.mjs",
     "build:native": "node ../../packages/native-audio/build.mjs",
-    "dev": "npm run copy-web && (npm run build:native || echo native-audio: сборка не удалась, будет worklet-путь) && electron .",
-    "pack": "npm run copy-web && npm run build:native && electron-builder --dir",
-    "dist": "npm run copy-web && npm run build:native && electron-builder"
+    "build:engine": "node ../../packages/engine/build.mjs",
+    "dev": "npm run build:web && npm run copy-web && (npm run build:native || echo native-audio: сборка не удалась, будет worklet-путь) && (npm run build:engine || echo engine: сборка не удалась, будет захват браузера) && electron .",
+    "pack": "npm run copy-web && npm run build:native && npm run build:engine && electron-builder --dir",
+    "dist": "npm run copy-web && npm run build:native && npm run build:engine && electron-builder"
   },
   "devDependencies": {
     "electron": "^33.2.1",
@@ -29,12 +31,21 @@
       "backend.js",
       "preload.js",
       "native-audio.js",
+      "engine.js",
+      "engine-host.js",
       "dist-web/**"
     ],
     "extraResources": [
       {
         "from": "../../packages/native-audio",
         "to": "native",
+        "filter": [
+          "*.node"
+        ]
+      },
+      {
+        "from": "../../packages/engine",
+        "to": "engine",
         "filter": [
           "*.node"
         ]

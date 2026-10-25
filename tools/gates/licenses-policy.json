@@ -1,0 +1,223 @@
+{
+  "allow": [
+    {
+      "spdx": "MIT",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "MIT-0",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "BSD-1-Clause",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "BSD-2-Clause",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "BSD-3-Clause",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "0BSD",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "Apache-2.0",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "ISC",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "Zlib",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "Unicode-3.0",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "Unicode-DFS-2016",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "MPL-2.0",
+      "why": "Только немодифицированные зависимости; запрещён вендор MPL."
+    },
+    {
+      "spdx": "OFL-1.1",
+      "why": "Только шрифты."
+    },
+    {
+      "spdx": "CC0-1.0",
+      "why": "Разрешена архитектурной политикой этапа 2a."
+    },
+    {
+      "spdx": "CC-BY-4.0",
+      "why": "Только контент."
+    },
+    {
+      "spdx": "CC-BY-SA-4.0",
+      "why": "Только контент."
+    },
+    {
+      "spdx": "PSF-2.0",
+      "why": "audioop-lts, typing_extensions и standard-* в окружении Python."
+    },
+    {
+      "spdx": "Unlicense",
+      "why": "treetable в окружении Python."
+    },
+    {
+      "spdx": "Apache-2.0 WITH LLVM-exception",
+      "why": "llvmlite: LICENSE.thirdparty содержит Apache-2.0 с разрешительным исключением LLVM."
+    },
+    {
+      "spdx": "HPND",
+      "why": "Historical Permission Notice and Disclaimer — пермиссивная (OSI), уровня MIT; маска ND её не задевает."
+    },
+    {
+      "spdx": "NCSA",
+      "why": "University of Illinois/NCSA — пермиссивная (OSI), уровня BSD-3-Clause; маска NC её не задевает."
+    }
+  ],
+  "deny": [
+    "GPL*",
+    "LGPL*",
+    "AGPL*"
+  ],
+  "denyParts": [
+    "NC",
+    "ND"
+  ],
+  "preexisting": [
+    {
+      "name": "mutagen",
+      "license": "GPL-2.0-or-later",
+      "source": "pip",
+      "reference": "services/api/requirements.txt:5; services/api/app/pipeline.py:530-541",
+      "why": "ставится или скачивается на машине пользователя, отдельный процесс/библиотека окружения бэкенда"
+    },
+    {
+      "name": "ffmpeg",
+      "license": "GPL-3.0-or-later",
+      "source": "runtime",
+      "reference": "GPL-сборка BtbN; apps/desktop/backend.js:27,32",
+      "why": "ставится или скачивается на машине пользователя, отдельный процесс/библиотека окружения бэкенда"
+    },
+    {
+      "name": "lameenc",
+      "license": "LGPL-3.0-or-later",
+      "source": "pip",
+      "reference": "через demucs",
+      "why": "ставится или скачивается на машине пользователя, отдельный процесс/библиотека окружения бэкенда"
+    },
+    {
+      "name": "soxr",
+      "license": "LGPL-2.1-or-later",
+      "source": "pip",
+      "reference": "через librosa",
+      "why": "ставится или скачивается на машине пользователя, отдельный процесс/библиотека окружения бэкенда"
+    },
+    {
+      "name": "libsndfile",
+      "license": "LGPL-2.1",
+      "source": "runtime",
+      "reference": "внутри колеса soundfile",
+      "why": "ставится или скачивается на машине пользователя, отдельный процесс/библиотека окружения бэкенда"
+    },
+    {
+      "name": "libffmpeg.so",
+      "license": "LGPL-2.1",
+      "source": "runtime",
+      "reference": "динамическая библиотека рантайма Electron",
+      "why": "поставляется в рантайме Electron немодифицированной динамической библиотекой; обязанности LGPL-2.1 — уведомление и ссылка на исходники (этап 50)"
+    }
+  ],
+  "overrides": {
+    "pip:jinja2": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/pallets/jinja/blob/3.1.6/LICENSE.txt",
+      "version": "3.1.6",
+      "original": "BSD License"
+    },
+    "pip:antlr4-python3-runtime": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/antlr/antlr4/blob/4.9.3/LICENSE.txt",
+      "version": "4.9.3",
+      "original": "BSD"
+    },
+    "pip:cloudpickle": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/cloudpipe/cloudpickle/blob/v3.1.2/LICENSE",
+      "version": "3.1.2",
+      "original": "BSD License"
+    },
+    "pip:mpmath": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/mpmath/mpmath/blob/1.3.0/LICENSE",
+      "version": "1.3.0",
+      "original": "BSD License"
+    },
+    "pip:numba": {
+      "spdx": "BSD-2-Clause",
+      "url": "https://github.com/numba/numba/blob/main/LICENSE",
+      "version": "0.66.0",
+      "original": "BSD License"
+    },
+    "pip:omegaconf": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/omry/omegaconf/blob/master/LICENSE",
+      "version": "2.3.1",
+      "original": "BSD License"
+    },
+    "pip:scipy": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/scipy/scipy/blob/main/LICENSE.txt",
+      "version": "1.18.0",
+      "original": "BSD License"
+    },
+    "pip:soundfile": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/bastibe/python-soundfile/blob/master/LICENSE",
+      "version": "0.14.0",
+      "original": "BSD License"
+    },
+    "pip:sympy": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/sympy/sympy/blob/sympy-1.14.0/LICENSE",
+      "version": "1.14.0",
+      "original": "BSD License"
+    },
+    "pip:threadpoolctl": {
+      "spdx": "BSD-3-Clause",
+      "url": "https://github.com/joblib/threadpoolctl/blob/3.6.0/LICENSE",
+      "version": "3.6.0",
+      "original": "BSD License"
+    },
+    "pip:torchaudio": {
+      "spdx": "BSD-2-Clause",
+      "url": "https://github.com/pytorch/audio/blob/main/LICENSE",
+      "version": "2.11.0+cpu",
+      "original": "BSD License"
+    }
+  },
+  "contentAllow": [
+    {
+      "path": "apps/web/ribbon.png",
+      "why": "скриншот интерфейса самого Пюпитра (1280×800, коммиты владельца, последний — 2447e28) — свой контент"
+    },
+    {
+      "path": "apps/web/roll.png",
+      "why": "скриншот интерфейса самого Пюпитра (1280×800, коммиты владельца, последний — 2447e28) — свой контент"
+    },
+    {
+      "path": "tools/icons/rampa-custom-icons.svg",
+      "why": "свои иконки Рампы (c-*) и узоры постеров (pt-*), нарисованы для проекта — исходник генератора GuitarIcon.tsx"
+    }
+  ]
+}

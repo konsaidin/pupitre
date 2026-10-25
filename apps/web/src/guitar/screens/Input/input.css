@@ -1,0 +1,45 @@
+/* Вход и звук (ui-spec §11.11): перенос design/mockups.html, строки 616–618 и 890–900 (раздел 9), селекторы под .rampa. */
+.rampa .page-head { display: flex; align-items: center; gap: var(--rp-s-4); flex-wrap: wrap; margin-bottom: 22px; }
+.rampa .page-head__title { display: grid; gap: 6px; margin-right: auto; }
+.rampa .page-head__title .rp-label { color: var(--rp-fg-3); }
+.rampa .io { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.rampa .io .rp-card { padding: 22px 24px; display: grid; gap: 18px; }
+.rampa .io__wide { grid-column: 1 / -1; }
+.rampa .bigmeter { display: grid; gap: 8px; }
+.rampa .bigmeter .rp-meter { height: 14px; border-radius: 7px; }
+.rampa .bigmeter__scale { display: flex; justify-content: space-between; font-family: var(--rp-font-mono); font-size: 10.5px; color: var(--rp-fg-3); }
+.rampa .lat { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; }
+.rampa .lat i { display: block; height: 100%; flex: var(--w) 1 0; background: var(--c); }
+.rampa .lat-legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--rp-fg-3); }
+.rampa .lat-legend span { display: inline-flex; align-items: center; gap: 6px; } .rampa .lat-legend i { width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+.rampa .opt-note { font-size: 12.5px; color: var(--rp-fg-3); margin-top: -8px; }
+/* Пюпитр: список устройств карточками-радио (голых <select> в Рампе нет), состояние доступа, отступы шапок карточек (в макете —
+   инлайн-стили), перегруз над шкалой, цвета звеньев задержки — токенами */
+.rampa .io__devices { display: grid; gap: 8px; }
+.rampa .io__device { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; border-radius: var(--rp-r-sm);
+  border: 1px solid var(--rp-line-1); background: var(--rp-well); color: var(--rp-fg-2); text-align: left; }
+.rampa .io__device[aria-checked='true'] { border-color: var(--rp-light); color: var(--rp-fg-1); box-shadow: 0 0 0 3px rgb(245 247 255 / 0.08); }
+.rampa .io__device:hover:not(:disabled) { border-color: var(--rp-line-3); color: var(--rp-fg-1); }
+.rampa .io__device span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rampa .io__warn { display: grid; gap: 10px; justify-items: start; padding: 16px; border-radius: var(--rp-r-md);
+  background: color-mix(in oklab, var(--rp-warn) 8%, var(--rp-well)); border: 1px solid color-mix(in oklab, var(--rp-warn) 30%, transparent); }
+.rampa .io .rp-card__head { margin: 0; }
+.rampa .io__stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.rampa .io__off { justify-self: start; }
+.rampa .io__clip { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; font-size: 12px; font-weight: 600; color: var(--rp-bad); }
+/* закрытый вход — без метки пика у левого края */
+.rampa .bigmeter .rp-meter:not([data-live='true'])::after { opacity: 0; }
+.rampa .io__peak { min-width: 9ch; text-align: right; }
+.rampa .io__noise { align-items: center; }
+.rampa .io__rtl { font-size: 20px; font-weight: 700; }
+.rampa .io__lat-in { --c: var(--rp-info); }
+.rampa .io__lat-out { --c: var(--rp-fg-4); }
+.rampa .io__device[aria-disabled='true'] { cursor: progress; opacity: 0.7; }
+.rampa .io__chled { width: 6px; height: 6px; }
+.rampa .io__xruns { margin-left: auto; }
+.rampa .io__xruns .rp-i { color: var(--rp-ok); }
+.rampa .io__xruns[data-xruns='true'] .rp-i { color: var(--rp-warn); }
+.rampa .io__engine-note { margin-top: 0; }
+@media (max-width: 900px) { .rampa .io, .rampa .io__stats { grid-template-columns: 1fr; } }
+/* телефон: одна колонка, пояснения скрыты (ui-spec §11.11) */
+@media (max-height: 500px) { .rampa .io, .rampa .io__stats { grid-template-columns: 1fr; } .rampa .opt-note { display: none; } }

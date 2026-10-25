@@ -1,0 +1,4 @@
+target/
+.alsa-shim/
+.jack-shim/
+*.node

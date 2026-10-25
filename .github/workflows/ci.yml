@@ -27,7 +27,7 @@ jobs:
 
       - run: npm ci
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.95.0
         with:
           targets: wasm32-unknown-unknown
 
@@ -50,19 +50,72 @@ jobs:
       - name: Desktop backend lifecycle tests
         run: node --test ../desktop/tests/backend.test.cjs
 
+  # license-checker 5.0.1 требует Node 24 — отдельный job, чтобы web тестировался на одном Node 22.
+  licenses:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            apps/web/package-lock.json
+            apps/desktop/package-lock.json
+
+      - name: npm production licenses
+        run: |
+          npm ci --prefix apps/web --ignore-scripts
+          npm ci --prefix apps/desktop --omit=dev --ignore-scripts
+          node tools/gates/check-licenses.mjs --only npm
+
   dsp:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.95.0
 
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: packages/dsp
 
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: packages/dsp/Cargo.toml
+          command: check licenses
+
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: packages/native-audio/Cargo.toml
+          command: check licenses
+
       - name: DSP core tests
         run: cargo test --manifest-path packages/dsp/Cargo.toml
+
+  engine:
+    # Нативный звуковой движок (этап 41): лицензии крейтов и тесты графа реального времени, замера задержки и отсутствия
+    # аллокаций в колбэке. libjack грузится при открытии клиента — сборке и тестам JACK не нужен (build.mjs: shim jack.pc).
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TARGET_DIR: ${{ github.workspace }}/packages/engine/target
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@1.95.0
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/engine
+
+      - uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: packages/engine/Cargo.toml
+          command: check licenses
+
+      - name: Engine tests
+        run: node packages/engine/build.mjs --test
 
   api:
     runs-on: ubuntu-latest

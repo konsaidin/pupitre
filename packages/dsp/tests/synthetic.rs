@@ -88,19 +88,21 @@ fn vibrato_not_detected_on_slow_drift() {
 }
 
 #[test]
-fn subharmonic_reads_as_distortion_keeping_melodic_pitch() {
-    // расщепление: удвоение периода — к 220 Гц добавлена сильная субгармоника 110 Гц
+fn subharmonic_reads_as_distortion_at_true_period() {
+    // удвоение периода: к 220 Гц добавлена сильная компонента 110 Гц.
+    // Сигнал периодичен на 110 Гц — это и есть высота (спектрально он неотличим
+    // от гласной с громкой 2-й гармоникой); сама субгармоника идёт в расщепление
     let base = fm_tone(2.5, 220.0, 0.0, 0.0, 0.3);
     let sub = fm_tone(2.5, 110.0, 0.0, 0.0, 0.11);
     let mixed: Vec<f32> = base.iter().zip(&sub).map(|(a, b)| a + b).collect();
     let frames = run(&mixed);
     let t = tail(&frames, 1.0);
     assert!(!t.is_empty());
-    let melodic = t.iter().filter(|f| f.voiced && (f.f0 - 220.0).abs() < 6.0).count();
+    let at_period = t.iter().filter(|f| f.voiced && (f.f0 - 110.0).abs() < 3.0).count();
     assert!(
-        melodic as f32 > 0.8 * t.len() as f32,
-        "мелодическая высота потеряна: 220 Гц в {}/{} кадров",
-        melodic,
+        at_period as f32 > 0.8 * t.len() as f32,
+        "высота не по периоду: 110 Гц в {}/{} кадров",
+        at_period,
         t.len()
     );
     let hot = t.iter().filter(|f| f.dist_score > 0.4).count();
@@ -111,6 +113,34 @@ fn subharmonic_reads_as_distortion_keeping_melodic_pitch() {
         t.len(),
         t.iter().map(|f| f.dist_score).fold(0.0f32, f32::max)
     );
+}
+
+#[test]
+fn vowel_with_loud_second_harmonic_keeps_its_octave() {
+    // гласная «а»: 2-я гармоника громче основного тона (H1 ≈ 0.4·H2) —
+    // типичный спектр живого пения; раньше такие кадры прыгали на октаву вверх
+    for hz in [130.8f32, 220.0] {
+        let partials = [0.4f32, 1.0, 0.5, 0.3, 0.2];
+        let mut voice = vec![0.0f32; (2.0 * SR) as usize];
+        for (k, amp) in partials.iter().enumerate() {
+            let h = fm_tone(2.0, hz * (k + 1) as f32, 0.0, 0.0, 0.15 * amp);
+            for (v, x) in voice.iter_mut().zip(&h) {
+                *v += x;
+            }
+        }
+        let frames = run(&voice);
+        let t = tail(&frames, 0.5);
+        assert!(!t.is_empty());
+        let right = t.iter().filter(|f| f.voiced && (f.f0 - hz).abs() < hz * 0.02).count();
+        assert!(
+            right as f32 > 0.95 * t.len() as f32,
+            "{} Гц: в своей октаве {}/{} кадров, f0 = {:?}",
+            hz,
+            right,
+            t.len(),
+            t.iter().take(5).map(|f| f.f0).collect::<Vec<_>>()
+        );
+    }
 }
 
 #[test]

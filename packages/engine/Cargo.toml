@@ -1,0 +1,37 @@
+[package]
+license = "MIT"
+name = "pupitre-engine"
+version = "0.1.0"
+edition = "2021"
+description = "Нативный звуковой движок Пюпитра: дуплекс с низкой задержкой, мониторинг, метры, замер RTL"
+
+[lib]
+name = "pupitre_engine"
+# rlib — для тестов и примеров без N-API; cdylib — аддон Electron (фича addon).
+crate-type = ["cdylib", "rlib"]
+
+[features]
+default = []
+# N-API-обвязка: собирается только для .node (build.mjs); cargo test и примеры — без неё.
+addon = ["dep:napi", "dep:napi-derive"]
+
+[dependencies]
+# libjack грузится при открытии клиента (dynamic_loading): .node загружается и без JACK в системе.
+jack = { version = "0.13.5", default-features = false, features = ["dynamic_loading"] }
+rtrb = "0.3"
+# высота — то же ядро, что у вокала (YIN, октавная коррекция)
+pupitre-dsp = { path = "../dsp" }
+napi = { version = "2", default-features = false, features = ["napi8"], optional = true }
+napi-derive = { version = "2", optional = true }
+
+[dev-dependencies]
+assert_no_alloc = "1.1"
+
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+strip = true

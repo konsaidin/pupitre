@@ -1,0 +1,407 @@
+{
+  "guitarset": {
+    "id": "guitarset",
+    "title": "GuitarSet 1.1.0",
+    "source": {
+      "kind": "zenodo",
+      "record": "3371780"
+    },
+    "license": "CC-BY-4.0",
+    "localOnly": false,
+    "optional": false,
+    "archives": [
+      {
+        "path": "annotation/annotation.zip",
+        "url": "https://zenodo.org/api/records/3371780/files/annotation.zip/content",
+        "md5": "b39b78e63d3446f2e54ddb7a54df9b10",
+        "size": 39132574
+      },
+      {
+        "path": "mono-mic/audio_mono-mic.zip",
+        "url": "https://zenodo.org/api/records/3371780/files/audio_mono-mic.zip/content",
+        "md5": "275966d6610ac34999b58426beb119c3",
+        "size": 656927981
+      },
+      {
+        "path": "mono-pickup/audio_mono-pickup_mix.zip",
+        "url": "https://zenodo.org/api/records/3371780/files/audio_mono-pickup_mix.zip/content",
+        "md5": "aecce79f425a44e2055e46f680e10f6a",
+        "size": 683145360
+      }
+    ],
+    "parts": {
+      "annotation": {
+        "glob": "annotation/*.jams",
+        "expect": 360
+      },
+      "mono-mic": {
+        "glob": "mono-mic/*_mic.wav",
+        "expect": 360
+      },
+      "mono-pickup": {
+        "glob": "mono-pickup/*_mix.wav",
+        "expect": 360
+      }
+    },
+    "minN": 360,
+    "note": "Все 360 записей, аннотации и обе монофонические записи; hex-pickup не входит в этот реестр."
+  },
+  "egset12": {
+    "id": "egset12",
+    "title": "EGSet12",
+    "source": {
+      "kind": "zenodo",
+      "record": "11406378"
+    },
+    "license": "CC-BY-4.0",
+    "localOnly": false,
+    "optional": true,
+    "archives": [
+      {
+        "path": "scores/01.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/01.gp/content",
+        "md5": "811dde6c5ffd1754dcbd468100a869af",
+        "size": 14513
+      },
+      {
+        "path": "annotation/01.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/01.jams/content",
+        "md5": "083c7dae8e6556c20b9a2d762e2c977f",
+        "size": 52172
+      },
+      {
+        "path": "audio/01.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/01.wav/content",
+        "md5": "2eb739c5fb73e6327bb47267afe3eddf",
+        "size": 8640044
+      },
+      {
+        "path": "scores/02.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/02.gp/content",
+        "md5": "dca6ce7f304ab28b7c3fdfbf8780a2ff",
+        "size": 14835
+      },
+      {
+        "path": "annotation/02.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/02.jams/content",
+        "md5": "848f984b17b261a65585e25fba977a33",
+        "size": 120087
+      },
+      {
+        "path": "audio/02.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/02.wav/content",
+        "md5": "69b8701ea9a81428a6346e0d3d4b9b85",
+        "size": 8886896
+      },
+      {
+        "path": "scores/03.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/03.gp/content",
+        "md5": "820a2337cc43c1b1b606151cfae4e6bb",
+        "size": 14398
+      },
+      {
+        "path": "annotation/03.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/03.jams/content",
+        "md5": "721ec50f570892f9cfa88fb1e22a6113",
+        "size": 45984
+      },
+      {
+        "path": "audio/03.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/03.wav/content",
+        "md5": "28141f17e46399553c52f5ed27bc10e2",
+        "size": 10368044
+      },
+      {
+        "path": "scores/04.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/04.gp/content",
+        "md5": "53aa7e4d86996aaeedeeef2e47dfacf3",
+        "size": 15221
+      },
+      {
+        "path": "annotation/04.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/04.jams/content",
+        "md5": "87426719ac4353d73e1af09970c31eb1",
+        "size": 86938
+      },
+      {
+        "path": "audio/04.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/04.wav/content",
+        "md5": "6fe2f6f915953e8ae28b8a84a7677d0f",
+        "size": 8797130
+      },
+      {
+        "path": "scores/05.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/05.gp/content",
+        "md5": "21a5166d9d16e8ac90c6ce16256a4ce8",
+        "size": 15069
+      },
+      {
+        "path": "annotation/05.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/05.jams/content",
+        "md5": "c5c2fd376031177e87a3eb4ad12d220c",
+        "size": 56724
+      },
+      {
+        "path": "audio/05.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/05.wav/content",
+        "md5": "3435348c2b6702524dade471be70e4eb",
+        "size": 9600044
+      },
+      {
+        "path": "scores/06.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/06.gp/content",
+        "md5": "dad00cbe2d7a28399106f0ec7221a8f0",
+        "size": 13771
+      },
+      {
+        "path": "annotation/06.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/06.jams/content",
+        "md5": "5ababdcf7741400dc93768334f6c899d",
+        "size": 186045
+      },
+      {
+        "path": "audio/06.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/06.wav/content",
+        "md5": "9f7ead382f373259b466ccd1884ed173",
+        "size": 8723924
+      },
+      {
+        "path": "scores/07.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/07.gp/content",
+        "md5": "ff4998113e7524e3063c27a7229f0c72",
+        "size": 14243
+      },
+      {
+        "path": "annotation/07.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/07.jams/content",
+        "md5": "e693844f4b46fd3831c7c4ee0a2c3aa8",
+        "size": 38330
+      },
+      {
+        "path": "audio/07.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/07.wav/content",
+        "md5": "77f752ab3e7a5c606a21ac7b0df4fa1c",
+        "size": 8755244
+      },
+      {
+        "path": "scores/08.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/08.gp/content",
+        "md5": "25a607d5bc6f7df2a6864bf09d770542",
+        "size": 15050
+      },
+      {
+        "path": "annotation/08.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/08.jams/content",
+        "md5": "513e00c522d53adac0ed9966a5b4c8cd",
+        "size": 48855
+      },
+      {
+        "path": "audio/08.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/08.wav/content",
+        "md5": "a59f373c00b8a327b37ce28f6601404c",
+        "size": 9169016
+      },
+      {
+        "path": "scores/09.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/09.gp/content",
+        "md5": "e4e6e78962d560037cd0fc9cd60c0959",
+        "size": 14756
+      },
+      {
+        "path": "annotation/09.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/09.jams/content",
+        "md5": "9f08cae003c6c3d9dc745c2e319496d4",
+        "size": 49728
+      },
+      {
+        "path": "audio/09.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/09.wav/content",
+        "md5": "593aec1394a905a0c8b255a847f54139",
+        "size": 8730980
+      },
+      {
+        "path": "scores/10.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/10.gp/content",
+        "md5": "3583cd15d0e1ae170ea2f2d77e99ef07",
+        "size": 13857
+      },
+      {
+        "path": "annotation/10.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/10.jams/content",
+        "md5": "8cbf70e1b086f4a8fe5cac79572635ae",
+        "size": 42653
+      },
+      {
+        "path": "audio/10.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/10.wav/content",
+        "md5": "123818ef1020102252192d9e7a231e07",
+        "size": 8730980
+      },
+      {
+        "path": "scores/11.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/11.gp/content",
+        "md5": "9d7b278dd3fda47cf7a717b0a6cdec86",
+        "size": 15356
+      },
+      {
+        "path": "annotation/11.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/11.jams/content",
+        "md5": "f392b5bba5f3b99866bba91cb4d35a9a",
+        "size": 57003
+      },
+      {
+        "path": "audio/11.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/11.wav/content",
+        "md5": "4bbaecaaa3e58bef6bb15a6cd0979fe2",
+        "size": 9032774
+      },
+      {
+        "path": "scores/12.gp",
+        "url": "https://zenodo.org/api/records/11406378/files/12.gp/content",
+        "md5": "a21a8f645d41186eb1194571110f5686",
+        "size": 15194
+      },
+      {
+        "path": "annotation/12.jams",
+        "url": "https://zenodo.org/api/records/11406378/files/12.jams/content",
+        "md5": "21217bda094eb8f29edfd1ed2f23ba45",
+        "size": 47846
+      },
+      {
+        "path": "audio/12.wav",
+        "url": "https://zenodo.org/api/records/11406378/files/12.wav/content",
+        "md5": "e1ee73508f37d5c28c69877a588665d2",
+        "size": 6702584
+      }
+    ],
+    "parts": {
+      "audio": {
+        "glob": "audio/*.wav",
+        "expect": 12
+      },
+      "annotation": {
+        "glob": "annotation/*.jams",
+        "expect": 12
+      },
+      "scores": {
+        "glob": "scores/*.gp",
+        "expect": 12
+      }
+    },
+    "minN": 12,
+    "note": "API содержит отдельные файлы, не архив: 12 WAV (106137660 байт), 12 JAMS (832365), 12 GP (176263). Полные 12/12 записей. Веса best_TabCNN_tablature_trancription_model (3345122 байт) не являются входом и не скачиваются; файлы GP не распаковываются."
+  },
+  "alphatab-testdata": {
+    "id": "alphatab-testdata",
+    "title": "alphaTab v1.8.4 test-data",
+    "source": {
+      "kind": "github-tarball",
+      "repo": "CoderLine/alphaTab",
+      "tag": "v1.8.4"
+    },
+    "license": "MPL-2.0",
+    "localOnly": false,
+    "optional": true,
+    "archives": [
+      {
+        "path": "source/alphaTab-v1.8.4.tar.gz",
+        "url": "https://codeload.github.com/CoderLine/alphaTab/tar.gz/refs/tags/v1.8.4",
+        "sha256": "6ee2ef25e2588bf21b30ce8b60086d09b369601bce8de63d7e24e0a715da3c1f",
+        "size": 57747653,
+        "member": "alphaTab-1.8.4/packages/alphatab/test-data"
+      }
+    ],
+    "parts": {
+      "test-data": {
+        "glob": "source/alphaTab-1.8.4/packages/alphatab/test-data/**/*",
+        "expect": 1149
+      }
+    },
+    "minN": 1149,
+    "note": "Все 1149 файлов packages/alphatab/test-data тега v1.8.4, включая вспомогательные файлы. Из tarball извлекается только этот каталог, содержимое не модифицируется. Лицензия репозитория MPL-2.0."
+  },
+  "guitar-techs": {
+    "id": "guitar-techs",
+    "title": "Guitar-TECHS — P1 techniques",
+    "source": {
+      "kind": "zenodo",
+      "record": "14963133"
+    },
+    "license": "CC-BY-4.0",
+    "localOnly": false,
+    "optional": true,
+    "archives": [
+      {
+        "path": "techniques/P1_techniques.zip",
+        "url": "https://zenodo.org/api/records/14963133/files/P1_techniques.zip/content",
+        "md5": "18634a41a6db5a8de10d07eb3122a872",
+        "size": 326280863
+      }
+    ],
+    "parts": {
+      "di": {
+        "glob": "techniques/P1_techniques/audio/directinput/*.wav",
+        "expect": 5
+      },
+      "micamp": {
+        "glob": "techniques/P1_techniques/audio/micamp/*.wav",
+        "expect": 5
+      },
+      "midi": {
+        "glob": "techniques/P1_techniques/midi/*.mid",
+        "expect": 5
+      },
+      "ego": {
+        "glob": "techniques/P1_techniques/video/ego/*.mp3",
+        "expect": 5
+      },
+      "exo": {
+        "glob": "techniques/P1_techniques/video/exo/*.mp3",
+        "expect": 5
+      }
+    },
+    "minN": 5,
+    "note": "Явная подвыборка: весь P1_techniques.zip (326280863 байт), все пять техник Bendings, Harmonics, PalmMute, PinchHarmonics, Vibrato во всех пяти представлениях. Другие архивы P1/P2/P3 вне этого реестра. __MACOSX и .DS_Store — метаданные, не входы. Внутри выбранных частей выборки нет.",
+    "flag": "guitar-techs"
+  },
+  "idmt-smt-guitar": {
+    "id": "idmt-smt-guitar",
+    "title": "IDMT-SMT-GUITAR",
+    "source": {
+      "kind": "manual",
+      "url": "https://zenodo.org/records/7544110"
+    },
+    "license": "CC-BY-NC-ND-4.0",
+    "localOnly": true,
+    "optional": true,
+    "archives": [],
+    "parts": {
+      "audio": {
+        "glob": "**/*.wav",
+        "expect": 1173
+      }
+    },
+    "minN": 1173,
+    "note": "Только ручная загрузка и распаковка в PUPITRE_DATA/idmt-smt-guitar. Никогда не включать в репозиторий, CI или сборку. Полный реестр 1173 WAV по центральному каталогу ZIP Zenodo (2026-10-24), не приблизительному числу нот в описании. Харнесс всегда SKIPPED (localOnly); локальную целостность проверяет verify."
+  },
+  "idmt-smt-bass": {
+    "id": "idmt-smt-bass",
+    "title": "IDMT-SMT-BASS",
+    "source": {
+      "kind": "manual",
+      "url": "https://zenodo.org/records/7188892"
+    },
+    "license": "CC-BY-NC-ND-4.0",
+    "localOnly": true,
+    "optional": true,
+    "archives": [],
+    "parts": {
+      "audio": {
+        "glob": "**/*.wav",
+        "expect": 5306
+      }
+    },
+    "minN": 5306,
+    "note": "Только ручная загрузка и распаковка в PUPITRE_DATA/idmt-smt-bass. Никогда не включать в репозиторий, CI или сборку. Полный реестр 5306 WAV по центральному каталогу ZIP Zenodo (2026-10-24), не приблизительному числу нот в описании. Харнесс всегда SKIPPED (localOnly); локальную целостность проверяет verify."
+  }
+}

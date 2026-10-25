@@ -1,0 +1,173 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "position": "ui-spec §11.1 оболочка: знак раздела и «Пюпитр | Гитара»",
+      "dataUi": "shell-brand",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: вкладка «Библиотека» с линией-рампой под активной",
+      "dataUi": "shell-tab-library",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: вкладка «Тюнер»",
+      "dataUi": "shell-tab-tuner",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: вкладка «Тон»",
+      "dataUi": "shell-tab-tone",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: вкладка «Вход и звук»",
+      "dataUi": "shell-tab-input",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: пилюля входа: LED, мини-уровень, задержка; клик — «Вход и звук»",
+      "dataUi": "shell-input-pill",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: переключатель «Голос | Гитара»",
+      "dataUi": "shell-mode-switch",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: аватар — кнопка статистики (до этапа 38b неактивна с подсказкой)",
+      "dataUi": "shell-avatar",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.1 оболочка: хост тостов (снизу слева, телефон — сверху справа)",
+      "dataUi": "shell-toasts",
+      "screen": "system",
+      "seed": null,
+      "stage": 8,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11 «Вход и звук»: карточка «Вход» — устройство, канал, что подключено, уровень, фон",
+      "dataUi": "input-card",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: канал [Вход 1 | Вход 2 | Оба] с огоньком сигнала у каждого входа",
+      "dataUi": "input-channel",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: что подключено [Гитара в линию | Звукосниматель | Микрофон]",
+      "dataUi": "input-source",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: шкала уровня −60…0 dBFS с пиком и клиппингом",
+      "dataUi": "input-meter",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: совет по гейну под шкалой",
+      "dataUi": "input-advice",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: фон в тишине и «Измерить · 2 с тишины»",
+      "dataUi": "input-measure",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: карточка «Выход и мониторинг»",
+      "dataUi": "input-monitor-card",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: как слышать себя [Прямой с интерфейса | Через Пюпитр | Не слышать]",
+      "dataUi": "input-monitoring",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: задержка туда-обратно (оценка браузера или отчёт движка)",
+      "dataUi": "input-latency",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: задержка звука, задержка картинки",
+      "dataUi": "input-delays",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §11.11: эталон строя A4",
+      "dataUi": "input-a4",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    },
+    {
+      "position": "ui-spec §12 доступность: живая область состояний входа",
+      "dataUi": "input-live",
+      "screen": "input",
+      "seed": null,
+      "stage": 21,
+      "check": "dom"
+    }
+  ]
+}

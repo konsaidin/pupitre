@@ -1,61 +1,39 @@
 // Игровой движок: мастер-часы (AudioContext), аккомпанемент, приём голоса,
 // скоринг в реальном времени, пауза/резюм, итог.
 
-import type { AnalysisFrame, AudioInput } from '../audio/AudioInput';
-import { Synth } from '../audio/synth';
-import { contourMidiAt } from '../lib/pitchline';
+import type { AnalysisFrame } from '../audio/AudioInput';
+import type { Transport } from '../audio/transport/Transport';
+import { WebAudioTransport } from '../audio/transport/WebAudioTransport';
 import type { SongMap, Difficulty } from '../lib/songMap';
-import {
-  matchPitch,
-  judge,
-  notePoints,
-  summarize,
-  scoringDuration,
-  type GameSummary,
-  type NoteResult,
-  type Judgement,
-  type TechStats,
-} from './scoring';
+import { notePoints, type GameSummary, type NoteResult, type Judgement } from './scoring';
+import type { FrameSource, JudgeHost, NoteJudge, VerdictKind } from './judge';
+import { VocalJudge } from './judges/vocalJudge';
+export type { TrailPoint } from './judges/vocalJudge';
 
 export type GamePhase = 'idle' | 'countdown' | 'playing' | 'paused' | 'finished';
-
-export interface TrailPoint {
-  songMs: number;
-  /** дробный midi для отрисовки — ровно то, что спел голос, без октавных поправок */
-  midi: number;
-  inTolerance: boolean;
-  /** сырой midi минус сглаженный: волнистость ленты (вибрато/шероховатость) */
-  rawOffset: number;
-  /** громкость, dBFS — толщина ленты */
-  loudDb: number;
-  /** вибрато активно в этом кадре */
-  vibrato: boolean;
-  /** score расщепления 0..1 — рваная текстура ленты */
-  distortion: number;
-}
 
 export interface JudgementEvent {
   noteIndex: number;
   judgement: Judgement;
   points: number;
   atMs: number;
+  kind?: VerdictKind;
+  offsetMs?: number;
+  detail?: string;
 }
 
-interface NoteState {
-  inTolMs: number;
-  lastFrameT: number | null;
-  finalized: boolean;
-}
-
-export interface EngineOptions {
+export interface EngineOptions<M extends SongMap = SongMap, F = AnalysisFrame> {
   ctx: AudioContext;
-  input: AudioInput;
-  map: SongMap;
+  input: FrameSource<F>;
+  map: M;
   difficulty: Difficulty;
   latencyMs: number;
   guideNotes: boolean;
   metronome: boolean;
   backingBuffer?: AudioBuffer;
+  transport?: Transport;
+  judge?: (host: JudgeHost<M>) => NoteJudge<M, F>;
+  onLoopWrap?: (snapshot: { results: (NoteResult | null)[]; forced: number }) => void;
   /**
    * Режим «петь по линии»: целью при матчинге служит контур map.pitchline,
    * а map.notes — виртуальные фразы (см. contourSegments) для комбо/вердиктов.
@@ -66,71 +44,69 @@ export interface EngineOptions {
 
 const COUNTDOWN_SEC = 3;
 const SEEK_LEAD_SEC = 0.8; // короткий разгон после перемотки вместо полного отсчёта
-const MAX_FRAME_DT_MS = 40;
 
-export class GameEngine {
-  readonly map: SongMap;
+export class GameEngine<M extends SongMap = SongMap, F = AnalysisFrame> {
+  readonly map: M;
   phase: GamePhase = 'idle';
   score = 0;
   combo = 0;
   maxCombo = 0;
-  trail: TrailPoint[] = [];
   judgements: JudgementEvent[] = [];
   results: (NoteResult | null)[];
-  /** последний голосовой кадр для HUD/индикаторов */
-  lastFrame: { songMs: number; midi: number; voiced: boolean; cents: number | null } | null = null;
-  /** последний полный кадр анализа — техники для бейджей ленты */
-  lastAnalysis: AnalysisFrame | null = null;
+  get trail() { return (this.judge as unknown as VocalJudge).trail; }
+  get lastFrame() { return (this.judge as unknown as VocalJudge).lastFrame; }
+  get lastAnalysis() { return (this.judge as unknown as VocalJudge).lastAnalysis; }
+  get techStats() { return (this.judge as unknown as VocalJudge).techStats; }
   /** A/B-луп фразы: при достижении loopB песня мотается на loopA (см. tick) */
   loopA: number | null = null;
   loopB: number | null = null;
-  /** суммарное время техник за игру (в итоги) */
-  readonly techStats: TechStats = { vibratoMs: 0, distortionMs: 0 };
+  private contentEndMs?: number;
 
-  private opts: EngineOptions;
-  private synth: Synth;
-  private backingSource: AudioBufferSourceNode | null = null;
-  private startCtxTime = 0; // ctx-время, соответствующее songMs = 0
-  private playStartCtxTime = 0; // конец разгона текущего запуска/резюма
+  private opts: EngineOptions<M, F>;
+  private transport: Transport;
   private fromMs = 0;
   private timer: ReturnType<typeof setInterval> | null = null;
   private generation = 0;
   private pausedAtMs = 0;
-  private noteStates: NoteState[];
+  private closed: boolean[];
+  private judge: NoteJudge<M, F>;
   private unsubscribe: (() => void) | null = null;
   private finished = false;
-  /** t предыдущего голосового кадра — шаг времени для статистики техник */
-  private lastVoicedT: number | null = null;
 
-  constructor(opts: EngineOptions) {
+  constructor(opts: EngineOptions<M, F>) {
     this.opts = opts;
     this.map = opts.map;
-    this.synth = new Synth(opts.ctx, 0.5);
-    this.noteStates = opts.map.notes.map(() => ({ inTolMs: 0, lastFrameT: null, finalized: false }));
+    this.transport = opts.transport ?? new WebAudioTransport(opts.ctx);
+    // Внешний транспорт уже загружен фабрикой сессии (слои, сетка долей).
+    if (!opts.transport) this.transport.load({
+      durationMs: this.map.durationMs, layers: [], bpm: this.map.bpm,
+      guideEvents: this.map.guideEvents ?? this.map.notes, guideNotes: opts.guideNotes,
+      metronome: opts.metronome, countIn: false,
+      legacyBacking: this.map.backing, backingBuffer: opts.backingBuffer,
+    });
+    this.judge = opts.judge ? opts.judge(opts) : new VocalJudge(opts) as unknown as NoteJudge<M, F>;
+    this.closed = opts.map.notes.map(() => false);
     this.results = opts.map.notes.map(() => null);
   }
 
   get ctxNow(): number {
-    return this.opts.ctx.currentTime;
+    return this.transport.clockNow();
   }
 
   /** Текущее время песни в мс (отрицательное во время отсчёта). */
   songMs(): number {
     if (this.phase === 'paused' || this.phase === 'idle') return this.pausedAtMs;
     if (this.phase === 'finished') return this.map.durationMs;
-    return (this.ctxNow - this.startCtxTime) * 1000;
+    return this.transport.songMs();
   }
 
   countdownRemaining(): number {
-    return this.phase === 'countdown' ? Math.max(0, this.playStartCtxTime - this.ctxNow) : 0;
+    return this.phase === 'countdown' ? this.transport.countdownRemaining() : 0;
   }
 
   /** Накопленная доля попадания по ноте (для заливки прогресса на ролле). */
   noteHitRatio(index: number): number {
-    const st = this.noteStates[index];
-    const n = this.map.notes[index];
-    const duration = n ? scoringDuration(n) : 0;
-    return st && duration > 0 ? Math.min(1, st.inTolMs / duration) : 0;
+    return this.judge.progress(index);
   }
 
   async start(): Promise<void> {
@@ -144,8 +120,7 @@ export class GameEngine {
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
     this.pausedAtMs = Math.max(this.fromMs, this.songMs());
     this.phase = 'paused';
-    this.synth.cancelAll();
-    this.stopBacking();
+    this.transport.halt();
     this.unsubscribe?.();
     this.unsubscribe = null;
     this.stopClock();
@@ -166,29 +141,18 @@ export class GameEngine {
     const target = Math.max(0, Math.min(ms, this.map.durationMs - 1));
     const wasPlaying = this.phase === 'playing' || this.phase === 'countdown';
     if (wasPlaying) {
-      this.synth.cancelAll();
-      this.stopBacking();
+      this.transport.halt();
       this.unsubscribe?.();
       this.unsubscribe = null;
     }
     const notes = this.map.notes;
     for (let i = 0; i < notes.length; i++) {
-      const n = notes[i];
-      const st = this.noteStates[i];
-      if (n.startMs + n.durMs <= target) {
-        if (!st.finalized) {
-          st.finalized = true; // прощёлкнута перемоткой вперёд — не судим
-          this.results[i] = null;
-        }
-      } else {
-        st.finalized = false;
-        st.inTolMs = 0;
-        st.lastFrameT = null;
-        this.results[i] = null;
-      }
+      const skipped = this.judge.reset(i, target) === 'skipped';
+      if (!skipped || !this.closed[i]) this.results[i] = null;
+      this.closed[i] = skipped;
     }
     this.judgements = this.judgements.filter((j) => j.atMs <= target);
-    this.trail = this.trail.filter((p) => p.songMs <= target);
+    this.judge.onSeek?.(target);
     this.combo = 0;
     this.score = this.results.reduce((s, r) => s + (r?.points ?? 0), 0);
     this.pausedAtMs = target;
@@ -199,8 +163,7 @@ export class GameEngine {
   quit(): void {
     this.phase = 'finished';
     this.finished = true;
-    this.synth.cancelAll();
-    this.stopBacking();
+    this.transport.halt();
     this.unsubscribe?.();
     this.unsubscribe = null;
     this.stopClock();
@@ -210,8 +173,9 @@ export class GameEngine {
    * A/B-луп для отработки фразы. a=null выключает; b подтягивается в границы
    * песни, вырожденный интервал (< 200 мс) игнорируется.
    */
-  setLoop(a: number | null, b: number | null): void {
+  setLoop(a: number | null, b: number | null, opts?: { contentEndMs?: number }): void {
     if (a === null || b === null) {
+      this.contentEndMs = undefined;
       this.loopA = null;
       this.loopB = null;
       this.rescheduleBacking();
@@ -220,6 +184,7 @@ export class GameEngine {
     const lo = Math.max(0, Math.min(a, b));
     const hi = Math.min(this.map.durationMs, Math.max(a, b));
     if (hi - lo < 200) return;
+    this.contentEndMs = opts?.contentEndMs;
     this.loopA = lo;
     this.loopB = hi;
     this.rescheduleBacking();
@@ -227,14 +192,17 @@ export class GameEngine {
 
   /** Часы движка независимы от Canvas/rAF; также вызываются на аудиокадрах. */
   tick(): void {
-    if (this.phase === 'countdown' && this.ctxNow >= this.playStartCtxTime) this.phase = 'playing';
+    if (this.phase === 'countdown' && this.transport.countdownRemaining() === 0) this.phase = 'playing';
     if (this.phase !== 'playing') return;
     const ms = this.songMs();
     if (this.loopA !== null && this.loopB !== null && ms >= this.loopB) {
+      const forced = this.contentEndMs === undefined ? 0 : this.finalizePassed(ms, this.contentEndMs);
+      this.opts.onLoopWrap?.({ results: this.results.slice(), forced });
       this.seekTo(this.loopA);
       return;
     }
     this.finalizePassed(ms - Math.max(0, this.opts.latencyMs));
+    this.judge.onTick?.(ms, this.generation);
     if (ms >= this.map.durationMs + Math.max(300, this.opts.latencyMs + 100)) this.finish();
   }
 
@@ -245,175 +213,60 @@ export class GameEngine {
 
   private rescheduleBacking(): void {
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
-    this.synth.cancelAll();
-    this.stopBacking();
-    this.scheduleBacking(Math.max(this.fromMs, this.songMs()));
+    this.generation++;
+    this.transport.reschedule(Math.max(this.fromMs, this.songMs()), this.loopB ?? this.map.durationMs);
   }
 
   private beginAt(fromMs: number, leadSec: number = COUNTDOWN_SEC): void {
-    const ctx = this.opts.ctx;
-    this.startCtxTime = ctx.currentTime + leadSec - fromMs / 1000;
-    this.playStartCtxTime = ctx.currentTime + leadSec;
     this.fromMs = fromMs;
     this.generation++;
     this.phase = 'countdown';
-    // после паузы/перемотки кадры шли мимо нас — шаг статистики техник заново
-    this.lastVoicedT = null;
-    for (const state of this.noteStates) state.lastFrameT = null;
-    this.scheduleBacking(fromMs);
+    this.judge.onBegin(fromMs);
+    this.transport.begin(fromMs, leadSec, this.loopB ?? this.map.durationMs);
     this.unsubscribe = this.opts.input.onFrame((f) => this.onPitchFrame(f));
     this.stopClock();
     this.timer = setInterval(() => this.tick(), 20);
   }
 
-  private scheduleBacking(fromMs: number): void {
-    const { map, ctx, guideNotes, metronome, backingBuffer } = this.opts;
-    const startAt = this.startCtxTime; // ctx-время songMs=0
-    const endMs = this.loopB ?? map.durationMs;
-    if (fromMs >= endMs) return;
-    if (map.backing.kind === 'url' && backingBuffer) {
-      const src = ctx.createBufferSource();
-      src.buffer = backingBuffer;
-      const gain = ctx.createGain();
-      gain.gain.value = 0.9;
-      src.connect(gain).connect(ctx.destination);
-      src.start(startAt + fromMs / 1000, fromMs / 1000, (endMs - fromMs) / 1000);
-      this.backingSource = src;
-    }
-    if (map.backing.kind === 'synth') {
-      if (guideNotes) {
-        for (const n of map.guideEvents ?? map.notes) {
-          if (n.startMs + n.durMs <= fromMs) continue;
-          if (n.startMs >= endMs) break;
-          const t = startAt + Math.max(n.startMs, fromMs) / 1000;
-          const dur = (Math.min(n.startMs + n.durMs, endMs) - Math.max(n.startMs, fromMs)) / 1000;
-          this.synth.playNote(n.midi, Math.max(t, ctx.currentTime + 0.02), dur, 0.7);
-        }
-      }
-      if (metronome && map.bpm) {
-        const beatMs = 60000 / map.bpm;
-        const firstBeat = Math.ceil(fromMs / beatMs);
-        for (let b = firstBeat; b * beatMs < endMs; b++) {
-          this.synth.playClick(startAt + (b * beatMs) / 1000, b % 4 === 0);
-        }
-      }
-    }
-  }
-
-  private stopBacking(): void {
-    try {
-      this.backingSource?.stop();
-    } catch {
-      // не стартовал
-    }
-    this.backingSource = null;
-  }
-
-  private onPitchFrame(f: AnalysisFrame): void {
+  private onPitchFrame(f: F): void {
     const generation = this.generation;
     this.tick();
     if (generation !== this.generation) return;
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
-    this.lastAnalysis = f;
+    this.judge.onRawFrame?.(f);
     // компенсация задержки тракта: голос "звучал" чуть раньше, чем дошёл до нас
-    const songMs = (f.t - this.startCtxTime) * 1000 - this.opts.latencyMs;
+    const songMs = this.transport.frameToSongMs(this.judge.frameTime(f), this.opts.latencyMs);
     if (songMs < this.fromMs || songMs >= this.map.durationMs || !Number.isFinite(songMs)) return;
 
-    const noteIdx = this.findActiveNote(songMs);
-    const note = noteIdx >= 0 ? this.map.notes[noteIdx] : null;
+    this.judge.onFrame(f, songMs);
+  }
 
-    if (!f.voiced) {
-      this.lastFrame = { songMs, midi: NaN, voiced: false, cents: null };
-      if (note) this.noteStates[noteIdx].lastFrameT = f.t;
-      this.lastVoicedT = null;
-      return;
-    }
-    // статистика техник: время с активным вибрато/расщеплением
-    const techDt =
-      this.lastVoicedT !== null ? Math.max(0, Math.min((f.t - this.lastVoicedT) * 1000, MAX_FRAME_DT_MS)) : 0;
-    this.lastVoicedT = f.t;
-    if (f.vibrato.active) this.techStats.vibratoMs += techDt;
-    if (f.distortion.active) this.techStats.distortionMs += techDt;
-
-    // в режиме линии цель — дробная высота контура в этот момент, не плашка
-    const target = note
-      ? this.opts.lineTarget && this.map.pitchline
-        ? contourMidiAt(this.map.pitchline, songMs)
-        : note.midi
-      : null;
-
-    let inTol = false;
-    let cents: number | null = null;
-    if (note) {
-      const st = this.noteStates[noteIdx];
-      if (target !== null) {
-        const m = matchPitch(f.midi, target, this.opts.difficulty);
-        cents = m.cents;
-        // нота с требуемой техникой: попадание только пока техника активна —
-        // и в счёте времени, и в цвете ленты (обратная связь честная)
-        const techOk = note.tech !== 'vibrato' || f.vibrato.active;
-        inTol = m.inTolerance && techOk;
-        const elapsed = st.lastFrameT !== null ? Math.max(0, Math.min((f.t - st.lastFrameT) * 1000, MAX_FRAME_DT_MS)) : 0;
-        const scoringStart = note.startMs + (note.tech ? note.techWarmupMs ?? 0 : 0);
-        const dt = Math.max(0, Math.min(elapsed, songMs - Math.max(scoringStart, this.fromMs)));
-        st.lastFrameT = f.t;
-        if (inTol && !st.finalized) st.inTolMs += dt;
-      } else {
-        // разрыв контура внутри фразы: время не считаем ни в плюс, ни в минус
-        st.lastFrameT = f.t;
+  private finalizePassed(songMs: number, contentEndMs?: number): number {
+    const forced = contentEndMs !== undefined;
+    const due: number[] = [];
+    for (let i = 0; i < this.map.notes.length; i++) {
+      if (forced ? this.map.notes[i].startMs >= contentEndMs : this.judge.closeAtMs(i) > songMs) {
+        if (!forced && this.judge.finalizeOrder === 'sequential') break;
+        continue;
       }
+      if (!this.closed[i]) due.push(i);
     }
-    // Точка рисуется РОВНО там, где голос: никаких октавных поправок
-    // отображения. Прощение октавы (beginner/medium) живёт только в скоринге
-    // (matchPitch) — глазам всегда правда, телепортов не существует.
-    const displayMidi = f.midi;
-    this.lastFrame = { songMs, midi: displayMidi, voiced: true, cents };
-    // rawOffset — дельта сырого контура к сглаженному: волна вибрато/
-    // шероховатость для ленты
-    const rawOffset =
-      Number.isNaN(f.midiRaw) || Number.isNaN(f.midi) ? 0 : f.midiRaw - f.midi;
-    this.trail.push({
-      songMs,
-      midi: displayMidi,
-      inTolerance: inTol,
-      rawOffset,
-      loudDb: f.loudDb,
-      vibrato: f.vibrato.active,
-      distortion: f.distortion.score,
-    });
+    if (this.judge.finalizeOrder === 'any') due.sort((a, b) => this.judge.closeAtMs(a) - this.judge.closeAtMs(b));
+    for (const i of due) this.finalize(i, songMs, forced);
+    return due.length;
   }
 
-  private findActiveNote(songMs: number): number {
-    // ноты отсортированы по startMs; линейный проход с небольшим окном
-    const notes = this.map.notes;
-    for (let i = 0; i < notes.length; i++) {
-      const n = notes[i];
-      if (songMs >= n.startMs && songMs < n.startMs + n.durMs) return i;
-      if (n.startMs > songMs) break;
-    }
-    return -1;
-  }
-
-  private finalizePassed(songMs: number): void {
-    const notes = this.map.notes;
-    for (let i = 0; i < notes.length; i++) {
-      const n = notes[i];
-      if (n.startMs + n.durMs > songMs - 50) break;
-      const st = this.noteStates[i];
-      if (st.finalized) continue;
-      st.finalized = true;
-      const duration = scoringDuration(n);
-      const hitRatio = duration > 0 ? Math.min(1, st.inTolMs / duration) : 0;
-      const j = judge(hitRatio);
-      if (j === 'miss') this.combo = 0;
-      else this.combo++;
-      this.maxCombo = Math.max(this.maxCombo, this.combo);
-      const points = j === 'miss' ? 0 : notePoints(hitRatio, this.combo);
-      this.score += points;
-      const result: NoteResult = { note: n, hitRatio, judgement: j, points };
-      this.results[i] = result;
-      this.judgements.push({ noteIndex: i, judgement: j, points, atMs: songMs });
-    }
+  private finalize(i: number, songMs: number, forced?: boolean): void {
+    this.closed[i] = true;
+    const { judgement: j, hitRatio, points: ownPoints, ...detail } = this.judge.finalize(i, forced);
+    if (detail.kind === 'skipped') return;
+    if (j === 'miss') this.combo = 0;
+    else this.combo++;
+    this.maxCombo = Math.max(this.maxCombo, this.combo);
+    const points = ownPoints ?? notePoints(hitRatio, this.combo);
+    this.score += points;
+    this.results[i] = { note: this.map.notes[i], hitRatio, judgement: j, points };
+    this.judgements.push({ noteIndex: i, judgement: j, points, atMs: songMs, ...detail });
   }
 
   private finish(): void {
@@ -422,12 +275,11 @@ export class GameEngine {
     // финализируем всё, что осталось
     this.finalizePassed(Number.MAX_SAFE_INTEGER);
     this.phase = 'finished';
-    this.synth.cancelAll();
-    this.stopBacking();
+    this.transport.halt();
     this.unsubscribe?.();
     this.unsubscribe = null;
     this.stopClock();
     const results = this.results.filter((r): r is NoteResult => r !== null);
-    this.opts.onFinish(summarize(results, this.score, this.maxCombo, this.techStats));
+    this.opts.onFinish(this.judge.summarize(results, this.score, this.maxCombo));
   }
 }

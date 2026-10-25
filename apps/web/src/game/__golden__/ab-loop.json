@@ -1,0 +1,5004 @@
+{
+  "results": [
+    {
+      "note": {
+        "startMs": 0,
+        "durMs": 800,
+        "midi": 60
+      },
+      "hitRatio": 0.9999999999999991,
+      "judgement": "perfect",
+      "points": 110
+    },
+    {
+      "note": {
+        "startMs": 1000,
+        "durMs": 800,
+        "midi": 64
+      },
+      "hitRatio": 0.9999999999999991,
+      "judgement": "perfect",
+      "points": 120
+    },
+    {
+      "note": {
+        "startMs": 2000,
+        "durMs": 800,
+        "midi": 67
+      },
+      "hitRatio": 0,
+      "judgement": "miss",
+      "points": 0
+    }
+  ],
+  "judgements": [
+    {
+      "noteIndex": 0,
+      "judgement": "perfect",
+      "points": 110,
+      "atMs": 1000
+    },
+    {
+      "noteIndex": 1,
+      "judgement": "perfect",
+      "points": 120,
+      "atMs": 3380
+    },
+    {
+      "noteIndex": 2,
+      "judgement": "miss",
+      "points": 0,
+      "atMs": 3380
+    }
+  ],
+  "score": 230,
+  "combo": 0,
+  "maxCombo": 2,
+  "phase": [
+    "idle",
+    "countdown",
+    "playing",
+    "countdown",
+    "playing",
+    "finished"
+  ],
+  "trailLength": 83,
+  "trailHash": "bc83efd5",
+  "techStats": {
+    "vibratoMs": 0,
+    "distortionMs": 0
+  },
+  "audio": [],
+  "summarize": {
+    "score": 230,
+    "accuracy": 0.6666666666666661,
+    "stars": 1,
+    "perfect": 2,
+    "good": 0,
+    "miss": 1,
+    "maxCombo": 2,
+    "results": [
+      {
+        "note": {
+          "startMs": 0,
+          "durMs": 800,
+          "midi": 60
+        },
+        "hitRatio": 0.9999999999999991,
+        "judgement": "perfect",
+        "points": 110
+      },
+      {
+        "note": {
+          "startMs": 1000,
+          "durMs": 800,
+          "midi": 64
+        },
+        "hitRatio": 0.9999999999999991,
+        "judgement": "perfect",
+        "points": 120
+      },
+      {
+        "note": {
+          "startMs": 2000,
+          "durMs": 800,
+          "midi": 67
+        },
+        "hitRatio": 0,
+        "judgement": "miss",
+        "points": 0
+      }
+    ],
+    "tech": {
+      "vibratoMs": 0,
+      "distortionMs": 0
+    }
+  },
+  "onFinish": [
+    {
+      "score": 230,
+      "accuracy": 0.6666666666666661,
+      "stars": 1,
+      "perfect": 2,
+      "good": 0,
+      "miss": 1,
+      "maxCombo": 2,
+      "results": [
+        {
+          "note": {
+            "startMs": 0,
+            "durMs": 800,
+            "midi": 60
+          },
+          "hitRatio": 0.9999999999999991,
+          "judgement": "perfect",
+          "points": 110
+        },
+        {
+          "note": {
+            "startMs": 1000,
+            "durMs": 800,
+            "midi": 64
+          },
+          "hitRatio": 0.9999999999999991,
+          "judgement": "perfect",
+          "points": 120
+        },
+        {
+          "note": {
+            "startMs": 2000,
+            "durMs": 800,
+            "midi": 67
+          },
+          "hitRatio": 0,
+          "judgement": "miss",
+          "points": 0
+        }
+      ],
+      "tech": {
+        "vibratoMs": 0,
+        "distortionMs": 0
+      }
+    }
+  ],
+  "frames": [
+    {
+      "lastAnalysis": {
+        "t": 0.25,
+        "hz": 440,
+        "midi": 59.5,
+        "midiRaw": 59.5,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": null
+    },
+    {
+      "lastAnalysis": {
+        "t": 3,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 0,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 20.000000000000018,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.04,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 40.000000000000036,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.06,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 60.00000000000006,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.08,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 80.00000000000007,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.1,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 100.00000000000009,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.12,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 120.00000000000011,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.14,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 140.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.16,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 160.00000000000014,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.18,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 180.00000000000017,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.2,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 200.00000000000017,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.22,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 220.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.24,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 240.00000000000023,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.26,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 259.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.2800000000000002,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 280.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.3,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 299.99999999999983,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.32,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 319.99999999999983,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.34,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 339.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.36,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 359.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.38,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 379.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.4,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 399.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.42,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.44,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 439.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.46,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 459.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.48,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 480,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.5,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 500,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.52,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 520,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.54,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 540,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.56,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 560,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.58,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 580.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.6,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 600.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.62,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 620.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.64,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 640.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.66,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 660.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.68,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 680.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.7,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 700.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.7199999999999998,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 719.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.74,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 740.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.76,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 759.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.7800000000000002,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 780.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 3.8,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 799.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1000,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.02,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1019.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.04,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1040,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.06,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1059.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.08,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1080,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.1,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1099.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.12,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1120,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.14,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1139.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.16,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1160.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.18,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1179.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.2,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1200.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.22,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1219.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.24,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1240.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.26,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1259.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.28,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1280.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.3,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1299.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.32,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1320.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.34,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1339.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.36,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1360.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.38,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1380,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.4,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1400.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.42,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1420,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.44,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1440.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.46,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1460,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.48,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1480.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.5,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1500,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.52,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1519.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.54,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1540,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.5600000000000005,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1560.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.58,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1580,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.6,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1599.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.62,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1620,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.64,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1639.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.66,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1660.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.68,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1679.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.7,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1700.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.72,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1719.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.74,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1740.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.76,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1759.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.78,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1780.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.8,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1799.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 4.8,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1799.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.2,
+        "hz": 440,
+        "midi": 61,
+        "midiRaw": 61,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1799.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.72,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 0,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.739999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 19.999999999999574,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.76,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 40.000000000000036,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.779999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 59.99999999999961,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.8,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 80.00000000000007,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.819999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 99.99999999999964,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.84,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 120.00000000000011,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.859999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 139.9999999999997,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.88,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 160.00000000000014,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.8999999999999995,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 179.99999999999972,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.92,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 200.00000000000017,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.9399999999999995,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 219.99999999999974,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.96,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 240.00000000000023,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 5.9799999999999995,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 259.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 280.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.02,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 299.99999999999983,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.04,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 320.0000000000003,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.06,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 339.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.08,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 360.00000000000034,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.1,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 379.9999999999999,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.12,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 400.00000000000034,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.14,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 419.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.16,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 440.0000000000004,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.18,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 459.99999999999994,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.199999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 479.99999999999955,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.22,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 500,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.24,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 520.0000000000005,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.26,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 540,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.279999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 559.9999999999997,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.3,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 580.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.319999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 599.9999999999997,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.34,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 620.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.359999999999999,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 639.9999999999997,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.38,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 660.0000000000001,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.3999999999999995,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 679.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.42,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 700.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.4399999999999995,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 719.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.46,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 740.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.4799999999999995,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 759.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.5,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 780.0000000000002,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.52,
+        "hz": 440,
+        "midi": 60,
+        "midiRaw": 60,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 799.9999999999998,
+        "midi": 60,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.72,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1000,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.739999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1019.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.76,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1040,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.779999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1059.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.8,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1080,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.819999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1099.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.84,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1120,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.859999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1139.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.88,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1160.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.8999999999999995,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1179.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.92,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1200.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.9399999999999995,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1219.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.96,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1240.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 6.9799999999999995,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1259.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1280.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.02,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1299.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.04,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1320.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.06,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1339.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.08,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1360.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.1,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1380,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.12,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1400.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.14,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1420,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.16,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1440.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.18,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1460,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.199999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1479.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.22,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1500,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.24,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1520.0000000000005,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.26,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1540,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.279999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1559.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.3,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1580,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.319999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1599.9999999999995,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.34,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1620,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.359999999999999,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1639.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.38,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1660.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.3999999999999995,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1679.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.42,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1700.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.4399999999999995,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1719.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.46,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1740.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.4799999999999995,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1759.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.5,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1780.0000000000002,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    },
+    {
+      "lastAnalysis": {
+        "t": 7.52,
+        "hz": 440,
+        "midi": 64,
+        "midiRaw": 64,
+        "clarity": 0.9,
+        "rms": 0.05,
+        "voiced": true,
+        "loudDb": -20,
+        "vibrato": {
+          "active": false,
+          "rateHz": 0,
+          "depthCents": 0,
+          "regularity": 0
+        },
+        "distortion": {
+          "active": false,
+          "score": 0
+        },
+        "breathiness": 0
+      },
+      "lastFrame": {
+        "songMs": 1799.9999999999998,
+        "midi": 64,
+        "voiced": true,
+        "cents": 0
+      }
+    }
+  ]
+}

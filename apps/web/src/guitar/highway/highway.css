@@ -1,0 +1,7 @@
+/* Дорожка раздела (ui-spec §10): канвас fretfall на весь контейнер и DOM-слой цифр ладов поверх. Только .rp-. */
+.rp-highway { position: absolute; inset: 0; overflow: hidden; background: #040509; }
+.rp-highway__canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.rp-highway__labels { position: absolute; inset: 0; pointer-events: none; }
+/* Цифра на ноте: тёмные моно-цифры Рампы; размер и место — только transform (scale от 32 px), появление — opacity */
+.rp-gemlabel { position: absolute; left: 0; top: 0; transform-origin: 0 0; font: 700 32px/1 var(--rp-font-mono); color: #06070b;
+  white-space: nowrap; will-change: transform, opacity; }

@@ -119,8 +119,11 @@ impl Yin {
         // очень глубокий, а у половинного (мелодическая высота) лишь умеренный.
         // Чистый тон так не выглядит: там оба минимума либо глубокие (октавная
         // неоднозначность), либо половинного минимума нет вовсе.
+        //
+        // Высоту при этом НЕ подменяем половинным периодом: ровно так же выглядит
+        // обычная гласная с громкой 2-й гармоникой (H1 ≈ 0.4·H2), и подмена давала
+        // октаву вверх в ~20% кадров живого пения. subh идёт только в расщепление.
         let mut subh = 0.0f32;
-        let mut tau_mel = tau_est;
         let half = tau_est / 2;
         if half >= self.tau_min && half > 2 {
             let r = (half / 64).max(3);
@@ -136,16 +139,15 @@ impl Yin {
             let c_full = self.cmndf[tau_est];
             if c_half > 0.12 && c_half < 0.55 && c_half > c_full + 0.08 {
                 subh = c_half - c_full;
-                tau_mel = th;
             }
         }
 
-        // параболическая интерполяция вокруг мелодического минимума
-        let mut tau_f = tau_mel as f32;
-        if tau_mel > 1 && tau_mel < MAX_TAU {
-            let a = self.cmndf[tau_mel - 1];
-            let b = self.cmndf[tau_mel];
-            let c = self.cmndf[tau_mel + 1];
+        // параболическая интерполяция вокруг минимума периода
+        let mut tau_f = tau_est as f32;
+        if tau_est > 1 && tau_est < MAX_TAU {
+            let a = self.cmndf[tau_est - 1];
+            let b = self.cmndf[tau_est];
+            let c = self.cmndf[tau_est + 1];
             let denom = a - 2.0 * b + c;
             if denom.abs() > 1e-12 {
                 tau_f += 0.5 * (a - c) / denom;

@@ -1,0 +1,524 @@
+/* «Рампа» — дизайн-система гитарного раздела Пюпитра (ui-spec.md §1–8, §13; инвариант 19).
+   Разделы 0–8 перенесены из design/mockups.html (строки 18–446) почти дословно, раздел А — адаптив из раздела 10 макета
+   (только классы разделов 0–8 и оболочки), раздел Б — раздел внутри легаси-обёртки MobileLandscape.
+   Отличия от макета помечены «Пюпитр:». CSS грузит только ленивый чанк раздела, но после загрузки он глобален, поэтому
+   все селекторы — внутри .rampa, с префиксом .rp- или под html[data-section='guitar'] (атрибут ставит оболочка раздела
+   на время пребывания в нём). Контраст токенов проверяет tokens.test.ts. */
+
+/* =====================================================================================================
+   0. Шрифты (локальные woff2, OFL 1.1). Accidentals — подмножество Noto Music: только ♭ ♮ ♯ (U+266D–266F)
+   ===================================================================================================== */
+@font-face { font-family: 'Rampa Sans'; src: url('./fonts/MartianGrotesk-VF.woff2') format('woff2');
+  font-weight: 100 1000; font-stretch: 75% 200%; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Rampa Mono'; src: url('./fonts/MartianMono-VF.woff2') format('woff2');
+  font-weight: 100 800; font-stretch: 75% 112.5%; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Rampa Accidentals'; src: url('./fonts/NotoMusic-accidentals.woff2') format('woff2');
+  unicode-range: U+266D-266F; font-display: swap;
+  size-adjust: 140%; ascent-override: 72%; descent-override: 16%; line-gap-override: 0%; }
+
+/* =====================================================================================================
+   1. Токены. Всё живёт на .rampa (корень гитарного раздела), а не на :root — старый UI не затрагивается.
+   ===================================================================================================== */
+/* Пюпитр: цвета вынесены в отдельный блок, его же получают «тёмные острова»: постер в светлой теме (он всегда тёмный —
+   иначе сигнальный текст на .rp-chip--onart теряет контраст) и экран «поверни телефон» (он вне .rampa, см. раздел Б). */
+.rampa,
+.rampa[data-theme='light'] .rp-poster,
+html[data-section='guitar'] .orientation-gate {
+  color-scheme: dark;
+  /* зал и поверхности: от самой глубокой тьмы к ближнему свету */
+  --rp-hall: #040509;
+  --rp-bg: #07080D;
+  --rp-surface-1: #0D0F15;
+  --rp-surface-2: #13161E;
+  --rp-surface-3: #1A1E28;
+  --rp-surface-4: #232835;
+  --rp-well: #05060A;
+  --rp-line-1: rgb(255 255 255 / 0.06);
+  --rp-line-2: rgb(255 255 255 / 0.11);
+  --rp-line-3: rgb(255 255 255 / 0.2);
+  --rp-scrim: rgb(3 4 7 / 0.74);
+  --rp-chip-base: rgb(10 12 18 / 0.6);
+  /* текст */
+  --rp-fg-1: #F4F6FB;
+  --rp-fg-2: #B6BCCB;
+  --rp-fg-3: #8C93A7;
+  --rp-fg-4: #5F6679;
+  /* свет — единственный акцент интерфейса */
+  --rp-light: #F5F7FF;
+  --rp-light-hi: #FFFFFF;
+  --rp-light-press: #D9DEEB;
+  --rp-on-light: #06070B;
+  --rp-haze: rgb(150 170 235 / 0.1);
+  --rp-beam: rgb(196 210 255 / 0.3);
+  --rp-focus: #F5F7FF;
+  /* сигналы */
+  --rp-ok: #45E3A2;
+  --rp-warn: #FFC65C;
+  --rp-bad: #FF6A76;
+  --rp-info: #8DB7FF;
+  --rp-early: #72D0FF;
+  --rp-late: #FFA06E;
+  /* струны: индекс 0 = самая низкая (как в данных и в fretfall). Гитаристская нумерация — только в подписях */
+  --rp-str-0: #FF4F5A; --rp-str-1: #E2C102; --rp-str-2: #1DACF9; --rp-str-3: #FF9216;
+  --rp-str-4: #3FCC0C; --rp-str-5: #C825ED; --rp-str-6: #26C6DA; --rp-str-7: #EC407A;
+  /* те же цвета для текста на поверхностях (контраст ≥ 4.5:1 до surface-3) */
+  --rp-str-0-text: #FF6B74; --rp-str-1-text: #E8CB2E; --rp-str-2-text: #4CBDFA; --rp-str-3-text: #FFA23F;
+  --rp-str-4-text: #5FD838; --rp-str-5-text: #DA6BF3; --rp-str-6-text: #4DD2E2; --rp-str-7-text: #F26595;
+  /* «фольга» мастерства: сумма всех гелей = белый свет */
+  --rp-foil: conic-gradient(from 210deg, #FF959C, #FFBE73, #EEDA67, #8CE06D, #77CDFB, #DE7CF4, #FF959C);
+  --rp-foil-line: linear-gradient(90deg, #FF959C, #FFBE73, #EEDA67, #8CE06D, #77CDFB, #DE7CF4);
+}
+.rampa,
+html[data-section='guitar'] .orientation-gate {
+  /* типографика */
+  --rp-font-sans: 'Rampa Accidentals', 'Rampa Sans', system-ui, sans-serif;
+  --rp-font-mono: 'Rampa Accidentals', 'Rampa Mono', ui-monospace, monospace;
+  --rp-fs-display: clamp(44px, 4.6vw, 72px);
+  --rp-fs-h1: clamp(26px, 2.2vw, 34px);
+  --rp-fs-h2: clamp(18px, 1.45vw, 22px);
+  --rp-fs-h3: 16px;
+  --rp-fs-body: 15px;
+  --rp-fs-sm: 13px;
+  --rp-fs-xs: 12px;
+  --rp-fs-label: 11px;
+
+  /* сетка 4 px */
+  --rp-s-1: 4px; --rp-s-2: 8px; --rp-s-3: 12px; --rp-s-4: 16px; --rp-s-5: 20px; --rp-s-6: 24px;
+  --rp-s-8: 32px; --rp-s-10: 40px; --rp-s-12: 48px; --rp-s-16: 64px;
+  --rp-gutter: clamp(16px, 2.6vw, 44px);
+  --rp-topbar-h: 60px;
+
+  /* радиусы: точные, «аппаратные» */
+  --rp-r-xs: 3px; --rp-r-sm: 6px; --rp-r-md: 10px; --rp-r-lg: 14px; --rp-r-xl: 20px; --rp-r-full: 999px;
+
+  /* глубина */
+  --rp-edge: inset 0 1px 0 rgb(255 255 255 / 0.05);
+  --rp-shadow-1: var(--rp-edge), 0 1px 2px rgb(0 0 0 / 0.45);
+  --rp-shadow-2: var(--rp-edge), 0 14px 34px -14px rgb(0 0 0 / 0.75), 0 2px 8px rgb(0 0 0 / 0.35);
+  --rp-shadow-3: inset 0 1px 0 rgb(255 255 255 / 0.07), 0 40px 90px -30px rgb(0 0 0 / 0.9), 0 0 0 1px var(--rp-line-2);
+  --rp-glow-light: 0 0 0 1px rgb(245 247 255 / 0.9), 0 0 26px rgb(196 210 255 / 0.32);
+  --rp-rampa: linear-gradient(90deg, transparent, rgb(245 247 255 / 0.95) 18%, rgb(245 247 255 / 0.95) 82%, transparent);
+
+  /* движение */
+  --rp-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --rp-ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --rp-dur-1: 90ms; --rp-dur-2: 160ms; --rp-dur-3: 240ms; --rp-dur-4: 420ms;
+}
+/* Светлая тема — для экранов вне игры (игра всегда тёмная). Сцена днём: репетиционный зал. */
+.rampa[data-theme='light'] {
+  color-scheme: light;
+  --rp-hall: #E9EBF0; --rp-bg: #F3F4F7; --rp-surface-1: #FFFFFF; --rp-surface-2: #F7F8FA; --rp-surface-3: #EEF0F4;
+  --rp-surface-4: #E3E6EC; --rp-well: #E8EAEF;
+  --rp-line-1: rgb(10 14 30 / 0.07); --rp-line-2: rgb(10 14 30 / 0.12); --rp-line-3: rgb(10 14 30 / 0.22); --rp-chip-base: rgb(255 255 255 / 0.75);
+  --rp-fg-1: #0B0D14; --rp-fg-2: #3D4354; --rp-fg-3: #5C6375; --rp-fg-4: #9AA0AE;
+  --rp-light: #0B0D14; --rp-light-hi: #000000; --rp-light-press: #2A2F3C; --rp-on-light: #FFFFFF; --rp-focus: #0B0D14;
+  --rp-haze: rgb(120 140 210 / 0.12); --rp-beam: rgb(60 80 160 / 0.18);
+  /* Пюпитр: ok темнее макета (#0E7A50): текст ok на своей плашке давал 4.40–4.48 < 4.5 на bg / s2 / s3 (tokens.test.ts) */
+  --rp-ok: #06774D; --rp-warn: #8A5A00; --rp-bad: #C0213A; --rp-info: #2952B3; --rp-early: #0B6D99; --rp-late: #A8461A;
+  --rp-str-0-text: #C8202D; --rp-str-1-text: #7A6500; --rp-str-2-text: #006FA8; --rp-str-3-text: #A65600;
+  --rp-str-4-text: #2A7A06; --rp-str-5-text: #9418B5; --rp-str-6-text: #00727F; --rp-str-7-text: #B01E55;
+  --rp-edge: inset 0 1px 0 rgb(255 255 255 / 0.9);
+  --rp-shadow-1: 0 1px 2px rgb(10 14 30 / 0.08), 0 0 0 1px rgb(10 14 30 / 0.04);
+  --rp-shadow-2: 0 12px 30px -14px rgb(10 14 30 / 0.25), 0 2px 6px rgb(10 14 30 / 0.06);
+  --rp-shadow-3: 0 40px 80px -30px rgb(10 14 30 / 0.35), 0 0 0 1px var(--rp-line-2);
+}
+
+/* =====================================================================================================
+   2. База. Сброс только внутри .rampa
+   ===================================================================================================== */
+/* Пюпитр: в макете — голые html, body; здесь — только пока открыт раздел (вокальный UI не меняется) */
+html[data-section='guitar'], html[data-section='guitar'] body { margin: 0; height: 100%; background: #040509; }
+.rampa, .rampa *, .rampa *::before, .rampa *::after { box-sizing: border-box; }
+/* Пюпитр: изоляция от легаси (ui-spec §13.2). Что styles.css задаёт глобально (* { margin; padding }, button:disabled,
+   touch-action), раздел задаёт себе сам — вид не зависит от того, подключены ли старые стили. Стоит до всех правил
+   компонентов: у тех та же специфичность, и они перекрывают сброс порядком. */
+.rampa :where(*) { margin: 0; padding: 0; }
+.rampa :where(button:disabled) { cursor: default; }
+.rampa :where(button, a, input, select, summary) { touch-action: manipulation; }
+.rampa { min-height: 100%; font-family: var(--rp-font-sans); font-size: var(--rp-fs-body); line-height: 1.5;
+  font-weight: 420; color: var(--rp-fg-1); background: var(--rp-bg); -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility; font-synthesis: none; font-kerning: normal; }
+.rampa :where(h1, h2, h3, h4, p, ul, ol, figure, dl, dd) { margin: 0; padding: 0; }
+.rampa :where(ul, ol) { list-style: none; }
+.rampa :where(button, input, select, textarea) { font: inherit; color: inherit; }
+.rampa :where(button) { cursor: pointer; background: none; border: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+.rampa :where(a) { color: inherit; text-decoration: none; }
+.rampa :where(svg) { flex-shrink: 0; }
+.rampa [hidden] { display: none !important; }
+.rampa ::selection { background: var(--rp-light); color: var(--rp-on-light); }
+.rampa :focus-visible { outline: 2px solid var(--rp-focus); outline-offset: 2px; border-radius: var(--rp-r-sm); }
+.rampa :where(h1, h2, h3) { font-weight: 720; font-stretch: 118%; letter-spacing: -0.02em; line-height: 1.08; text-wrap: balance; }
+
+/* текстовые роли */
+.rp-display { font-size: var(--rp-fs-display); font-weight: 800; font-stretch: 150%; letter-spacing: -0.035em; line-height: 0.95; }
+.rp-h1 { font-size: var(--rp-fs-h1); font-weight: 760; font-stretch: 125%; letter-spacing: -0.025em; line-height: 1.04; }
+.rp-h2 { font-size: var(--rp-fs-h2); font-weight: 720; font-stretch: 118%; letter-spacing: -0.02em; line-height: 1.12; }
+.rp-h3 { font-size: var(--rp-fs-h3); font-weight: 680; font-stretch: 110%; letter-spacing: -0.01em; line-height: 1.25; }
+/* Пюпитр: на телефоне легаси «.mobile-viewport h1 { font-size }» (landscape.css, специфичность 0,1,1) перебивает роль у h1.
+   Та же специфичность и более поздний порядок возвращают размер роли; правила экранов (0,2,0 и выше) по-прежнему сильнее. */
+:where(.mobile-viewport .rampa) h1.rp-display { font-size: var(--rp-fs-display); }
+:where(.mobile-viewport .rampa) h1.rp-h1 { font-size: var(--rp-fs-h1); }
+:where(.mobile-viewport .rampa) h1.rp-h2 { font-size: var(--rp-fs-h2); }
+:where(.mobile-viewport .rampa) h1.rp-h3 { font-size: var(--rp-fs-h3); }
+.rp-sm { font-size: var(--rp-fs-sm); }
+.rp-xs { font-size: var(--rp-fs-xs); }
+.rp-muted { color: var(--rp-fg-2); }
+.rp-faint { color: var(--rp-fg-3); }
+.rp-label { font-family: var(--rp-font-mono); font-size: var(--rp-fs-label); font-weight: 600; font-stretch: 100%;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--rp-fg-3); line-height: 1.2; }
+.rp-num { font-family: var(--rp-font-mono); font-stretch: 87.5%; font-weight: 600; letter-spacing: -0.01em; }
+.rp-unit { font-size: 0.62em; font-weight: 600; color: var(--rp-fg-3); letter-spacing: 0; margin-left: 0.18em; }
+.rp-kbd { display: inline-grid; place-items: center; min-width: 22px; height: 20px; padding: 0 6px; font-family: var(--rp-font-mono);
+  font-size: 10.5px; font-weight: 600; font-stretch: 100%; color: var(--rp-fg-2); border: 1px solid var(--rp-line-2);
+  border-bottom-width: 2px; border-radius: 5px; background: var(--rp-surface-2); line-height: 1; }
+.rp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* иконки: Tabler outline, штрих 1.75 на 20 px */
+.rp-i { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.rp-i--sm { width: 16px; height: 16px; stroke-width: 1.9; }
+.rp-i--lg { width: 24px; height: 24px; stroke-width: 1.6; }
+.rp-i--xl { width: 32px; height: 32px; stroke-width: 1.4; }
+.rp-i--fill { fill: currentColor; stroke: none; }
+
+/* =====================================================================================================
+   3. Оболочка раздела: верхняя панель (десктоп) → левый рельс (телефон в ландшафте)
+   ===================================================================================================== */
+.rp-shell { position: relative; min-height: 100vh; display: grid; grid-template-rows: var(--rp-topbar-h) 1fr; isolation: isolate;
+  background:
+    radial-gradient(1100px 460px at 50% -160px, var(--rp-haze), transparent 70%),
+    radial-gradient(700px 400px at 100% 0, rgb(150 170 235 / 0.04), transparent 70%),
+    var(--rp-bg); }
+.rp-shell::after { /* зерно плёнки: статичное, 3.5 % */
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: 0.035; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.rp-topbar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: var(--rp-s-6); padding: 0 var(--rp-gutter);
+  background: linear-gradient(180deg, rgb(7 8 13 / 0.92), rgb(7 8 13 / 0.78)); backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--rp-line-1); }
+.rp-brand { display: flex; align-items: center; gap: 10px; color: var(--rp-fg-1); white-space: nowrap; }
+.rp-brand__mark { width: 26px; height: 26px; }
+.rp-brand__name { font-size: 17px; font-weight: 780; font-stretch: 130%; letter-spacing: -0.03em; }
+.rp-brand__mode { font-family: var(--rp-font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase;
+  color: var(--rp-fg-3); padding-left: 10px; border-left: 1px solid var(--rp-line-2); line-height: 14px; }
+.rp-nav { display: flex; align-items: stretch; gap: 2px; height: 100%; margin-left: var(--rp-s-4); }
+.rp-nav a { position: relative; display: flex; align-items: center; gap: 8px; padding: 0 14px; color: var(--rp-fg-3);
+  font-size: 14px; font-weight: 560; transition: color var(--rp-dur-2); }
+.rp-nav a:hover { color: var(--rp-fg-1); }
+.rp-nav__short { display: none; font-style: normal; }
+.rp-nav a[aria-current='page'] { color: var(--rp-fg-1); }
+.rp-nav a[aria-current='page']::after { content: ''; position: absolute; left: 10px; right: 10px; bottom: -1px; height: 2px; border-radius: 2px;
+  background: var(--rp-rampa); box-shadow: 0 0 14px 1px var(--rp-beam), 0 -6px 18px rgb(196 210 255 / 0.12); }
+.rp-topbar__right { margin-left: auto; display: flex; align-items: center; gap: var(--rp-s-3); }
+.rp-inputpill { display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 12px 0 10px; border-radius: var(--rp-r-full);
+  background: var(--rp-surface-2); border: 1px solid var(--rp-line-1); color: var(--rp-fg-2); font-size: 12.5px; font-weight: 520; white-space: nowrap; }
+.rp-inputpill:hover { border-color: var(--rp-line-2); color: var(--rp-fg-1); }
+.rp-inputpill .rp-num { color: var(--rp-fg-1); font-size: 12px; }
+.rp-avatar { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700;
+  background: radial-gradient(circle at 30% 25%, #39405A, #161A24); border: 1px solid var(--rp-line-2); color: var(--rp-fg-1); }
+.rp-main { position: relative; min-width: 0; }
+.rp-page { padding: 28px var(--rp-gutter) 56px; max-width: 1760px; margin: 0 auto; }
+
+/* =====================================================================================================
+   4. Кнопки
+   ===================================================================================================== */
+.rp-btn { --h: 40px; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: var(--h);
+  padding: 0 16px; border-radius: var(--rp-r-sm); font-size: 14px; font-weight: 620; letter-spacing: -0.005em; white-space: nowrap;
+  color: var(--rp-fg-1); background: var(--rp-surface-3); border: 1px solid var(--rp-line-2); box-shadow: var(--rp-shadow-1);
+  transition: background var(--rp-dur-2), border-color var(--rp-dur-2), box-shadow var(--rp-dur-2), transform var(--rp-dur-1), color var(--rp-dur-2); }
+.rp-btn:hover { background: var(--rp-surface-4); border-color: var(--rp-line-3); }
+.rp-btn:active { transform: translateY(1px); }
+.rp-btn:disabled, .rp-btn[aria-disabled='true'] { color: var(--rp-fg-4); background: var(--rp-surface-2); border-color: var(--rp-line-1); box-shadow: none; cursor: default; transform: none; }
+.rp-btn--light { color: var(--rp-on-light); background: var(--rp-light); border-color: transparent;
+  box-shadow: inset 0 -1px 0 rgb(0 0 0 / 0.12), 0 0 0 1px rgb(255 255 255 / 0.2), 0 8px 26px -10px rgb(196 210 255 / 0.55); }
+.rp-btn--light:hover { background: var(--rp-light-hi); border-color: transparent;
+  box-shadow: 0 0 0 4px rgb(245 247 255 / 0.12), 0 10px 34px -8px rgb(196 210 255 / 0.7); }
+.rp-btn--light:active { background: var(--rp-light-press); }
+.rp-btn--light:focus-visible { outline-offset: 3px; }
+.rp-btn--ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--rp-fg-2); }
+.rp-btn--ghost:hover { background: rgb(255 255 255 / 0.05); border-color: transparent; color: var(--rp-fg-1); }
+.rp-btn--danger { color: var(--rp-bad); background: color-mix(in oklab, var(--rp-bad) 9%, transparent); border-color: color-mix(in oklab, var(--rp-bad) 28%, transparent); }
+.rp-btn--danger:hover { background: color-mix(in oklab, var(--rp-bad) 16%, transparent); border-color: color-mix(in oklab, var(--rp-bad) 45%, transparent); }
+.rp-btn--sm { --h: 32px; padding: 0 12px; font-size: 13px; gap: 6px; }
+.rp-btn--lg { --h: 48px; padding: 0 22px; font-size: 15px; }
+.rp-btn--xl { --h: 58px; padding: 0 30px 0 26px; font-size: 18px; font-weight: 760; font-stretch: 125%; letter-spacing: -0.02em; border-radius: 8px; gap: 12px; }
+.rp-btn--icon { width: var(--h); padding: 0; }
+.rp-btn .rp-kbd { margin-left: 4px; background: transparent; }
+.rp-btn--light .rp-kbd { color: rgb(6 7 11 / 0.6); border-color: rgb(6 7 11 / 0.18); }
+.rp-btngroup { display: flex; gap: var(--rp-s-2); flex-wrap: wrap; }
+
+/* =====================================================================================================
+   5. Поля: сегменты, слайдеры, переключатели, выпадающие, поиск, степпер
+   ===================================================================================================== */
+.rp-seg { display: inline-flex; padding: 3px; gap: 2px; border-radius: 9px; background: var(--rp-well); border: 1px solid var(--rp-line-1);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.5); }
+.rp-seg__item { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; height: 32px; padding: 0 14px;
+  border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--rp-fg-3); white-space: nowrap; transition: color var(--rp-dur-2), background var(--rp-dur-2); }
+.rp-seg__item:hover { color: var(--rp-fg-1); }
+.rp-seg__item[aria-pressed='true'], .rp-seg__item[aria-checked='true'] { color: var(--rp-fg-1); background: var(--rp-surface-4);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.09), 0 1px 2px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.05); }
+.rp-seg__item[aria-pressed='true']::after, .rp-seg__item[aria-checked='true']::after { content: ''; position: absolute; left: 30%; right: 30%; bottom: 0; height: 1.5px;
+  border-radius: 2px; background: var(--rp-light); box-shadow: 0 0 8px 1px var(--rp-beam); }
+.rp-seg__item small { font-family: var(--rp-font-mono); font-size: 10.5px; font-weight: 600; color: var(--rp-fg-3); }
+.rp-seg--fill { display: flex; } .rp-seg--fill .rp-seg__item { flex: 1; }
+/* Пюпитр: в макете недоступного пункта нет, а «Вход и звук» его требует (у моно-устройства нет второго канала) */
+.rp-seg__item:disabled { color: var(--rp-fg-4); cursor: default; }
+.rp-seg__item:disabled:hover { color: var(--rp-fg-4); }
+.rp-seg--sm .rp-seg__item { height: 26px; padding: 0 10px; font-size: 12px; }
+
+/* слайдер: нативный input[type=range], заливка — через --v (0..100%) */
+.rp-range { --v: 50%; -webkit-appearance: none; appearance: none; width: 100%; height: 22px; background: transparent; margin: 0; cursor: pointer; }
+.rp-range::-webkit-slider-runnable-track { height: 4px; border-radius: 2px;
+  background: linear-gradient(90deg, rgb(245 247 255 / 0.5), var(--rp-light)) 0 / var(--v) 100% no-repeat, var(--rp-surface-4); }
+.rp-range::-moz-range-track { height: 4px; border-radius: 2px; background: var(--rp-surface-4); }
+.rp-range::-moz-range-progress { height: 4px; border-radius: 2px; background: linear-gradient(90deg, rgb(245 247 255 / 0.5), var(--rp-light)); }
+.rp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; margin-top: -7px; border-radius: 50%; background: var(--rp-light);
+  border: 4px solid var(--rp-surface-1); box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35), 0 0 16px var(--rp-beam); }
+.rp-range::-moz-range-thumb { width: 10px; height: 10px; border-radius: 50%; background: var(--rp-light); border: 4px solid var(--rp-surface-1);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.35), 0 0 16px var(--rp-beam); }
+.rp-range:focus-visible { outline: none; }
+.rp-range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(--rp-focus), 0 0 18px var(--rp-beam); }
+.rp-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px var(--rp-focus), 0 0 18px var(--rp-beam); }
+.rp-slider { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 14px; }
+.rp-slider__value { font-family: var(--rp-font-mono); font-stretch: 87.5%; font-weight: 650; font-size: 14px; color: var(--rp-fg-1); min-width: 52px; text-align: right; }
+.rp-slider__ticks { grid-column: 1; display: flex; justify-content: space-between; padding: 0 4px; font-family: var(--rp-font-mono);
+  font-size: 10.5px; color: var(--rp-fg-3); font-weight: 560; }
+
+.rp-switch { position: relative; display: inline-flex; width: 38px; height: 22px; border-radius: 11px; background: var(--rp-surface-4);
+  border: 1px solid var(--rp-line-2); transition: background var(--rp-dur-2), border-color var(--rp-dur-2); flex-shrink: 0; }
+.rp-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--rp-fg-3);
+  transition: transform var(--rp-dur-3) var(--rp-ease-out), background var(--rp-dur-2); }
+.rp-switch[aria-checked='true'] { background: var(--rp-light); border-color: transparent; box-shadow: 0 0 16px -2px var(--rp-beam); }
+.rp-switch[aria-checked='true']::after { transform: translateX(16px); background: var(--rp-on-light); }
+.rp-toggle-row { display: flex; align-items: center; gap: 12px; min-height: 36px; }
+.rp-toggle-row__text { display: grid; gap: 1px; } .rp-toggle-row__text small { color: var(--rp-fg-3); font-size: 12.5px; }
+
+.rp-select { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; height: 40px; padding: 0 12px 0 14px;
+  border-radius: var(--rp-r-sm); background: var(--rp-well); border: 1px solid var(--rp-line-2); color: var(--rp-fg-1); font-size: 14px; font-weight: 520; min-width: 160px; }
+.rp-select:hover { border-color: var(--rp-line-3); }
+.rp-select .rp-i { color: var(--rp-fg-3); }
+.rp-input { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; border-radius: var(--rp-r-sm); background: var(--rp-well);
+  border: 1px solid var(--rp-line-2); color: var(--rp-fg-3); font-size: 14px; }
+.rp-input input { flex: 1; min-width: 0; background: none; border: 0; outline: 0; color: var(--rp-fg-1); }
+.rp-input input::placeholder { color: var(--rp-fg-3); }
+.rp-input:focus-within { border-color: var(--rp-line-3); box-shadow: 0 0 0 3px rgb(245 247 255 / 0.08); }
+.rp-stepper { display: inline-flex; align-items: center; height: 36px; border-radius: var(--rp-r-sm); background: var(--rp-well); border: 1px solid var(--rp-line-2); }
+.rp-stepper button { width: 34px; height: 100%; display: grid; place-items: center; color: var(--rp-fg-2); }
+.rp-stepper button:hover { color: var(--rp-fg-1); background: rgb(255 255 255 / 0.04); }
+.rp-stepper output { white-space: nowrap; padding: 0 8px; min-width: 70px; text-align: center; font-family: var(--rp-font-mono); font-stretch: 87.5%; font-weight: 650; font-size: 13.5px;
+  border-left: 1px solid var(--rp-line-1); border-right: 1px solid var(--rp-line-1); line-height: 34px; }
+.rp-field { display: grid; gap: 8px; }
+.rp-field > .rp-stepper, .rp-field > .rp-seg:not(.rp-seg--fill) { justify-self: start; }
+.rp-field__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.rp-field__hint { font-size: 12.5px; color: var(--rp-fg-3); }
+.rp-check { width: 18px; height: 18px; border-radius: 5px; display: grid; place-items: center; border: 1px solid var(--rp-line-3); background: var(--rp-well); flex-shrink: 0; }
+.rp-check[aria-checked='true'] { background: var(--rp-light); border-color: transparent; color: var(--rp-on-light); }
+
+/* =====================================================================================================
+   6. Плашки, чипы, статусы, строй
+   ===================================================================================================== */
+.rp-chip { --c: var(--rp-fg-2); display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px 0 8px; border-radius: var(--rp-r-full);
+  font-size: 12px; font-weight: 600; line-height: 1; white-space: nowrap; color: var(--c);
+  background: color-mix(in oklab, var(--c) 12%, var(--rp-chip-base)); border: 1px solid color-mix(in oklab, var(--c) 26%, transparent);
+  backdrop-filter: blur(6px); }
+.rp-chip .rp-i { width: 14px; height: 14px; stroke-width: 2; }
+.rp-chip--dot::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.rp-chip--plain { padding-left: 10px; }
+.rp-chip--ok { --c: var(--rp-ok); } .rp-chip--warn { --c: var(--rp-warn); } .rp-chip--bad { --c: var(--rp-bad); }
+.rp-chip--info { --c: var(--rp-info); } .rp-chip--light { --c: var(--rp-light); } .rp-chip--early { --c: var(--rp-early); } .rp-chip--late { --c: var(--rp-late); }
+.rp-chip--progress { background: linear-gradient(90deg, color-mix(in oklab, var(--c) 26%, var(--rp-chip-base)) var(--p, 40%), color-mix(in oklab, var(--c) 8%, var(--rp-chip-base)) var(--p, 40%)); }
+/* светлая тема: заливка прогресса бледнее — при 26 % цветной текст на ней падает до 3.7, при 16 % — до 4.3 (tokens.test.ts); 12 % — как у обычной плашки */
+.rampa[data-theme='light'] .rp-chip--progress { background: linear-gradient(90deg, color-mix(in oklab, var(--c) 12%, var(--rp-chip-base)) var(--p, 40%), color-mix(in oklab, var(--c) 3%, var(--rp-chip-base)) var(--p, 40%)); }
+.rp-chip--live::before { animation: rp-pulse 1.6s var(--rp-ease-in-out) infinite; }
+.rp-chip--spin .rp-i { animation: rp-spin 1.1s linear infinite; }
+.rp-tag { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 5px; font-size: 11.5px; font-weight: 620;
+  color: var(--rp-fg-2); background: rgb(255 255 255 / 0.05); border: 1px solid var(--rp-line-1); white-space: nowrap; }
+.rp-tag--on { color: var(--rp-fg-1); border-color: var(--rp-line-3); background: rgb(255 255 255 / 0.08); }
+/* строй: буквы в цветах струн, сверху вниз как на грифе у гитариста — от низкой к высокой */
+.rp-tuning { display: inline-flex; gap: 2px; font-family: var(--rp-font-mono); font-weight: 700; font-stretch: 100%; font-size: 13px; line-height: 1; }
+.rp-tuning > span { --c: var(--rp-fg-2); position: relative; display: grid; place-items: center; min-width: 22px; height: 24px; padding: 0 3px; border-radius: 4px;
+  color: var(--c); background: color-mix(in oklab, var(--c) 10%, transparent); }
+.rp-tuning > span::after { content: ''; position: absolute; left: 4px; right: 4px; bottom: 2px; height: 2px; border-radius: 1px; background: var(--c); opacity: 0.85; }
+.rp-tuning > span[data-changed]::before { content: ''; position: absolute; top: 2px; right: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--rp-light); }
+.rp-tuning > :nth-child(1) { --c: var(--rp-str-0-text); } .rp-tuning > :nth-child(2) { --c: var(--rp-str-1-text); }
+.rp-tuning > :nth-child(3) { --c: var(--rp-str-2-text); } .rp-tuning > :nth-child(4) { --c: var(--rp-str-3-text); }
+.rp-tuning > :nth-child(5) { --c: var(--rp-str-4-text); } .rp-tuning > :nth-child(6) { --c: var(--rp-str-5-text); }
+.rp-tuning > :nth-child(7) { --c: var(--rp-str-6-text); }
+.rp-tuning--sm > span { min-width: 17px; height: 19px; font-size: 11px; }
+/* кольцо мастерства */
+.rp-ring { --p: 0.6; --c: var(--rp-light); position: relative; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(var(--c) calc(var(--p) * 360deg), rgb(255 255 255 / 0.09) 0); flex-shrink: 0; }
+.rp-ring::before { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--rp-surface-1); }
+.rp-ring > span { position: relative; font-family: var(--rp-font-mono); font-stretch: 75%; font-size: 10.5px; font-weight: 700; color: var(--rp-fg-1); }
+.rp-ring--foil { background: var(--rp-foil); box-shadow: 0 0 14px rgb(255 220 240 / 0.18); }
+.rp-ring--lg { width: 64px; height: 64px; } .rp-ring--lg::before { inset: 5px; } .rp-ring--lg > span { font-size: 15px; }
+
+/* уровень сигнала */
+.rp-meter { --v: 0.6; --peak: 0.72; position: relative; height: 8px; border-radius: 4px; background: var(--rp-well); overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--rp-line-1); }
+.rp-meter::before { content: ''; position: absolute; inset: 0; width: calc(var(--v) * 100%);
+  background: linear-gradient(90deg, #2ED39A 0, #45E3A2 60%, #FFC65C 82%, #FF6A76 96%) 0 0 / calc(100% / var(--v)) 100% no-repeat; }
+.rp-meter::after { content: ''; position: absolute; top: 0; bottom: 0; left: calc(var(--peak) * 100%); width: 2px; background: var(--rp-fg-1); opacity: 0.85; }
+.rp-meter--zone { background: linear-gradient(90deg, transparent 62%, rgb(69 227 162 / 0.1) 62% 86%, transparent 86%), var(--rp-well); }
+.rp-mini-meter { display: inline-flex; gap: 2px; align-items: flex-end; height: 14px; }
+.rp-mini-meter i { width: 3px; border-radius: 1px; background: var(--rp-surface-4); }
+.rp-mini-meter i:nth-child(1) { height: 5px; } .rp-mini-meter i:nth-child(2) { height: 7px; } .rp-mini-meter i:nth-child(3) { height: 9px; }
+.rp-mini-meter i:nth-child(4) { height: 11px; } .rp-mini-meter i:nth-child(5) { height: 14px; }
+.rp-mini-meter i.on { background: var(--rp-ok); box-shadow: 0 0 6px rgb(69 227 162 / 0.6); }
+.rp-mini-meter i.on.hot { background: var(--rp-warn); }
+.rp-led { width: 8px; height: 8px; border-radius: 50%; background: var(--rp-surface-4); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.4); flex-shrink: 0; }
+.rp-led--on { background: var(--rp-light); box-shadow: 0 0 10px 1px var(--rp-beam); }
+.rp-led--ok { background: var(--rp-ok); box-shadow: 0 0 10px rgb(69 227 162 / 0.7); }
+.rp-led--bad { background: var(--rp-bad); box-shadow: 0 0 10px rgb(255 106 118 / 0.8); }
+/* Пюпитр: в макете warn нет, а ui-spec §11.1 его называет (вход не выбран / устройство отключено) */
+.rp-led--warn { background: var(--rp-warn); box-shadow: 0 0 10px rgb(255 198 92 / 0.7); }
+
+/* =====================================================================================================
+   7. Карточки, постеры, пустые состояния, скелетоны
+   ===================================================================================================== */
+.rp-card { position: relative; border-radius: var(--rp-r-md); background: linear-gradient(180deg, rgb(255 255 255 / 0.028), rgb(255 255 255 / 0) 42%), var(--rp-surface-1);
+  border: 1px solid var(--rp-line-1); box-shadow: var(--rp-shadow-1); }
+.rp-card--pad { padding: var(--rp-s-6); }
+.rp-card--raised { background: linear-gradient(180deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0) 42%), var(--rp-surface-2); box-shadow: var(--rp-shadow-2); }
+.rp-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--rp-s-3); margin-bottom: var(--rp-s-4); }
+.rp-section-title { display: flex; align-items: center; gap: 10px; }
+.rp-section-title .rp-i { color: var(--rp-fg-3); }
+/* выбранное состояние: метки «спайк-тейп», как разметка позиций на полу сцены */
+.rp-spike { position: relative; }
+.rp-spike::before { content: ''; position: absolute; inset: -5px; pointer-events: none; border-radius: 4px;
+  background:
+    linear-gradient(var(--rp-light), var(--rp-light)) 0 0 / 12px 2px, linear-gradient(var(--rp-light), var(--rp-light)) 0 0 / 2px 12px,
+    linear-gradient(var(--rp-light), var(--rp-light)) 100% 0 / 12px 2px, linear-gradient(var(--rp-light), var(--rp-light)) 100% 0 / 2px 12px,
+    linear-gradient(var(--rp-light), var(--rp-light)) 0 100% / 12px 2px, linear-gradient(var(--rp-light), var(--rp-light)) 0 100% / 2px 12px,
+    linear-gradient(var(--rp-light), var(--rp-light)) 100% 100% / 12px 2px, linear-gradient(var(--rp-light), var(--rp-light)) 100% 100% / 2px 12px;
+  background-repeat: no-repeat; filter: drop-shadow(0 0 4px var(--rp-beam)); }
+
+/* генеративный постер: два «прожектора» + рисунок + зерно; оттенки --h1/--h2 из хэша songId */
+.rp-poster { --h1: 250; --h2: 320; --x1: 26%; --y1: 28%; --x2: 78%; --y2: 74%; position: relative; overflow: hidden; isolation: isolate;
+  background:
+    radial-gradient(58% 72% at var(--x1) var(--y1), oklch(0.66 0.17 var(--h1) / 0.95), transparent 70%),
+    radial-gradient(52% 68% at var(--x2) var(--y2), oklch(0.56 0.2 var(--h2) / 0.9), transparent 72%),
+    linear-gradient(155deg, oklch(0.22 0.05 var(--h1)), oklch(0.09 0.025 var(--h2))); }
+.rp-poster__art { position: absolute; inset: 0; width: 100%; height: 100%; color: oklch(0.95 0.05 var(--h1) / 0.5); mix-blend-mode: soft-light; }
+.rp-poster__art--screen { mix-blend-mode: screen; color: oklch(0.9 0.08 var(--h1) / 0.28); }
+.rp-poster::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0.55; mix-blend-mode: overlay;
+  background:
+    radial-gradient(120% 90% at 50% 120%, rgb(0 0 0 / 0.6), transparent 60%),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .7 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+.rp-poster__glyph { position: absolute; right: -0.04em; bottom: -0.2em; font-size: 260px; font-weight: 900; font-stretch: 160%; letter-spacing: -0.06em; line-height: 1;
+  color: transparent; -webkit-text-stroke: 1px oklch(0.95 0.06 var(--h1) / 0.35); pointer-events: none; }
+
+.rp-empty { display: grid; justify-items: center; text-align: center; gap: var(--rp-s-3); padding: var(--rp-s-12) var(--rp-s-6); }
+.rp-empty__art { width: 132px; height: 92px; margin-bottom: var(--rp-s-2); }
+.rp-empty p { max-width: 420px; color: var(--rp-fg-2); }
+.rp-skel { border-radius: 6px; background: linear-gradient(90deg, var(--rp-surface-2) 0, var(--rp-surface-3) 40%, var(--rp-surface-2) 80%) 0 0 / 300% 100%;
+  animation: rp-shimmer 1.6s linear infinite; }
+.rp-dropzone { display: grid; place-items: center; gap: 8px; text-align: center; padding: var(--rp-s-6); border-radius: var(--rp-r-md);
+  border: 1.5px dashed var(--rp-line-3); background: repeating-linear-gradient(135deg, rgb(255 255 255 / 0.015) 0 10px, transparent 10px 20px), var(--rp-well); color: var(--rp-fg-2); }
+.rp-dropzone--over { border-color: var(--rp-light); box-shadow: 0 0 0 4px rgb(245 247 255 / 0.08), inset 0 0 40px rgb(196 210 255 / 0.08); }
+.rp-dropzone--done { border-style: solid; border-color: color-mix(in oklab, var(--rp-ok) 40%, transparent); background: color-mix(in oklab, var(--rp-ok) 5%, var(--rp-well)); }
+
+/* =====================================================================================================
+   8. Модалки, тосты, подсказки, прогресс
+   ===================================================================================================== */
+.rp-backdrop { position: absolute; inset: 0; z-index: 30; display: grid; place-items: center; padding: var(--rp-s-6);
+  background: radial-gradient(80% 70% at 50% 40%, rgb(3 4 7 / 0.55), rgb(3 4 7 / 0.88)); backdrop-filter: blur(6px); }
+.rp-modal { width: min(760px, 100%); max-height: calc(100vh - 48px); overflow: auto; border-radius: var(--rp-r-lg);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.04), transparent 120px), var(--rp-surface-2); box-shadow: var(--rp-shadow-3); }
+.rp-modal__head { display: flex; align-items: center; justify-content: space-between; gap: var(--rp-s-4); padding: 20px 20px 0 var(--rp-s-6); }
+.rp-modal__body { padding: var(--rp-s-5) var(--rp-s-6); display: grid; gap: var(--rp-s-5); }
+.rp-modal__foot { display: flex; align-items: center; justify-content: flex-end; gap: var(--rp-s-2); padding: var(--rp-s-4) var(--rp-s-6);
+  border-top: 1px solid var(--rp-line-1); background: rgb(0 0 0 / 0.15); border-radius: 0 0 var(--rp-r-lg) var(--rp-r-lg); }
+.rp-modal__foot .rp-spacer { margin-right: auto; }
+.rp-toasts { position: fixed; left: var(--rp-gutter); bottom: 24px; z-index: 40; display: grid; gap: 10px; width: min(400px, calc(100% - 32px)); }
+.rp-toast { --c: var(--rp-info); display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 12px 12px 12px 14px;
+  border-radius: var(--rp-r-md); background: var(--rp-surface-3); border: 1px solid var(--rp-line-2); box-shadow: var(--rp-shadow-2); font-size: 13.5px; }
+.rp-toast > .rp-i { color: var(--c); }
+.rp-toast b { font-weight: 650; } .rp-toast small { display: block; color: var(--rp-fg-3); font-size: 12.5px; }
+.rp-toast--ok { --c: var(--rp-ok); } .rp-toast--warn { --c: var(--rp-warn); } .rp-toast--bad { --c: var(--rp-bad); }
+.rp-tip { justify-self: start; display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; background: var(--rp-surface-4); border: 1px solid var(--rp-line-2);
+  font-size: 12.5px; color: var(--rp-fg-1); box-shadow: var(--rp-shadow-2); white-space: nowrap; }
+.rp-progress { height: 4px; border-radius: 2px; background: var(--rp-surface-4); overflow: hidden; }
+.rp-progress > i { display: block; height: 100%; width: var(--p, 40%); border-radius: inherit; background: var(--rp-light); box-shadow: 0 0 10px var(--rp-beam); }
+.rp-progress--ok > i { background: var(--rp-ok); box-shadow: none; }
+.rp-progress--warn > i { background: var(--rp-warn); box-shadow: none; }
+.rp-divider { height: 1px; background: var(--rp-line-1); border: 0; margin: 0; }
+.rp-list { display: grid; }
+.rp-list > li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--rp-line-1); }
+.rp-list > li:last-child { border-bottom: 0; }
+.rp-stat { display: grid; gap: 2px; }
+.rp-stat__v { white-space: nowrap; font-family: var(--rp-font-mono); font-stretch: 87.5%; font-weight: 680; font-size: 26px; letter-spacing: -0.02em; line-height: 1.1; color: var(--rp-fg-1); }
+.rp-stat__d { font-size: 12.5px; color: var(--rp-fg-3); }
+.rp-stat__d .up { color: var(--rp-ok); }
+
+@keyframes rp-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+@keyframes rp-spin { to { transform: rotate(360deg); } }
+@keyframes rp-shimmer { to { background-position: -300% 0; } }
+@keyframes rp-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+/* Движение: декоративное выключается и системной настройкой, и профилем Пюпитра (html[data-reduced-motion=true]) */
+@media (prefers-reduced-motion: reduce) {
+  .rampa *, .rampa *::before, .rampa *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; scroll-behavior: auto !important; }
+}
+html[data-reduced-motion='true'] .rampa *, html[data-reduced-motion='true'] .rampa *::before, html[data-reduced-motion='true'] .rampa *::after {
+  animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+
+.rp-chip--onart { background: color-mix(in oklab, var(--c) 10%, rgb(6 7 11 / 0.8)); border-color: color-mix(in oklab, var(--c) 30%, rgb(255 255 255 / 0.06)); }
+
+/* =====================================================================================================
+   А. Адаптив (из раздела 10 макета — только классы разделов 0–8 и оболочки; раскладки экранов — рядом с экранами).
+   Ноутбук 1366×768 — панель 56 px. Телефон в ландшафте (~844×390) — верхняя панель становится левым рельсом 64 px.
+   ===================================================================================================== */
+@media (max-height: 820px) and (min-height: 501px) {
+  .rampa { --rp-topbar-h: 56px; }
+  .rp-page { padding-top: 22px; padding-bottom: 40px; }
+}
+@media (max-width: 1380px) and (min-height: 501px) {
+  .rp-nav a { padding: 0 11px; }
+  .rp-inputpill__name { display: none; }
+}
+@media (max-height: 500px) {
+  .rampa { --rp-fs-body: 14px; --rp-fs-h1: 22px; --rp-fs-h2: 17px; --rp-fs-display: 38px; --rp-gutter: 16px; --rp-topbar-h: 0px; }
+  .rp-shell { grid-template-rows: none; grid-template-columns: calc(64px + env(safe-area-inset-left)) minmax(0, 1fr); }
+  .rp-topbar { position: sticky; top: 0; height: 100vh; flex-direction: column; justify-content: flex-start; gap: 6px;
+    padding: 12px 0 10px env(safe-area-inset-left); border-bottom: 0; border-right: 1px solid var(--rp-line-1); background: rgb(7 8 13 / 0.94); }
+  .rp-brand { padding: 2px 0 8px; } .rp-brand__name, .rp-brand__mode { display: none; } .rp-brand__mark { width: 28px; height: 28px; }
+  .rp-nav { flex-direction: column; height: auto; margin: 0; gap: 2px; }
+  .rp-nav a { flex-direction: column; justify-content: center; gap: 3px; width: 56px; height: 52px; padding: 0; font-size: 9.5px; font-weight: 600; border-radius: 10px; text-align: center; line-height: 1.1; }
+  .rp-nav a span { display: none; } .rp-nav__short { display: block; }
+  .rp-nav a[aria-current='page'] { background: rgb(255 255 255 / 0.06); }
+  .rp-nav a[aria-current='page']::after { left: 0; right: auto; top: 12px; bottom: 12px; width: 2px; height: auto; }
+  .rp-topbar__right { margin: auto 0 0; flex-direction: column; gap: 8px; }
+  .rp-inputpill { width: 44px; height: 30px; padding: 0; justify-content: center; gap: 4px; }
+  .rp-inputpill__name, .rp-inputpill .rp-num, .rp-modeswitch { display: none; }
+  .rp-avatar { width: 30px; height: 30px; }
+  .rp-page { padding: 12px max(16px, env(safe-area-inset-right)) 24px 16px; }
+  .rp-btn { --h: 38px; } .rp-btn--sm { --h: 32px; } .rp-btn--lg { --h: 44px; } .rp-btn--xl { --h: 50px; font-size: 16px; padding: 0 20px; }
+  .rp-seg__item { height: 30px; padding: 0 11px; font-size: 12.5px; }
+  .rp-label { font-size: 10px; }
+  .rp-toasts { left: auto; right: max(12px, env(safe-area-inset-right)); bottom: auto; top: 10px; width: 330px; } .rp-toast { padding: 8px 8px 8px 12px; gap: 10px; } .rp-toast small { display: none; }
+  .rp-empty__art { display: none; }
+  .rp-backdrop { padding: 8px; }
+  .rp-modal { max-height: calc(100vh - 16px); } .rp-modal__foot { position: sticky; bottom: 0; background: var(--rp-surface-2); }
+  .rp-modal__body { gap: 12px; padding: 12px 16px; } .rp-modal__head { padding: 12px 12px 0 16px; } .rp-modal__foot { padding: 10px 16px; }
+}
+
+/* =====================================================================================================
+   Б. Пюпитр: раздел внутри легаси-обёртки MobileLandscape (components/MobileLandscape.tsx и landscape.css не меняются)
+   ===================================================================================================== */
+/* Короб 16:9 и отступ рельса вокала (landscape.css:23-32, 76-86) в разделе не действуют: раскладка Рампы рассчитана
+   на 844×390 (≈ 2.16:1). contain: none — fixed-слои (зерно, тосты) снова считаются от окна, а не от короба. */
+html[data-section='guitar'] .mobile-viewport { background: #040509; }
+html[data-section='guitar'] .mobile-viewport .app-frame { width: 100%; height: 100%; aspect-ratio: auto; contain: none; }
+html[data-section='guitar'] .mobile-viewport .app-main { margin-left: 0; }
+/* «Поверни телефон» в стиле Рампы (ui-spec §11.1): знак раздела (c-mark), заголовок, пояснение. Рисунок и надпись
+   «PUPITRE · 16:9» вокального экрана в разделе скрыты — раскладка раздела не 16:9. Токены — из блока цветов и типографики. */
+html[data-section='guitar'] .orientation-gate { gap: var(--rp-s-3); padding: var(--rp-s-8) var(--rp-s-6); color: var(--rp-fg-1);
+  background: radial-gradient(560px 320px at 50% -60px, var(--rp-haze), transparent 70%), var(--rp-hall);
+  font-family: var(--rp-font-sans); font-size: var(--rp-fs-body); font-weight: 420; line-height: 1.5;
+  -webkit-font-smoothing: antialiased; font-synthesis: none; }
+html[data-section='guitar'] .orientation-gate::before { content: ''; width: 64px; height: 64px; margin-bottom: var(--rp-s-2);
+  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F5F7FF' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4.5 3.5 20M12 4.5 6.9 20M12 4.5 10.3 20M12 4.5 13.7 20M12 4.5 17.1 20M12 4.5 20.5 20'/><path d='M12 3.6h.01' stroke-width='3'/></svg>") center / contain no-repeat;
+  filter: drop-shadow(0 0 12px var(--rp-beam)); }
+html[data-section='guitar'] .orientation-gate > .rotate-phone,
+html[data-section='guitar'] .orientation-gate > .overline { display: none; }
+html[data-section='guitar'] .orientation-gate h1 { font-size: var(--rp-fs-h1); font-weight: 760; font-stretch: 125%;
+  letter-spacing: -0.025em; line-height: 1.04; text-wrap: balance; }
+html[data-section='guitar'] .orientation-gate p { max-width: 320px; color: var(--rp-fg-2); font-size: var(--rp-fs-sm); line-height: 1.45; }

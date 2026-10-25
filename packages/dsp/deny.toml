@@ -1,0 +1,5 @@
+# Неизвестные лицензии, включая собственные крейты без декларации, блокируют гейт.
+[licenses]
+confidence-threshold = 0.93
+unused-allowed-license = "allow"
+allow = ["MIT", "MIT-0", "BSD-1-Clause", "BSD-2-Clause", "BSD-3-Clause", "0BSD", "Apache-2.0", "ISC", "Zlib", "Unicode-3.0", "Unicode-DFS-2016", "MPL-2.0", "PSF-2.0", "Unlicense", "Apache-2.0 WITH LLVM-exception"]
