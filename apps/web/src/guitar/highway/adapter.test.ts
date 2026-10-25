@@ -1,20 +1,28 @@
 // Адаптер TabMap → партия fretfall на синтетической карте devMap и патчи дорожки (VENDOR.md): метки ладов уходят в
 // DOM-приёмник, проекция cam.project, масштаб рендера задаёт размер буфера, статусы и левша не роняют кадр,
-// reduce-motion ставит камеру сразу.
+// reduce-motion ставит камеру сразу; (10) вспышка и гашение промаха — от момента вердикта, когда нота уже ушла.
 import { beforeAll, describe, expect, it } from 'vitest';
 import { devMap } from '../model/devMap';
 import { drawHighway, drawTab, STATUS, type FfCamera, type FfGemLabel } from '../vendor/fretfall/highway.js';
 import { DEFAULT_STYLE, theme } from '../vendor/fretfall/themes.js';
-import { adaptMap } from './adapter';
+import { adaptMap, setVerdict, stampStatuses } from './adapter';
 
-// Заглушки канваса — как в апстрим-тесте highway.test.mjs: любой метод контекста — пустая функция.
+// Заглушки канваса — как в апстрим-тесте highway.test.mjs: любой метод контекста — пустая функция; счётчики — вспышки
+// (радиальные градиенты) и заливки серым промаха.
 const texts: string[] = [];
+const spy = { radial: 0, grey: 0 };
 const context = new Proxy(
   {
     measureText: () => ({ width: 10, actualBoundingBoxAscent: 5, actualBoundingBoxDescent: 0 }),
     createLinearGradient: () => ({ addColorStop() {} }),
-    createRadialGradient: () => ({ addColorStop() {} }),
+    createRadialGradient: () => {
+      spy.radial++;
+      return { addColorStop() {} };
+    },
     fillText: (str: string) => texts.push(str),
+    set fillStyle(v: unknown) {
+      if (v === '#5F6679') spy.grey++;
+    },
   } as Record<string, unknown>,
   { get: (target, key: string) => (key in target ? target[key] : () => {}) },
 );
@@ -99,6 +107,39 @@ describe('патчи дорожки', () => {
     const a = right.project!(3, 2, 3), b = left.project!(3, 2, 3);
     expect(a.x + b.x).toBeCloseTo(1440, 0);
     expect(a.y).toBeCloseTo(b.y, 6);
+  });
+
+  it('(10) вспышка попадания и серая нота промаха — от момента вердикта, после ухода ноты с дорожки', () => {
+    const a = adaptMap(devMap({ events: 200 }));
+    const cam: FfCamera = {};
+    // одиночная нота на ладу, сыгранная 0.6 с назад: на дорожке её уже нет
+    const i = a.arr.notes.findIndex((n, k) => n.time > 2 && n.fret > 0 && !n.mute && n.chord === null && a.ffOfEvent[a.fromFf[k * 2]].length === 1);
+    expect(i).toBeGreaterThan(0);
+    const now = a.arr.notes[i].time + 0.6;
+    const ev = a.fromFf[i * 2];
+    const frame = (at: number) => {
+      spy.radial = 0;
+      spy.grey = 0;
+      drawHighway(canvas(), a.arr, at, t, cam);
+      return { ...spy };
+    };
+    const base = frame(now), base2 = frame(now + 0.2), base1 = frame(now + 0.1), base5 = frame(now + 0.5);
+    setVerdict(a, ev, STATUS.hit, 20);
+    stampStatuses(a, now - 0.05);
+    expect(a.arr.statusAt[i]).toBe(now - 0.05);
+    expect(frame(now).radial).toBe(base.radial + 1); // вспышка жива 200 мс от вердикта
+    expect(frame(now + 0.2).radial).toBe(base2.radial); // и погасла
+    setVerdict(a, ev, STATUS.missed);
+    stampStatuses(a, now);
+    expect(frame(now + 0.1).grey).toBe(base1.grey + 1); // промах гаснет на грифе
+    expect(frame(now + 0.5).grey).toBe(base5.grey); // через 450 мс — погас
+    setVerdict(a, ev, STATUS.none);
+    stampStatuses(a, now + 0.6);
+    expect(a.arr.statusAt[i]).toBeNaN(); // перемотка: снова ждёт
+    // место вердикта — над всеми струнами на ладу ноты
+    frame(now + 0.6);
+    const top = cam.projectAbove!(i);
+    for (let str = 0; str < a.arr.strings; str++) expect(top.y).toBeLessThan(cam.project!(a.arr.notes[i].fret, str, now + 0.6).y);
   });
 
   it('табулатура (вид T) рисуется по той же партии', () => {

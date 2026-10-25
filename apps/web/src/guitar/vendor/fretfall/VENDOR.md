@@ -32,7 +32,7 @@
 | Файл | SHA-256 | Апстрим |
 |---|---|---|
 | `themes.js` | `2caf217de54cb63564457cd496abab4cb8a8bdbc10e670f8606546f1168e12ed` | `src/themes.js` — `96600546fe3701d69ce38138c6536e4e4dfb7046957165004ed9f87d5ee16260` |
-| `highway.js` | `a0d370b68963710c3ec764acfb5eabec5c45785052b3ee48e1ba59c65b701633` | `src/highway.js` — `8e4fb621e52d1e79a06850a19adb1476fc9b3a84ec6f2b7ae24aeb076b8e4357` |
+| `highway.js` | `35ea089e6f50c84f7116ed3c3f95f9f8cec18f5fe7f83428c6f0b0b5ff2a4e79` | `src/highway.js` — `8e4fb621e52d1e79a06850a19adb1476fc9b3a84ec6f2b7ae24aeb076b8e4357` |
 | `fromScore.js` | `736d109626a12f6aa34f7733efe5c953f7d10d03fcebbdf164fbd7e9019d0bc5` | вырезка из `src/player.js` — `e83a4e18d1e1f9657d9acc0faa86dbb1094cec7d6eb6bbe7a3ffdb44df900cdf` |
 
 ### Патч 1 — `themes.js`: без Google Fonts
@@ -63,6 +63,11 @@
    градиента; `t.soffit === false` выключает (адаптивное качество).
 9. **Без размытия тени.** В нотном листе и табулатуре `shadowBlur` заменён ореолом из широких полупрозрачных обводок
    (как `glow` в 3D-дорожке) — инвариант 19; в файле его больше нет.
+10. **Отклик от момента вердикта.** `arr.statusAt` — `Float64Array` секунд песни, когда сменился статус ноты (NaN — не
+   менялся; отмечает вызывающий, `stampStatuses` в `guitar/highway/adapter.ts`). Есть `arr.statusAt` — вспышка попадания
+   (и слабая «удар замечен») ведётся от него 200 мс и рисуется поверх нот; промах и не та нота гаснут на грифе серыми с
+   красной кромкой 450 мс — и у нот, уже ушедших с дорожки (вердикт приходит после удара). `cam.projectAbove(i)` — место
+   подписи вердикта над грифом на ладу ноты. Без `arr.statusAt` — как в патче (2).
 
 ### Вырезка `fromScore.js` из `player.js`
 

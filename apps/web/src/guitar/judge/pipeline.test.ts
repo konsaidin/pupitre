@@ -3,6 +3,9 @@
 // высоты и детектор атак), в имитации AudioWorklet → кадры → гитарный судья. Почти все события засчитаны, «не та
 // нота» — редкость; по ходу печатается сводка по видам вердиктов. Атак детектор находит не все (в переборе новая нота
 // звучит поверх прошлой) — остальные судья берёт по смене высоты; атак при этом не больше, чем событий × 1.5.
+// Отклик дорожке: попадание сообщается по кадрам, а не по закрытию события — медиана меньше 30 мс после удара, 90 % —
+// меньше 80 мс; ранний отклик почти всегда совпадает с итогом. Двузвучия на низких струнах YIN слышит плохо (редкие
+// ложные кадры) — они засчитаны по удару, не «не та нота».
 import * as alphaTab from '@coderline/alphatab';
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -95,10 +98,22 @@ async function demoFrames(): Promise<{ frames: InputFrame[]; map: ReturnType<typ
 describe('распознавание на звуке синтезатора', () => {
   it('демо-песня соло: засчитано ≥ 90 % событий, «не та нота» ≤ 5 %, ложных атак нет', async () => {
     const { frames, map } = await demoFrames();
-    const judge = guitarJudge({ map, difficulty: 'medium' }, { toClock: (ms) => ms / 1000, a4Hz: 440, strictness: 'normal' });
+    let frameMs = 0;
+    const firstTold: Array<{ kind: string; delayMs: number } | undefined> = [];
+    const judge = guitarJudge({ map, difficulty: 'medium' }, {
+      toClock: (ms) => ms / 1000, a4Hz: 440, strictness: 'normal',
+      onStatus: (i, status, v) => {
+        if (status === 'attacked' || status === 'none' || firstTold[i]) return;
+        firstTold[i] = { kind: status, delayMs: frameMs - (map.notes[i].startMs + (v?.offsetMs ?? 0)) };
+      },
+    });
     judge.onBegin(0);
     map.notes.forEach((_, i) => judge.reset(i, 0));
-    for (const f of frames) judge.onFrame(f, f.atMs);
+    for (const f of frames) {
+      frameMs = f.atMs;
+      judge.onFrame(f, f.atMs);
+    }
+    const toldEarly = firstTold.slice();
     const verdicts = map.notes.map((_, i) => judge.finalize(i));
     const judged = verdicts.filter((v) => v.kind !== 'skipped');
     const count = (kinds: string[]) => judged.filter((v) => kinds.includes(v.kind!)).length;
@@ -107,11 +122,21 @@ describe('распознавание на звуке синтезатора', ()
     const offsets = judged.filter((v) => v.offsetMs !== undefined && v.kind !== 'wrong').map((v) => v.offsetMs!).sort((a, b) => a - b);
     const onsets = frames.filter((f) => f.onset).length;
     const missed = verdicts.map((v, i) => [v, map.notes[i]] as const).filter(([v]) => v.kind === 'missed' || v.kind === 'wrong');
-    console.log(missed.map(([v, e]) => `${v.kind} ${Math.round(e.startMs)} мс: ${e.notes.map((n) => `${n.string}/${n.fret}`).join(' ')}`).join('\n'));
+    console.log(missed.map(([v, e]) => `${v.kind} ${Math.round(e.startMs)} мс: ${e.notes.map((n) => `${n.string}/${n.fret} (${n.midi})`).join(' ')}` +
+      (v.heardMidi === undefined ? '' : `, слышно ${v.heardMidi.toFixed(2)}`)).join('\n'));
     console.log(
       `событий ${judged.length}: попаданий ${hits} (точно ${count(['hit'])}, рано ${count(['early'])}, поздно ${count(['late'])}), ` +
         `не та ${wrong}, пропуск ${count(['missed'])}; атак ${onsets}; медиана смещения ${offsets[offsets.length >> 1]} мс`,
     );
+    const hitKinds = ['hit', 'early', 'late'];
+    const delays = toldEarly.filter((x) => x && hitKinds.includes(x.kind)).map((x) => x!.delayMs).sort((a, b) => a - b);
+    const flips = verdicts.filter((v, i) => toldEarly[i] && hitKinds.includes(toldEarly[i]!.kind) !== hitKinds.includes(v.kind!)).length;
+    console.log(`ранний отклик попадания: ${delays.length} событий, медиана ${delays[delays.length >> 1]?.toFixed(1)} мс после удара, ` +
+      `90 % — до ${delays[Math.floor(delays.length * 0.9)]?.toFixed(1)} мс; разошлись с итогом: ${flips}`);
+    expect(delays.length).toBeGreaterThanOrEqual(hits * 0.9);
+    expect(delays[delays.length >> 1]).toBeLessThan(30);
+    expect(delays[Math.floor(delays.length * 0.9)]).toBeLessThan(80);
+    expect(flips).toBeLessThanOrEqual(2);
     expect(judged.length).toBeGreaterThan(60);
     expect(hits / judged.length).toBeGreaterThanOrEqual(0.9);
     expect(wrong / judged.length).toBeLessThanOrEqual(0.05);

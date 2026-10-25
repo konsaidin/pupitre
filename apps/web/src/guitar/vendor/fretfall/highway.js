@@ -9,6 +9,10 @@ import { noteName } from './music.js';
 export const STATUS = { none: 0, attacked: 1, hit: 2, early: 3, late: 4, wrong: 5, missed: 6 };
 const HIT_STATUS = new Set([STATUS.hit, STATUS.early, STATUS.late]), MISS_STATUS = new Set([STATUS.wrong, STATUS.missed]);
 const MISS_GREY = '#5F6679', MISS_EDGE = '#FF6A76'; // --rp-fg-4 и --rp-bad Рампы
+// ПАТЧ Пюпитра (10): отклик от момента вердикта — arr.statusAt (Float64Array, секунды песни, когда сменился статус ноты;
+// NaN — не менялся). Вердикт приходит после удара, нередко когда нота уже ушла с дорожки: вспышка попадания и «удар
+// замечен» ведутся от него, промах и не та нота гаснут на грифе. Без arr.statusAt — как в патче (2)
+const FLASH_S = 0.2, MISS_FADE_S = 0.45, AFTERGLOW_S = 1.5;
 const VH = 900, HIGHWAY = 84, NOTE_SPEED = 28; // fret widths of highway ahead of the strike line; fret widths a note travels per second
 const STRING_W = 2.2, LANE_W = 0.9, ANCHOR_LANE_W = 2.4; // px: a string (thinnest wound, see stringWidth), a fret lane, the hand position's
 
@@ -872,6 +876,13 @@ export function drawHighway(canvas, arr, now, t, cam) {
     }
   }
   const statusOf = (note) => (arr.status ? arr.status[indexOf.get(note)] ?? STATUS.none : STATUS.none);
+  const marked = []; // ПАТЧ (10): индексы нот со свежей сменой статуса — и тех, что уже ушли с дорожки
+  if (arr.status && arr.statusAt) {
+    for (let i = firstAt(arr.notes, now - AFTERGLOW_S); i < arr.notes.length && arr.notes[i].time <= now + 0.3; i++) {
+      const age = now - arr.statusAt[i];
+      if (age >= 0 && age < MISS_FADE_S) marked.push(i);
+    }
+  }
 
   const chordOf = (note) => (note.chord === null || note.chord === undefined ? null : arr.chords[note.chord]);
   // Shown by the frame alone: a repeated chord, and one the hand has damped — there is no pitch in it to draw, so its
@@ -880,6 +891,12 @@ export function drawHighway(canvas, arr, now, t, cam) {
   const spot = (note) => { // x along the neck (an open string spans the hand position), y at its string's height
     const a = anchorAt(anchors, note.time), open = note.fret === 0;
     return { a, open, x: open ? a.fret - 1 + a.width / 2 : note.fret - 0.5, y: ys(note.string) };
+  };
+  // ПАТЧ Пюпитра (10): место вердикта DOM-слоя — над грифом на ладу ноты i (открытая струна — середина позиции руки),
+  // CSS-пиксели канваса этого кадра
+  cam.projectAbove = (i) => {
+    const [px, py, k] = P(spot(arr.notes[i]).x, boardHi + 0.2, 0);
+    return { x: px * unitPx, y: py * unitPx, k: k * unitPx };
   };
   // A slide glides from x along the neck over its note's length (a quarter second at least), easing in and out. Its trail
   // follows it, and so do its gem and its target on the fretboard while it sounds: a sliding chord moves with its slide
@@ -1137,7 +1154,7 @@ export function drawHighway(canvas, arr, now, t, cam) {
     stringPath(note.string, 0, true);
     stroke();
     glow(false);
-    if (-dt < 0.2) {
+    if (-dt < 0.2 && !arr.statusAt) { // ПАТЧ (10): со statusAt вспышка — в цикле ниже, от момента вердикта
       const [px, py, k] = P(spot(note).x, y, 0);
       g.save();
       g.translate(px, py);
@@ -1161,7 +1178,6 @@ export function drawHighway(canvas, arr, now, t, cam) {
       g.restore();
     }
   }
-
   // A chord shape being held: its frame lit on the board
   g.strokeStyle = t.anchorLane;
   g.lineWidth = 2.5;
@@ -1381,7 +1397,7 @@ export function drawHighway(canvas, arr, now, t, cam) {
     const c = missed ? MISS_GREY : color(note.string);
     const hw = (open ? (a.width - 0.2) / 2 : 0.34) * (note.grace ? 0.6 : 1), hh = (open ? 0.12 : 0.42) * gap * (note.grace ? 0.6 : 1); // grace notes are small
 
-    if (dt < -0.15) continue;
+    if (dt < -0.15 || (missed && dt < 0 && arr.statusAt)) continue; // ПАТЧ (10): сыгранный мимо гаснет в цикле ниже
     const faded = dt < 0 ? Math.max(0, 1 + dt / 0.15) : Math.min(1, (LOOK - dt) / 0.4); // fade in at the far end, out once played
     g.globalAlpha = faded;
 
@@ -1715,6 +1731,49 @@ export function drawHighway(canvas, arr, now, t, cam) {
     }
     g.globalAlpha = 1;
   }
+  // ПАТЧ (10): вспышка от момента вердикта: попадание — белое ядро → цвет струны → прозрачно и кольцо за 180 мс (при
+  // reduce-движении без кольца); «удар замечен» до вердикта — слабое белое ядро. Поверх нот: нота на линии удара иначе
+  // закрывает вспышку целиком
+  for (const i of marked) {
+    const note = arr.notes[i], st = arr.status[i], age = now - arr.statusAt[i], hit = HIT_STATUS.has(st);
+    if ((!hit && st !== STATUS.attacked) || age >= FLASH_S || frameOnly(note)) continue;
+    const c = color(note.string), [px, py, k] = P(spot(note).x, boardY(note), 0), u = age / FLASH_S;
+    g.save();
+    g.translate(px, py);
+    g.scale(1, 0.4);
+    const flash = g.createRadialGradient(0, 0, 0, 0, 0, 0.85 * k);
+    flash.addColorStop(0, alpha(t.flash, (hit ? 0.75 : 0.35) * (1 - u)));
+    if (hit) flash.addColorStop(0.45, alpha(c, 0.7 * (1 - u)));
+    flash.addColorStop(1, alpha(hit ? c : t.flash, 0));
+    g.fillStyle = flash;
+    g.beginPath();
+    g.arc(0, 0, 0.85 * k, 0, Math.PI * 2);
+    fill();
+    if (hit && !t.reduceMotion) {
+      const r = Math.min(1, age / 0.18);
+      g.strokeStyle = alpha(c, 0.8 * (1 - r));
+      g.lineWidth = 2 / 0.4;
+      g.beginPath();
+      g.arc(0, 0, (0.45 + 0.6 * r) * k, 0, Math.PI * 2);
+      g.stroke();
+    }
+    g.restore();
+  }
+
+  // ПАТЧ (10): промах и не та нота гаснут на грифе серыми с красной кромкой — от момента вердикта
+  for (const i of marked) {
+    const note = arr.notes[i], age = now - arr.statusAt[i];
+    if (!MISS_STATUS.has(arr.status[i]) || note.time > now || frameOnly(note)) continue;
+    const { a, open, x } = spot(note), size = note.grace ? 0.6 : 1;
+    g.globalAlpha = 0.9 * (1 - age / MISS_FADE_S);
+    gem(x, ys(note.string), 0, (open ? (a.width - 0.2) / 2 : 0.34) * size, (open ? 0.12 : 0.42) * gap * size);
+    g.fillStyle = MISS_GREY;
+    fill();
+    g.strokeStyle = MISS_EDGE;
+    g.lineWidth = 2;
+    stroke();
+  }
+  g.globalAlpha = 1;
   lap('notes');
 
   // A barre being played: its bar across the strings on the board

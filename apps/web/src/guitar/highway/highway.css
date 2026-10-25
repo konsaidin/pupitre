@@ -5,3 +5,16 @@
 /* Цифра на ноте: тёмные моно-цифры Рампы; размер и место — только transform (scale от 32 px), появление — opacity */
 .rp-gemlabel { position: absolute; left: 0; top: 0; transform-origin: 0 0; font: 700 32px/1 var(--rp-font-mono); color: #06070b;
   white-space: nowrap; will-change: transform, opacity; }
+/* Вердикты (ui-spec §9, §10.2): моно 12 px на тёмной подложке, рамка и ореол цвета сигнала; место, подъём и гашение —
+   transform и opacity из кадра дорожки. Иконка — по виду: ← рано, → поздно, ✕ не та нота */
+.rp-highway__verdicts { position: absolute; inset: 0; pointer-events: none; }
+.rp-verdict { position: absolute; left: 0; top: 0; display: inline-flex; align-items: center; gap: 6px; padding: 4px 9px; border-radius: 6px;
+  white-space: nowrap; font-family: var(--rp-font-mono); font-size: 12px; font-weight: 700; font-stretch: 87.5%; line-height: 1.2;
+  color: var(--c, var(--rp-light)); background: rgb(4 5 9 / 0.78); border: 1px solid color-mix(in oklab, var(--c, var(--rp-light)) 45%, transparent);
+  box-shadow: 0 0 16px -4px var(--c, var(--rp-light)); opacity: 0; will-change: transform, opacity; }
+.rp-verdict--early { --c: var(--rp-early); }
+.rp-verdict--late { --c: var(--rp-late); }
+.rp-verdict--wrong { --c: var(--rp-bad); }
+.rp-verdict .rp-i { width: 13px; height: 13px; stroke-width: 2.2; display: none; }
+.rp-verdict--early .rp-verdict__early, .rp-verdict--late .rp-verdict__late, .rp-verdict--wrong .rp-verdict__wrong { display: block; }
+@media (max-height: 500px) { .rp-verdict { font-size: 10.5px; padding: 3px 7px; } }

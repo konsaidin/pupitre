@@ -73,8 +73,11 @@ export const STATUS: {
   readonly missed: 6;
 };
 
-/** Партия, как её рисует дорожка Пюпитра: + (2) статусы нот. */
-export type FfDrawArrangement = FfArrangement & { status?: Uint8Array };
+/**
+ * Партия, как её рисует дорожка Пюпитра: + (2) статусы нот; + (10) секунды песни, когда сменился статус ноты (NaN — не
+ * менялся) — вспышки и гашение промахов ведутся от них.
+ */
+export type FfDrawArrangement = FfArrangement & { status?: Uint8Array; statusAt?: Float64Array };
 
 export type FfDrawTheme = FfTheme & FfViewOptions;
 
@@ -91,6 +94,8 @@ export interface FfCamera {
   right?: number;
   /** (3) Проекция последнего кадра: лад (1 — первый), струна (0 — нижняя), секунды песни → CSS-пиксели канваса. */
   project?: (fret: number, string: number, sec: number) => { x: number; y: number; k: number };
+  /** (10) Над грифом на ладу ноты `arr.notes[i]` (открытая струна — середина позиции руки), CSS-пиксели канваса. */
+  projectAbove?: (i: number) => { x: number; y: number; k: number };
   [key: string]: unknown;
 }
 

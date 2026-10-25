@@ -10,7 +10,7 @@ import { GameEngine } from '../../game/engine';
 import type { FrameSource } from '../../game/judge';
 import { noneJudge } from '../../game/judges/noneJudge';
 import type { GameSummary } from '../../game/scoring';
-import { adaptMap, type AdaptedMap } from '../highway/adapter';
+import { adaptMap, setVerdict, type AdaptedMap } from '../highway/adapter';
 import { guitarJudge, type GuitarStatus } from '../judge/guitarJudge';
 import { buildPlayableMap } from '../model/playable';
 import type { GuitarArrangement, Strictness, TabMap } from '../model/types';
@@ -70,9 +70,7 @@ export function createPlaySession({ ctx, arr, layers, speed, metronome, scoring,
             toClock: heardClock(ctx), a4Hz: scoring.a4Hz, strictness: scoring.strictness,
             // события закрываются по расписанию минуса, кадры — во времени слышимого (позже на вывод) и с доставкой
             finalizeDelayMs: Math.max(60, outputDelayMs(ctx)) + FRAME_SLACK_MS,
-            onStatus: (event, status) => {
-              for (const ff of adapted.ffOfEvent[event]) adapted.arr.status[ff] = STATUS_CODE[status];
-            },
+            onStatus: (event, status, v) => setVerdict(adapted, event, STATUS_CODE[status], v?.offsetMs, v?.heardMidi),
           })
       : (host) => noneJudge<TabMap, InputFrame>(host),
     onFinish,

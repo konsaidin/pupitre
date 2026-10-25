@@ -1,24 +1,34 @@
 // Гитарный судья на картах своих фикстур (импорт alphaTex → играбельная карта) и синтетических кадрах: попадания, рано и
 // поздно, вне окна, не та нота, ошибка октавы, удар без высоты, восьмые подряд, легато без атаки, аккорд, эталон A4,
-// строгость, отклик дорожке, перемотка.
+// строгость, отклик дорожке (ранний: попадание по первым кадрам высоты, не та нота — по концу окна высоты, промах — по
+// часам), перемотка.
 import { describe, expect, it } from 'vitest';
 import { convertTex } from '../import/fixtures';
 import { buildPlayableMap } from '../model/playable';
 import type { Strictness, TabMap } from '../model/types';
+import type { JudgeVerdict } from '../../game/judge';
 import { foldSemitones, guitarJudge, pitchMatches, type GuitarStatus } from './guitarJudge';
 
 const mapOf = (name: string): TabMap =>
   buildPlayableMap(convertTex(name).arrangements[0], { kind: 'synth', speed: 1, leadInMs: 0 }, { mode: 'max' });
 
-function judgeFor(map: TabMap, patch: { a4Hz?: number; strictness?: Strictness } = {}) {
+function judgeFor(map: TabMap, patch: { a4Hz?: number; strictness?: Strictness; finalizeDelayMs?: number } = {}) {
   const statuses: Array<[number, GuitarStatus]> = [];
+  const told: Array<[number, GuitarStatus, JudgeVerdict | undefined]> = [];
   const j = guitarJudge(
     { map, difficulty: 'medium' },
-    { toClock: (ms) => ms / 1000, a4Hz: patch.a4Hz ?? 440, strictness: patch.strictness ?? 'normal', onStatus: (i, s) => statuses.push([i, s]) },
+    {
+      toClock: (ms) => ms / 1000, a4Hz: patch.a4Hz ?? 440, strictness: patch.strictness ?? 'normal', finalizeDelayMs: patch.finalizeDelayMs,
+      onStatus: (i, s, v) => {
+        statuses.push([i, s]);
+        told.push([i, s, v]);
+      },
+    },
   );
   j.onBegin(0);
   map.notes.forEach((_, i) => j.reset(i, 0));
   statuses.length = 0;
+  told.length = 0;
   /** Атака в t и высота midi каждые 10 мс с t + 20 по t + 140 (кадры — по порядку времени). */
   const play = (t: number, midi: number, clarity = 0.9) => {
     j.onFrame({ atMs: t, midi: NaN, clarity: 0, levelDb: -20, onset: true }, t);
@@ -28,7 +38,7 @@ function judgeFor(map: TabMap, patch: { a4Hz?: number; strictness?: Strictness }
     for (let t = from; t <= to; t += 10) j.onFrame({ atMs: t, midi, clarity: 0.9, levelDb: -20, onset: false }, t);
   };
   const finalize = () => map.notes.map((_, i) => j.finalize(i));
-  return { j, statuses, play, pitchOnly, finalize };
+  return { j, statuses, told, play, pitchOnly, finalize };
 }
 
 describe('высота', () => {
@@ -53,13 +63,78 @@ describe('одиночные ноты', () => {
     ]);
   });
 
-  it('точно в такт и в ноту — perfect; отклик дорожке: удар, затем вердикт', () => {
+  it('точно в такт и в ноту — perfect; отклик дорожке: удар, затем попадание — до закрытия события, без повтора', () => {
     const { play, finalize, statuses } = judgeFor(map);
     map.notes.forEach((e, i) => play(e.startMs + 10, midis[i]));
+    expect(statuses.slice(0, 4)).toEqual([[0, 'attacked'], [0, 'hit'], [1, 'attacked'], [1, 'hit']]);
     const v = finalize();
     expect(v.map((x) => [x.judgement, x.kind, x.hitRatio])).toEqual(map.notes.map(() => ['perfect', 'hit', 1]));
-    expect(statuses.slice(0, 2)).toEqual([[0, 'attacked'], [1, 'attacked']]);
     expect(statuses.filter(([, s]) => s === 'hit')).toHaveLength(7);
+  });
+
+  it('ранний отклик: попадание — по трём кадрам высоты (≈ 40 мс после удара), со смещением', () => {
+    const { j, told } = judgeFor(map);
+    const at = 500 + 70;
+    j.onFrame({ atMs: at, midi: NaN, clarity: 0, levelDb: -20, onset: true }, at);
+    // +10 — раньше окна высоты (+20), +20 и +30 — ещё не ясно
+    for (const d of [10, 20, 30]) j.onFrame({ atMs: at + d, midi: midis[1], clarity: 0.9, levelDb: -20, onset: false }, at + d);
+    expect(told.map(([i, s]) => [i, s])).toEqual([[1, 'attacked']]);
+    j.onFrame({ atMs: at + 40, midi: midis[1], clarity: 0.9, levelDb: -20, onset: false }, at + 40);
+    expect(told.at(-1)).toEqual([1, 'late', expect.objectContaining({ kind: 'late', offsetMs: 70 })]);
+  });
+
+  it('ранний отклик: не та нота — когда окно высоты прошло, с услышанной высотой', () => {
+    const { j, play, told } = judgeFor(map);
+    play(1000, midis[2] + 2);
+    expect(told.map(([, s]) => s)).toEqual(['attacked']);
+    j.onFrame({ atMs: 1160, midi: NaN, clarity: 0, levelDb: -60, onset: false }, 1160);
+    expect(told.at(-1)).toEqual([2, 'wrong', expect.objectContaining({ heardMidi: midis[2] + 2 })]);
+  });
+
+  it('ранний отклик: промах — по часам, когда окно прошло с запасом на доставку; до начала игры — нет', () => {
+    const { j, told, play } = judgeFor(map, { finalizeDelayMs: 200 });
+    j.onBegin(400);
+    play(1000, midis[2]);
+    j.onTick!(500 + 150 + 199, 1);
+    expect(told.filter(([, s]) => s === 'missed')).toEqual([]);
+    j.onTick!(500 + 150 + 201, 1);
+    expect(told.filter(([, s]) => s === 'missed').map(([i]) => i)).toEqual([1]); // событие 0 — до точки старта
+    j.onTick!(1000 + 150 + 201, 1);
+    expect(told.filter(([, s]) => s === 'missed').map(([i]) => i)).toEqual([1]); // 2 — сыграно
+  });
+
+  it('ранний отклик: ложный низ атаки не мешает — попадание по трём нужным кадрам подряд', () => {
+    const { j, told } = judgeFor(map);
+    j.onFrame({ atMs: 1500, midi: NaN, clarity: 0, levelDb: -20, onset: true }, 1500);
+    const seq = [midis[3], midis[3], midis[3] - 19, midis[3] - 19, midis[3], midis[3]];
+    seq.forEach((m, k) => j.onFrame({ atMs: 1525 + k * 5, midi: m, clarity: 0.7, levelDb: -20, onset: false }, 1525 + k * 5));
+    expect(told.map(([, s]) => s)).toEqual(['attacked']);
+    j.onFrame({ atMs: 1555, midi: midis[3], clarity: 0.9, levelDb: -20, onset: false }, 1555);
+    expect(told.at(-1)?.[1]).toBe('hit');
+  });
+
+  it('поздняя атака не затирает показанное попадание; перемотка сбрасывает и пропущенные', () => {
+    const { j, told, pitchOnly, statuses } = judgeFor(map);
+    pitchOnly(1490, 1530, midis[3]); // попадание по смене высоты, без атаки
+    expect(told.at(-1)?.[1]).toBe('hit');
+    j.onFrame({ atMs: 1560, midi: NaN, clarity: 0, levelDb: -20, onset: true }, 1560);
+    expect(told.at(-1)?.[1]).toBe('hit');
+    expect(j.reset(3, 2000)).toBe('skipped');
+    expect(statuses.at(-1)).toEqual([3, 'none']);
+  });
+
+  it('кадры без высоты не портят медиану; редкие чужие кадры — не «не та нота»', () => {
+    const { j, finalize } = judgeFor(map);
+    j.onFrame({ atMs: 0, midi: NaN, clarity: 0, levelDb: -20, onset: true }, 0);
+    for (let d = 20; d <= 140; d += 10) {
+      const clear = d % 30 === 0;
+      j.onFrame({ atMs: d, midi: clear ? midis[0] : NaN, clarity: clear ? 0.9 : 0.1, levelDb: -20, onset: false }, d);
+    }
+    j.onFrame({ atMs: 500, midi: NaN, clarity: 0, levelDb: -20, onset: true }, 500);
+    for (const d of [40, 80]) j.onFrame({ atMs: 500 + d, midi: midis[1] - 7, clarity: 0.6, levelDb: -20, onset: false }, 500 + d);
+    const v = finalize();
+    expect(v[0]).toMatchObject({ judgement: 'perfect', kind: 'hit', hitRatio: 1 });
+    expect(v[1]).toMatchObject({ judgement: 'good', kind: 'hit', hitRatio: 0.7 });
   });
 
   it('раньше и позже «точно» — good с early/late и смещением; вне окна — промах', () => {
@@ -157,5 +232,16 @@ describe('легато и аккорды', () => {
     play(e2.startMs, e2.notes[0].midi + 1);
     const v = finalize();
     expect([v[0].kind, v[1].kind, v[1].hitRatio, v[2].kind]).toEqual(['hit', 'hit', 0.7, 'wrong']);
+  });
+
+  it('аккорд: отклик дорожке — сразу по удару; звук аккорда в трети кадров — попадание', () => {
+    const map = mapOf('chords');
+    const [e0] = map.notes;
+    const { j, told, finalize } = judgeFor(map);
+    j.onFrame({ atMs: e0.startMs + 15, midi: NaN, clarity: 0, levelDb: -20, onset: true }, e0.startMs + 15);
+    expect(told).toEqual([[0, 'hit', expect.objectContaining({ offsetMs: 15 })]]);
+    const ms = [e0.notes[0].midi - 4, e0.notes[0].midi - 4, e0.notes[1].midi];
+    ms.forEach((m, k) => j.onFrame({ atMs: e0.startMs + 50 + k * 20, midi: m, clarity: 0.7, levelDb: -20, onset: false }, e0.startMs + 50 + k * 20));
+    expect(finalize()[0]).toMatchObject({ kind: 'hit', hitRatio: 1 });
   });
 });

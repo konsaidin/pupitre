@@ -1,18 +1,26 @@
 // Играбельная карта (TabMap, §3.4) → партия fretfall, как её рисует highway.js: секунды, лады абсолютные, струна 0 —
 // нижняя, капо [{time: 0, fret}], аккорды (по одному на удар — как у конвертера), формы руки, якоря, доли, фразы, секции.
 // Карты индексов «нота fretfall ↔ (событие, нота события)» — для статусов судьи и DOM-слоёв. Помощники fretfall
-// (markRepeats, annotate, markArpeggios) вызываются один раз на карту.
+// (markRepeats, annotate, markArpeggios) вызываются один раз на карту. Отклик судьи: setVerdict пишет статусы нот события
+// и подробности (смещение, услышанная высота), stampStatuses в кадре дорожки отмечает, когда статус сменился.
 import type { FfChord, FfHandShape, FfNote } from '../vendor/fretfall/fromScore.js';
-import type { FfDrawArrangement } from '../vendor/fretfall/highway.js';
+import { STATUS, type FfDrawArrangement } from '../vendor/fretfall/highway.js';
 import { annotate, markArpeggios, markRepeats } from '../vendor/fretfall/music.js';
 import type { PlayNote, TabEvent, TabMap } from '../model/types';
 
 export interface AdaptedMap {
-  arr: FfDrawArrangement & { status: Uint8Array };
+  arr: FfDrawArrangement & { status: Uint8Array; statusAt: Float64Array };
   /** Нота fretfall i → [индекс события в map.notes, индекс ноты в событии]. */
   fromFf: Int32Array;
   /** Событие → индексы его нот в arr.notes. */
   ffOfEvent: number[][];
+  /** Высота ноты fretfall (MIDI) — для «+1 лад» у не той ноты. */
+  midi: Float32Array;
+  /** Вердикт события: смещение удара, мс, и услышанная высота (NaN — нет). */
+  offsetMs: Float32Array;
+  heardMidi: Float32Array;
+  /** Статус ноты, который уже видела дорожка: смена → arr.statusAt. */
+  seen: Uint8Array;
 }
 
 const has = (n: PlayNote, tech: PlayNote['techs'][number]) => n.techs.includes(tech);
@@ -122,6 +130,48 @@ export function adaptMap(map: TabMap): AdaptedMap {
     handShapes, markers: [], hairpins: [], rhythm: [], meters: [], keys: [],
     capos: map.capo ? [{ time: 0, fret: map.capo }] : [], lyrics: [],
     status: new Uint8Array(notes.length),
+    statusAt: new Float64Array(notes.length).fill(NaN),
   };
-  return { arr, fromFf, ffOfEvent };
+  const midi = Float32Array.from(rows, (r) => map.notes[r.ev].notes[r.idx].midi);
+  const events = map.notes.length;
+  return {
+    arr, fromFf, ffOfEvent, midi,
+    offsetMs: new Float32Array(events).fill(NaN), heardMidi: new Float32Array(events).fill(NaN), seen: new Uint8Array(notes.length),
+  };
+}
+
+/** Вердикт события (код STATUS) → статусы его нот и подробности для слоя вердиктов. */
+export function setVerdict(a: AdaptedMap, event: number, code: number, offsetMs = NaN, heardMidi = NaN): void {
+  for (const ff of a.ffOfEvent[event]) a.arr.status[ff] = code;
+  a.offsetMs[event] = offsetMs;
+  a.heardMidi[event] = heardMidi;
+}
+
+/** Окно отметки вокруг кадра, с: вердикт приходит до ≈ 1 с после ноты, «удар замечен» — до её начала. */
+const STAMP_BACK_S = 2.5;
+const STAMP_AHEAD_S = 0.5;
+
+/** Первая нота не раньше time (ноты — по времени). */
+export function firstNoteAt(notes: ReadonlyArray<{ time: number }>, time: number): number {
+  let lo = 0;
+  let hi = notes.length;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (notes[mid].time < time) lo = mid + 1;
+    else hi = mid;
+  }
+  return lo;
+}
+
+/**
+ * Отметить, когда сменились статусы нот рядом с now (секунды песни кадра дорожки): от этого момента дорожка ведёт
+ * вспышки и гашение промахов, слой вердиктов — подписи. Сброс в «ждёт» (перемотка) — NaN. Без аллокаций.
+ */
+export function stampStatuses(a: AdaptedMap, now: number): void {
+  const { notes, status, statusAt } = a.arr;
+  for (let i = firstNoteAt(notes, now - STAMP_BACK_S); i < notes.length && notes[i].time <= now + STAMP_AHEAD_S; i++) {
+    if (status[i] === a.seen[i]) continue;
+    a.seen[i] = status[i];
+    statusAt[i] = status[i] === STATUS.none ? NaN : now;
+  }
 }

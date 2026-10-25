@@ -1,13 +1,17 @@
 // Дорожка (ui-spec §10, этап 10b): canvas fretfall на весь контейнер, свой rAF, кадр по часам песни + visualOffsetMs.
 // Масштаб рендера — по бюджету пикселей (2.2 МП в Electron, 0.9 МП в браузере; не выше DPR и 2), адаптивное качество:
 // средний кадр > 16 мс 2 с — масштаб −0.25 (не ниже 0.6), после двух шагов ещё и без софита; < 9 мс 5 с — +0.25 до потолка.
-// Цифры ладов на нотах — DOM-слой (GemLabelLayer): чёткие при любом масштабе. В кадре нет setState и аллокаций сверх
-// fretfall; эффект идемпотентен под StrictMode (создаёт и освобождает в одном эффекте).
+// Цифры ладов на нотах — DOM-слой (GemLabelLayer): чёткие при любом масштабе. Отклик судьи: перед кадром — время смены
+// статусов (stampStatuses, от него дорожка ведёт вспышки и гашение промахов), после — подписи вердиктов из пула (verdicts.ts).
+// В кадре нет setState и аллокаций сверх fretfall (текст подписи — один раз на вердикт); эффект идемпотентен под
+// StrictMode (создаёт и освобождает в одном эффекте).
 import { useEffect, useRef } from 'react';
 import { drawHighway, drawTab, type FfCamera, type FfDrawTheme, type FfGemLabel } from '../vendor/fretfall/highway.js';
 import { DEFAULT_STYLE, theme } from '../vendor/fretfall/themes.js';
 import type { GuitarSettings } from '../model/types';
-import type { AdaptedMap } from './adapter';
+import { GuitarIcon } from '../ui/GuitarIcon';
+import { stampStatuses, type AdaptedMap } from './adapter';
+import { chipOpacity, chipText, collectChips, layoutChips, newChip, type VerdictChipKind } from './verdicts';
 import './highway.css';
 
 export interface HighwayView {
@@ -32,6 +36,7 @@ const PIXEL_BUDGET = typeof navigator !== 'undefined' && /Electron/.test(navigat
 const MIN_SCALE = 0.6;
 const LABEL_POOL = 128;
 const LABEL_PX = 32;
+const VERDICT_SLOTS = [0, 1, 2, 3, 4, 5, 6, 7];
 
 /** Стартовый масштаб рендера: не выше DPR и 2, и не больше бюджета пикселей. */
 export function startScale(cssW: number, cssH: number, dpr = globalThis.devicePixelRatio || 1, budget = PIXEL_BUDGET): number {
@@ -68,6 +73,7 @@ export function nextQuality(q: Quality, frameMs: number, dtMs: number): Quality 
 export function GuitarHighway({ adapted, songMs, visualOffsetMs, view, compact = false }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const labelsRef = useRef<HTMLDivElement>(null);
+  const verdictsRef = useRef<HTMLDivElement>(null);
   // Свежие пропсы — через ref: цикл кадров живёт весь срок компонента и не пересоздаётся на каждый рендер.
   const live = useRef({ adapted, songMs, visualOffsetMs, view, compact });
   live.current = { adapted, songMs, visualOffsetMs, view, compact };
@@ -85,6 +91,16 @@ export function GuitarHighway({ adapted, songMs, visualOffsetMs, view, compact =
     }
     const sink: FfGemLabel[] = [];
     const cam: FfCamera = {};
+    // подписи вердиктов: элементы рисует React (иконки), кадр меняет класс, текст, transform и opacity
+    const verdictEls = [...verdictsRef.current!.children] as HTMLElement[];
+    const verdictTexts = verdictEls.map((el) => el.querySelector<HTMLElement>('.rp-verdict__text')!);
+    const shownKind: Array<VerdictChipKind | ''> = verdictEls.map(() => '');
+    const shownText = verdictEls.map(() => '');
+    const chips = verdictEls.map(newChip);
+    /** Текст подписи ноты — на её вердикт (момент statusAt): после перемотки та же нота получает новый. */
+    const texts = new Map<number, { at: number; text: string }>();
+    let chipsShown = 0;
+    let textsOf: AdaptedMap | null = null;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)');
     let quality: Quality = { scale: 1, ceiling: 2, ema: 0, slowMs: 0, fastMs: 0, steps: 0 };
     let sizeKey = '';
@@ -131,6 +147,7 @@ export function GuitarHighway({ adapted, songMs, visualOffsetMs, view, compact =
       t.renderScale = quality.scale;
       t.reduceMotion = reduce.matches;
       t.soffit = quality.steps < 2;
+      stampStatuses(a, now);
       if (v.mode === 'tab') drawTab(canvas, a.arr, now, t);
       else drawHighway(canvas, a.arr, now, t, cam);
       // Метки: только transform и opacity; текст меняется, лишь когда меняется цифра. Приёмник заполняется от дальних
@@ -145,6 +162,46 @@ export function GuitarHighway({ adapted, songMs, visualOffsetMs, view, compact =
       }
       for (let i = count; i < shown; i++) pool[i].style.opacity = '0';
       shown = count;
+      // Вердикты: над грифом на ладу ноты (у аккорда — над серединой его нот), с подъёмом и разведением.
+      const above = cam.projectAbove;
+      if (textsOf !== a) {
+        textsOf = a;
+        texts.clear();
+      }
+      const n = v.mode === 'tab' || !above ? 0 : collectChips(a, now, chips);
+      for (let k = 0; k < n; k++) {
+        const c = chips[k];
+        const at = a.arr.statusAt[c.note];
+        let cached = texts.get(c.note);
+        if (!cached || cached.at !== at) {
+          if (texts.size > 256) texts.clear();
+          texts.set(c.note, (cached = { at, text: chipText(a, c.note, c.kind) }));
+        }
+        c.text = cached.text;
+        const ffs = a.ffOfEvent[a.fromFf[c.note * 2]];
+        let x = 0;
+        let y = Infinity;
+        for (const f of ffs) {
+          const p = above!(f);
+          x += p.x;
+          y = Math.min(y, p.y);
+        }
+        c.x = x / ffs.length;
+        c.y = y;
+      }
+      layoutChips(chips, n, reduce.matches);
+      for (let k = 0; k < n; k++) {
+        const c = chips[k], el = verdictEls[k];
+        if (shownKind[k] !== c.kind) {
+          shownKind[k] = c.kind;
+          el.className = `rp-verdict rp-verdict--${c.kind}`;
+        }
+        if (shownText[k] !== c.text) verdictTexts[k].textContent = shownText[k] = c.text;
+        el.style.transform = `translate(${c.x.toFixed(1)}px, ${c.y.toFixed(1)}px) translate(-50%, -100%)`;
+        el.style.opacity = chipOpacity(c.age).toFixed(2);
+      }
+      for (let k = n; k < chipsShown; k++) verdictEls[k].style.opacity = '0';
+      chipsShown = n;
       const t1 = performance.now();
       quality = nextQuality(quality, t1 - t0, t1 - last);
       last = t1;
@@ -169,6 +226,16 @@ export function GuitarHighway({ adapted, songMs, visualOffsetMs, view, compact =
     <div className="rp-highway" data-ui="highway">
       <canvas ref={canvasRef} className="rp-highway__canvas" />
       <div ref={labelsRef} className="rp-highway__labels" aria-hidden="true" />
+      <div ref={verdictsRef} className="rp-highway__verdicts" data-ui="highway-verdicts" aria-hidden="true">
+        {VERDICT_SLOTS.map((k) => (
+          <div key={k} className="rp-verdict">
+            <GuitarIcon name="arrow-left" className="rp-verdict__early" />
+            <GuitarIcon name="x" className="rp-verdict__wrong" />
+            <span className="rp-verdict__text" />
+            <GuitarIcon name="arrow-right" className="rp-verdict__late" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

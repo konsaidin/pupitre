@@ -5,6 +5,7 @@ import { currentLang } from '../lib/i18n';
 const FORMS = {
   song: { en: ['song', 'songs'], ru: ['песня', 'песни', 'песен'] },
   part: { en: ['part', 'parts'], ru: ['партия', 'партии', 'партий'] },
+  fret: { en: ['fret', 'frets'], ru: ['лад', 'лада', 'ладов'] },
 } as const;
 
 /** «1 песня, 3 песни, 5 песен» / «1 song, 3 songs»: число со словом в нужной форме. */
