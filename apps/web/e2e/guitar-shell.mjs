@@ -1,7 +1,7 @@
 // Оболочка гитарного раздела (этап 8b, приёмка п. 3): вход из вокального меню, .rampa без легаси .topbar, шрифт
 // «Rampa Sans», Tab до вкладок и «Голос | Гитара» с видимым фокусом; изоляция: #/guitar/_system без легаси-стилей
 // совпадает со снимком с ними (≤ 0.1 %), вокальная главная после захода в раздел и возврата — с главной до захода (вне
-// .topnav, ≤ 0.1 %), data-section снят; телефон 844×390 — .mobile-viewport и .app-frame на всё окно; сборка без
+// .topnav, ≤ 0.1 %), data-section снова «vocal»; телефон 844×390 — .mobile-viewport и .app-frame на всё окно; сборка без
 // VITE_PUPITRE_GUITAR — пункта «Гитара» нет, #/guitar раздел не открывает.
 // Запуск: node apps/web/e2e/guitar-shell.mjs [--prod]  (--prod — то же на production-сборке с флагом, vite preview).
 import assert from 'node:assert/strict';
@@ -14,7 +14,8 @@ import { emojiWoff2Firefox, launchFirefox, scenario, seedAndReload, shoot, start
 
 const PROD = process.argv.includes('--prod');
 const OUT = join(homedir(), '.cache/pupitre/e2e/guitar-shell');
-const LEGACY_CSS = ['/src/styles.css', '/src/components.css', '/src/landscape.css'];
+// Легаси-стили вокала удалены (2026-10-25, вокал на Рампе); изоляция — от раскладок вокальных экранов (.vo-*).
+const LEGACY_CSS = ['/src/screens/vocal.css'];
 const LIMIT = 0.001; // доля различающихся пикселей
 
 const requireWeb = createRequire(join(webRoot, 'package.json'));
@@ -84,14 +85,13 @@ await scenario(async (track) => {
     await seedAndReload(page);
     await page.waitForSelector('.screen.home', { visible: true });
     await shoot(page, join(OUT, 'home-before.png'), { width: 1440, height: 900 });
-    const topnav = await rect(page, '.topnav');
+    const topnav = await rect(page, '[data-ui="shell-nav"]');
 
-    // Вход из вокального меню.
-    const link = await page.waitForSelector('xpath/.//nav[contains(@class,"topnav")]//button[.//span[text()="Гитара"]]');
-    await link.click();
+    // Вход из вокального режима: переключатель «Голос | Гитара» общей оболочки Рампы.
+    await page.click('[data-ui="shell-mode-switch"] .rp-seg__item[aria-checked="false"]');
     await page.waitForSelector('.rampa .rp-topbar', { visible: true });
     assert.equal(await page.evaluate(() => location.hash), '#/guitar');
-    assert.equal(await page.$('.topbar'), null, 'Легаси .topbar в разделе');
+    assert.equal(await page.$('[data-ui="vocal-root"]'), null, 'Вокальная оболочка осталась в разделе');
     assert.equal(await page.evaluate(() => document.documentElement.dataset.section), 'guitar');
     await page.evaluate(() => document.fonts.load('16px "Rampa Sans"').then(() => document.fonts.ready));
     const font = await page.$eval('.rp-h1', (el) => getComputedStyle(el).fontFamily);
@@ -111,7 +111,7 @@ await scenario(async (track) => {
       assert.ok(seen.get(id).visible, `Невидимый фокус у ${id}: ${seen.get(id).focused}`);
     }
 
-    // Изоляция: снимок справочника с легаси-стилями и без них.
+    // Изоляция: снимок справочника с раскладками вокала и без них.
     // _system — только в DEV; в production-сборке — любой экран раздела (легаси-стили там одним файлом, сверка — в dev).
     await page.goto(new URL(PROD ? '#/guitar/tuner' : '#/guitar/_system', server.url).href);
     await page.waitForSelector(PROD ? '[data-ui="stub-tuner"]' : '[data-ui="stub-system"], [data-ui="system"]', { visible: true });
@@ -137,7 +137,7 @@ await scenario(async (track) => {
     await page.waitForSelector('.rp-modeswitch', { visible: true });
     await page.click('.rp-modeswitch .rp-seg__item[aria-checked="false"]');
     await page.waitForSelector('.screen.home', { visible: true });
-    assert.equal(await page.evaluate(() => document.documentElement.dataset.section ?? null), null, 'data-section остался');
+    assert.equal(await page.evaluate(() => document.documentElement.dataset.section ?? null), 'vocal', 'data-section не вернулся к голосу');
     await page.mouse.move(1439, 899);
     await shoot(page, join(OUT, 'home-after.png'), { width: 1440, height: 900 });
     const leak = await diff(join(OUT, 'home-before.png'), join(OUT, 'home-after.png'), { exclude: topnav });
@@ -177,11 +177,10 @@ await scenario(async (track) => {
     await page.goto(plain.url);
     await seedAndReload(page);
     await page.waitForSelector('.screen.home', { visible: true });
-    const labels = await page.$$eval('.topnav-link span', (spans) => spans.map((s) => s.textContent));
-    assert.ok(!labels.includes('Гитара'), `Пункт «Гитара» в сборке без флага: ${labels.join(', ')}`);
+    assert.equal(await page.$('[data-ui="shell-mode-switch"]'), null, 'Переключатель «Гитара» в сборке без флага');
     await page.goto(new URL('#/guitar', plain.url).href);
-    await page.waitForSelector('.topbar', { visible: true });
-    assert.equal(await page.$('.rampa'), null, '#/guitar открыл раздел без флага');
+    await page.waitForSelector('[data-ui="vocal-root"] [data-ui="shell-topbar"]', { visible: true });
+    assert.equal(await page.$('[data-ui="guitar-root"]'), null, '#/guitar открыл раздел без флага');
     assert.deepEqual(log.errors(), [], 'Ошибки в сборке без флага');
   } finally {
     try { await noflag?.close(); } finally { await plain.close(); }

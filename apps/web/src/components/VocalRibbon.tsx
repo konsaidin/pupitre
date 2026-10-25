@@ -38,30 +38,30 @@ const AGE_BUCKETS = 3;
 const TRAIL_BREAK_SEMIS = 6;
 
 const C = {
-  bg: '#1d1f25',
+  bg: '#1A1E28',
   octaveLine: 'rgba(255,255,255,0.10)',
   octaveText: 'rgba(230,235,245,0.35)',
-  guide: 'rgba(185,165,207,0.9)',
-  guideDim: 'rgba(185,165,207,0.45)',
-  guideActive: '#b9a5cf',
-  ghost: 'rgba(160,170,200,0.30)',
-  hitFill: '#708c7a',
-  perfect: '#b2d2bb',
-  good: '#ddc091',
-  miss: '#dda09d',
-  contour: 'rgba(185,172,205,0.65)',
-  contourDim: 'rgba(185,172,205,0.25)',
+  guide: 'rgba(182,188,203,0.9)',
+  guideDim: 'rgba(182,188,203,0.45)',
+  guideActive: '#8DB7FF',
+  ghost: 'rgba(140,147,167,0.30)',
+  hitFill: '#1F8A62',
+  perfect: '#45E3A2',
+  good: '#FFC65C',
+  miss: '#FF6A76',
+  contour: 'rgba(141,183,255,0.65)',
+  contourDim: 'rgba(141,183,255,0.25)',
   nowLine: 'rgba(255,255,255,0.35)',
   text: 'rgba(230,235,245,0.85)',
-  badgeBg: 'rgba(31,29,37,0.95)',
-  vibBadge: '#b9accd',
-  distBadge: '#ff9840',
+  badgeBg: 'rgba(13,15,21,0.95)',
+  vibBadge: '#8DB7FF',
+  distBadge: '#FFA06E',
 };
 
-/** Цвет ленты: мимо — серо-голубой, в допуске — зелёный, расщепление — тёплый. */
+/** Цвет ленты (палитра Рампы): мимо — голубой --rp-info, в допуске — --rp-ok, расщепление — тёплый --rp-late. */
 function ribbonColor(inTol: boolean, dist: number): [number, number, number] {
-  const base: [number, number, number] = inTol ? [178, 210, 187] : [165, 175, 200];
-  const warm: [number, number, number] = [218, 172, 123];
+  const base: [number, number, number] = inTol ? [69, 227, 162] : [141, 183, 255];
+  const warm: [number, number, number] = [255, 160, 110];
   const k = Math.min(1, dist);
   return [
     Math.round(base[0] + (warm[0] - base[0]) * k),
@@ -387,7 +387,7 @@ function drawBadge(ctx: CanvasRenderingContext2D, x: number, y: number, label: s
   ctx.font = '12px system-ui, sans-serif';
   const w = ctx.measureText(label).width + 14;
   const h = 20;
-  ctx.fillStyle = 'rgba(31,29,37,0.95)';
+  ctx.fillStyle = 'rgba(13,15,21,0.95)';
   ctx.beginPath();
   ctx.roundRect(x, y, w, h, 10);
   ctx.fill();
@@ -402,7 +402,7 @@ function drawBadge(ctx: CanvasRenderingContext2D, x: number, y: number, label: s
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, dir: 'up' | 'down') {
-  ctx.fillStyle = '#ddc091';
+  ctx.fillStyle = '#FFC65C';
   ctx.beginPath();
   const s = dir === 'up' ? -1 : 1;
   ctx.moveTo(x, y + 8 * s);

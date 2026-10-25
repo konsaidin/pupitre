@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   deleteSong,
@@ -13,8 +13,10 @@ import { t } from '../lib/i18n';
 import { bestScore } from '../lib/profile';
 import { useProfile } from '../state/ProfileContext';
 import { ScreenHeader } from '../components/ScreenHeader';
-import { Icon } from '../components/Icon';
+import { RampaPoster } from '../components/RampaPoster';
+import { GuitarIcon } from '../guitar/ui/GuitarIcon';
 import type { PlayState } from './GameScreen';
+import './vocal.css';
 
 const STAGE_LABEL: Record<SongStage, string> = {
   queued: 'Queued…',
@@ -99,20 +101,26 @@ export function LibraryScreen() {
   });
 
   return (
-    <div className="screen library-screen">
+    <div className="screen library-screen rp-page vo-page" data-ui="vocal-songs">
       <ScreenHeader
         title={t('Your soundtrack.')}
         eyebrow={t('The songs you make your own')}
         subtitle={t('The music you love. The voice only you have. Put them together.')}
         action={
-          <span className="count-badge">
-            <Icon name="note" size={16} />
-            {ready} {t('ready')}
-          </span>
+          <>
+            <span className="rp-chip rp-chip--plain">
+              <GuitarIcon name="music" size="sm" />
+              <span className="rp-num">{ready}</span> {t('ready')}
+            </span>
+            <button className="rp-btn rp-btn--light" disabled={uploading} onClick={() => fileRef.current?.click()}>
+              <GuitarIcon name="plus" size="sm" />
+              {uploading ? t('Uploading…') : t('Choose a file')}
+            </button>
+          </>
         }
       />
       <button
-        className={`dropzone${dragOver ? ' over' : ''}`}
+        className={`rp-dropzone vo-drop${dragOver ? ' rp-dropzone--over' : ''}`}
         disabled={uploading}
         onDragOver={(e) => {
           e.preventDefault();
@@ -125,20 +133,14 @@ export function LibraryScreen() {
           void onFiles(e.dataTransfer.files);
         }}
         onClick={() => fileRef.current?.click()}
+        data-ui="songs-drop"
       >
-        <span className="upload-art" aria-hidden="true">
-          <span className="upload-disc" />
-          <span className="upload-plus">+</span>
-        </span>
-        <span className="dropzone-copy">
-          <span className="overline">{t('Make it your next song')}</span>
-          <strong>{uploading ? t('Uploading…') : t('Drop a track. Find your part.')}</strong>
-          <span>{t('We’ll find the vocal melody and turn it into notes you can sing along with.')}</span>
-          <small>MP3, WAV, FLAC, M4A</small>
-        </span>
-        <span className="btn primary">
-          <Icon name="upload" size={18} />
-          {uploading ? t('Uploading…') : t('Choose a file')}
+        <GuitarIcon name={uploading ? 'loader-2' : 'cloud-upload'} size="lg" className={uploading ? 'vo-spin' : undefined} />
+        <span className="vo-drop__copy">
+          <span className="rp-label">{t('Make it your next song')}</span>
+          <strong className="rp-h3">{uploading ? t('Uploading…') : t('Drop a track. Find your part.')}</strong>
+          <span className="rp-sm rp-muted">{t('We’ll find the vocal melody and turn it into notes you can sing along with.')}</span>
+          <span className="rp-label rp-faint">MP3 · WAV · FLAC · M4A</span>
         </span>
       </button>
       <input
@@ -153,37 +155,33 @@ export function LibraryScreen() {
         }}
       />
       {error && (
-        <div className="notice error" role="alert">
-          <Icon name="alert" size={20} />
+        <div className="rp-card rp-card--pad vo-notice" role="alert">
+          <GuitarIcon name="alert-triangle" />
           <div>
-            <strong>{t('The library needs a moment.')}</strong>
-            <p>{t('Check your connection or the song server in settings, then try again.')}</p>
-            <details>
+            <b>{t('The library needs a moment.')}</b>
+            <p className="rp-sm rp-muted">{t('Check your connection or the song server in settings, then try again.')}</p>
+            <details className="rp-xs rp-faint">
               <summary>{t('Details')}</summary>
               <p>{error}</p>
             </details>
           </div>
-          <button className="btn" onClick={() => void refresh()}>
+          <button className="rp-btn" onClick={() => void refresh()}>
+            <GuitarIcon name="refresh" size="sm" />
             {t('Retry')}
           </button>
         </div>
       )}
-      <div className="library-toolbar">
-        <div className="chip-row">
+      <div className="vo-filters">
+        <div className="rp-seg" role="group">
           {(['all', 'ready', 'processing'] as Filter[]).map((f) => (
-            <button
-              key={f}
-              className={filter === f ? 'chip-btn active' : 'chip-btn'}
-              aria-pressed={filter === f}
-              onClick={() => setFilter(f)}
-            >
+            <button key={f} className="rp-seg__item" aria-pressed={filter === f} onClick={() => setFilter(f)}>
               {t(f === 'all' ? 'All tracks' : f === 'ready' ? 'Ready' : 'Processing')}
-              <span>{f === 'all' ? (songs?.length ?? 0) : f === 'ready' ? ready : processing}</span>
+              <small>{f === 'all' ? (songs?.length ?? 0) : f === 'ready' ? ready : processing}</small>
             </button>
           ))}
         </div>
-        <label className="search-field">
-          <Icon name="search" size={18} />
+        <label className="rp-input vo-search">
+          <GuitarIcon name="search" size="sm" />
           <input
             type="search"
             placeholder={t('Find a song…')}
@@ -194,28 +192,26 @@ export function LibraryScreen() {
         </label>
       </div>
       {songs === null && !error && (
-        <div className="empty-state" role="status">
-          <Icon name="note" size={32} />
-          <h2>{t('Opening your library…')}</h2>
+        <div className="rp-empty" role="status">
+          <GuitarIcon name="loader-2" size="lg" className="vo-spin" />
+          <h2 className="rp-h3">{t('Opening your library…')}</h2>
           <p>{t('Your next favorite session is on its way.')}</p>
         </div>
       )}
       {songs?.length === 0 && !error && (
-        <div className="empty-state">
-          <span className="empty-state-icon">
-            <Icon name="headphones" size={32} />
-          </span>
-          <h2>{t('Every repertoire starts with one song.')}</h2>
+        <div className="rp-empty">
+          <GuitarIcon name="headphones" size="lg" />
+          <h2 className="rp-h3">{t('Every repertoire starts with one song.')}</h2>
           <p>{t('Add a track above. We’ll get the notes ready for your first take.')}</p>
         </div>
       )}
       {songs && songs.length > 0 && visible?.length === 0 && (
-        <div className="empty-state">
-          <Icon name="search" size={28} />
-          <h2>{t('No tracks found')}</h2>
+        <div className="rp-empty">
+          <GuitarIcon name="search" size="lg" />
+          <h2 className="rp-h3">{t('No tracks found')}</h2>
           <p>{t('Try another title or show all tracks.')}</p>
           <button
-            className="btn"
+            className="rp-btn"
             onClick={() => {
               setFilter('all');
               setQuery('');
@@ -226,102 +222,88 @@ export function LibraryScreen() {
         </div>
       )}
       {!!visible?.length && (
-        <div className="track-list">
-          <div className="track-list-head">
-            <span>#</span>
-            <span>{t('Track')}</span>
-            <span>{t('Status')}</span>
-            <span>{t('Best result')}</span>
-            <span />
-          </div>
-          {visible.map((s, i) => {
+        <div className="vo-songs">
+          {visible.map((s) => {
             const best = bestScore(profile, s.id);
             const busy = s.status === 'queued' || s.status === 'processing';
-            const cover = s.id.split('').reduce((sum, c) => sum + c.charCodeAt(0), 0) % 4;
             return (
-              <article key={s.id} className="track-row">
-                <span className="track-number">{String(i + 1).padStart(2, '0')}</span>
-                <div className="track-identity">
-                  <span className={`track-cover cover-${cover}`} aria-hidden="true">
-                    <span />
-                    <Icon name="note" size={20} />
+              <article key={s.id} className="vo-song" data-status={s.status}>
+                <RampaPoster seed={s.title} glyph={s.title.trim().charAt(0).toUpperCase()} className="vo-song__poster">
+                  <span className={`rp-chip rp-chip--onart vo-song__status${s.status === 'done' ? ' rp-chip--ok' : busy ? ' rp-chip--info' : ''}`}>
+                    {busy ? <GuitarIcon name="loader-2" size="sm" className="vo-spin" /> : <i className={`rp-led${s.status === 'done' ? ' rp-led--ok' : s.status === 'error' ? ' rp-led--bad' : ''}`} />}
+                    {t(STAGE_LABEL[s.stage])}
+                    {busy ? ` · ${Math.round(s.progress)} %` : ''}
                   </span>
-                  <div>
-                    <h3 title={s.title}>{s.title}</h3>
-                    <p>
-                      {s.artist || t('Your collection')}
-                      {s.durationMs ? ` · ${formatDur(s.durationMs)}` : ''}
-                      {s.status === 'done' ? ` · ${t('{n} notes', { n: s.noteCount })}` : ''}
-                    </p>
-                    {s.status === 'done' && !s.separated && (
-                      <span className="track-warning" title={s.separationError ?? undefined}>
-                        {t('Full mix playback')}
-                      </span>
-                    )}
-                    {s.error && (
-                      <details className="track-error">
-                        <summary>{t('What happened?')}</summary>
-                        {s.error}
-                      </details>
-                    )}
-                    {busy && (
-                      <span
-                        className="mini-progress"
-                        role="progressbar"
-                        aria-label={t(STAGE_LABEL[s.stage])}
-                        aria-valuenow={Math.round(s.progress)}
-                        aria-valuemin={0}
-                        aria-valuemax={100}
-                      >
-                        <span style={{ width: `${s.progress}%` }} />
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <span className={`track-status ${s.status}`}>
-                  <i />
-                  {t(STAGE_LABEL[s.stage])}
-                  {busy ? ` ${Math.round(s.progress)}%` : ''}
-                </span>
-                <span className="track-best">
-                  {best ? (
-                    <>
-                      <b>{Math.round(best.accuracy * 100)}%</b>
-                      <small>
-                        {'★'.repeat(best.stars)}
-                        {'☆'.repeat(3 - best.stars)}
-                      </small>
-                    </>
-                  ) : (
-                    <span>—</span>
-                  )}
-                </span>
-                <div className="track-actions">
+                  {s.durationMs ? <span className="rp-num vo-song__dur">{formatDur(s.durationMs)}</span> : null}
                   {s.status === 'done' && (
                     <button
-                      className="btn play-track"
+                      className="rp-btn rp-btn--light rp-btn--icon vo-song__play"
                       disabled={openingId !== null}
                       onClick={() => void playSong(s)}
                       aria-label={`${t('Sing')}: ${s.title}`}
+                      title={openingId === s.id ? t('Opening…') : t('Sing')}
                     >
-                      <Icon name="play" size={18} />
-                      <span>{openingId === s.id ? t('Opening…') : t('Sing')}</span>
+                      <GuitarIcon name={openingId === s.id ? 'loader-2' : 'player-play-filled'} className={openingId === s.id ? 'vo-spin' : undefined} />
                     </button>
                   )}
+                </RampaPoster>
+                {busy && (
+                  <span
+                    className="rp-progress vo-song__progress"
+                    role="progressbar"
+                    aria-label={t(STAGE_LABEL[s.stage])}
+                    aria-valuenow={Math.round(s.progress)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
+                    <i style={{ width: `${s.progress}%` }} />
+                  </span>
+                )}
+                <div className="vo-song__body">
+                  <div className="vo-song__title">
+                    <h3 title={s.title}>{s.title}</h3>
+                    <p className="rp-sm rp-faint">
+                      {s.artist || t('Your collection')}
+                      {s.status === 'done' ? ` · ${t('{n} notes', { n: s.noteCount })}` : ''}
+                    </p>
+                  </div>
+                  {best ? (
+                    <span className="rp-ring vo-song__best" title={t('Best result')} style={{ '--p': best.accuracy } as CSSProperties}>
+                      <span className="rp-num">{Math.round(best.accuracy * 100)}</span>
+                    </span>
+                  ) : (
+                    <span className="rp-ring vo-song__best vo-song__best--none" title={t('Best result')}>
+                      <span className="rp-num">—</span>
+                    </span>
+                  )}
+                </div>
+                <div className="vo-song__foot">
+                  {s.status === 'done' && !s.separated && (
+                    <span className="rp-tag" title={s.separationError ?? undefined}>
+                      {t('Full mix playback')}
+                    </span>
+                  )}
+                  {s.error && (
+                    <details className="rp-xs rp-faint vo-song__error">
+                      <summary>{t('What happened?')}</summary>
+                      {s.error}
+                    </details>
+                  )}
                   {s.status === 'error' && (
-                    <button className="btn tiny" onClick={() => void songAction(() => retrySong(s.id))}>
+                    <button className="rp-btn rp-btn--sm" onClick={() => void songAction(() => retrySong(s.id))}>
+                      <GuitarIcon name="refresh" size="sm" />
                       {t('Retry')}
                     </button>
                   )}
                   <button
-                    className="icon-btn delete-track"
+                    className="rp-btn rp-btn--ghost rp-btn--icon rp-btn--sm vo-song__delete"
                     aria-label={`${t('Delete')}: ${s.title}`}
+                    title={t('Delete')}
                     onClick={() => {
-                      if (confirm(t('Delete “{title}”?', { title: s.title })))
-                        void songAction(() => deleteSong(s.id));
+                      if (confirm(t('Delete “{title}”?', { title: s.title }))) void songAction(() => deleteSong(s.id));
                     }}
                   >
-                    <Icon name="trash" size={16} />
+                    <GuitarIcon name="trash" size="sm" />
                   </button>
                 </div>
               </article>

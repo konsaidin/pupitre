@@ -3,8 +3,9 @@ import { useNotePreview } from '../audio/useNotePreview';
 import { t } from '../lib/i18n';
 import { midiToHz, midiToName } from '../lib/music';
 import { useProfile } from '../state/ProfileContext';
-import { Icon } from './Icon';
+import { GuitarIcon } from '../guitar/ui/GuitarIcon';
 
+const name = (midi: number) => midiToName(midi).replace('#', '♯');
 const WHITE = [0, 2, 4, 5, 7, 9, 11, 12];
 const BLACK = [
   { step: 1, after: 0 },
@@ -27,57 +28,55 @@ export function StudioPiano() {
   };
 
   return (
-    <section className="studio-piano">
-      <div className="piano-intro">
-        <span className="overline">
-          <Icon name="piano" size={17} />
+    <section className="rp-card vo-piano" data-ui="studio-piano">
+      <div className="vo-piano__intro">
+        <span className="rp-label rp-section-title">
+          <GuitarIcon name="keyboard" size="sm" />
           {t('A note to start with')}
         </span>
-        <h2>{t('Hear it. Then sing it.')}</h2>
-        <p>{t('Touch the keys and find a comfortable sound. No microphone needed.')}</p>
-        <div className="piano-display">
-          <span className={preview.playing ? 'signal-led on' : 'signal-led'} />
-          <strong>{preview.midi === null ? '—' : midiToName(preview.midi)}</strong>
-          <span>
+        <h2 className="rp-h3">{t('Hear it. Then sing it.')}</h2>
+        <p className="rp-sm rp-muted">{t('Touch the keys and find a comfortable sound. No microphone needed.')}</p>
+        <div className="vo-piano__display">
+          <i className={preview.playing ? 'rp-led rp-led--on' : 'rp-led'} />
+          <strong className="rp-num">{preview.midi === null ? '—' : name(preview.midi)}</strong>
+          <span className="rp-xs rp-faint rp-num">
             {preview.midi === null ? t('Ready when you are') : `${midiToHz(preview.midi).toFixed(1)} Hz`}
           </span>
         </div>
       </div>
-      <div className="piano-instrument">
-        <div className="piano-toolbar">
-          <span>
-            PUPITRE <i>/ KEYS</i>
-          </span>
-          <div className="octave-control">
+      <div className="vo-piano__instrument">
+        <div className="vo-piano__toolbar">
+          <span className="rp-label">PUPITRE / KEYS</span>
+          <div className="rp-stepper">
             <button aria-label={t('Lower octave')} disabled={base <= 36} onClick={() => changeOctave(-12)}>
-              −
+              <GuitarIcon name="minus" size="sm" />
             </button>
-            <span>
-              {midiToName(base)} — {midiToName(base + 12)}
-            </span>
+            <output>
+              {name(base)} — {name(base + 12)}
+            </output>
             <button aria-label={t('Higher octave')} disabled={base >= 72} onClick={() => changeOctave(12)}>
-              +
+              <GuitarIcon name="plus" size="sm" />
             </button>
           </div>
         </div>
-        <div className="piano-keybed" role="group" aria-label={t('Playable piano keyboard')}>
-          <div className="white-keys">
+        <div className="vo-piano__keys" role="group" aria-label={t('Playable piano keyboard')}>
+          <div className="vo-piano__white">
             {WHITE.map((step) => (
               <button
                 key={step}
-                className={`piano-key white-key${preview.midi === base + step ? ' pressed' : ''}`}
+                className={`vo-key vo-key--white${preview.midi === base + step ? ' vo-key--on' : ''}`}
                 aria-label={t('Play {note}', { note: midiToName(base + step) })}
                 aria-pressed={preview.midi === base + step}
                 onClick={() => play(base + step)}
               >
-                <span>{midiToName(base + step)}</span>
+                <span>{name(base + step)}</span>
               </button>
             ))}
           </div>
           {BLACK.map(({ step, after }) => (
             <button
               key={step}
-              className={`piano-key black-key${preview.midi === base + step ? ' pressed' : ''}`}
+              className={`vo-key vo-key--black${preview.midi === base + step ? ' vo-key--on' : ''}`}
               style={{ left: `${((after + 0.69) / 8) * 100}%` }}
               aria-label={t('Play {note}', { note: midiToName(base + step) })}
               aria-pressed={preview.midi === base + step}
@@ -85,13 +84,10 @@ export function StudioPiano() {
             />
           ))}
         </div>
-        <div className="piano-caption">
-          <Icon name="speaker" size={14} />
-          <span>{preview.error || t('Tap a key. Your next note is right here.')}</span>
-          <span className="piano-screws" aria-hidden="true">
-            ⊕　⊕
-          </span>
-        </div>
+        <span className="rp-xs rp-faint vo-piano__caption">
+          <GuitarIcon name="volume" size="sm" />
+          {preview.error || t('Tap a key. Your next note is right here.')}
+        </span>
       </div>
     </section>
   );

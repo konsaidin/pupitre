@@ -18,23 +18,18 @@ export function count(n: number, word: keyof typeof FORMS): string {
 }
 export const GUITAR_RU: Record<string, string> = {
   // — оболочка —
-  Guitar: 'Гитара',
-  'Pupitre, guitar mode': 'Пюпитр, гитарный режим',
-  'Guitar mode sections': 'Разделы гитарного режима',
   Library: 'Библиотека',
   Songs: 'Песни',
   Tuner: 'Тюнер',
   Tone: 'Тон',
   'Input and sound': 'Вход и звук',
+  'Pupitre, guitar mode': 'Пюпитр, гитарный режим',
+  'Guitar mode sections': 'Разделы гитарного режима',
   Input: 'Вход',
   'No input selected': 'Вход не выбран',
   'Choose the input device in Input and sound': 'Выбери устройство входа в разделе «Вход и звук»',
   ms: 'мс',
-  'Pupitre mode': 'Режим Пюпитра',
   Voice: 'Голос',
-  Profile: 'Профиль',
-  'Player statistics will appear later': 'Статистика игрока появится позже',
-  Notifications: 'Уведомления',
   // — ошибки импорта —
   'The file is larger than 20 MB': 'Файл больше 20 МБ',
   'The archive is too large or suspicious': 'Архив слишком большой или подозрительный',

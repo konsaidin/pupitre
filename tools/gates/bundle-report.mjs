@@ -12,9 +12,9 @@ const ROOT = gatesRoot();
 const dist = join(ROOT, 'apps/web/dist');
 const baselinePath = join(ROOT, 'tools/gates/baselines/bundle.json');
 const BUDGET = { js: 3072, css: 1024, start: 3072 };
-// Следы гитарного раздела; в стартовых файлах их быть не должно ни в каком регистре.
-const MARKERS = /alphatab|fretfall|rampa|inst-processor/gi;
-const CSS_MARKERS = /\.rp-/gi;
+// Следы гитарного раздела; в стартовых файлах их быть не должно ни в каком регистре. Дизайн-система «Рампа» (.rampa,
+// .rp-*, Rampa Sans) с 2026-10-25 — общий слой обоих режимов (решение пользователя: вокал на Рампе) и во входе разрешена.
+const MARKERS = /alphatab|fretfall|inst-processor/gi;
 
 // PUPITRE_GATES_ROOT подменяет корень только для tools/gates/selftest.mjs и только внутри его каталога.
 function gatesRoot() {
@@ -127,7 +127,6 @@ try {
   }
   for (const [name, text] of [['index.html', html], ...all.map(n => [n, readFileSync(join(dist, n), 'utf8')])]) {
     const found = new Set([...text.matchAll(MARKERS)].map(m => m[0].toLowerCase()));
-    if (/\.(?:css|html)$/i.test(name)) for (const m of text.matchAll(CSS_MARKERS)) found.add(m[0].toLowerCase());
     for (const marker of found) violations.push(`${name} содержит маркер ${marker}`);
     if (slice && text.includes(slice)) violations.push(`dsp-inst.wasm встроен в ${name}`);
   }

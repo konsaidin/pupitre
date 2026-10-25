@@ -123,17 +123,6 @@
     "note": "подмножество Noto Music: только знаки альтерации (♯ ♭ ♮…); зарезервированных имён у шрифта нет"
   },
   {
-    "id": "Phosphor Icons",
-    "kind": "icons",
-    "path": "apps/web/src/components/Icon.tsx",
-    "sha256": "1e9ed631f7f5b689e2ce192eff2c14ae4cdb05e61fe782da523f2ef70e84bb53",
-    "author": "Phosphor Icons",
-    "license": "MIT",
-    "url": "https://github.com/phosphor-icons/core",
-    "licenseText": "apps/web/public/licenses/Phosphor-MIT.txt",
-    "note": "контуры иконок вокального UI встроены в код компонента"
-  },
-  {
     "id": "Tabler Icons",
     "kind": "icons",
     "path": "apps/web/src/guitar/ui/GuitarIcon.tsx",

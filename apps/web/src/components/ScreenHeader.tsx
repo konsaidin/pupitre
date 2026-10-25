@@ -1,14 +1,13 @@
-// Единая шапка экрана: кнопка «назад», заголовок, опциональный подзаголовок.
-// Один компонент на все экраны — навигация не теряется ни на телефоне, ни на десктопе.
-
+// Заголовок страницы «Рампы»: надпись-метка, заголовок, подзаголовок, действие справа. Навигация — в верхней панели
+// (вкладки), поэтому кнопка «назад» — только если задан backTo.
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GuitarIcon } from '../guitar/ui/GuitarIcon';
 import { t } from '../lib/i18n';
-import { Icon } from './Icon';
 
 interface ScreenHeaderProps {
   title: ReactNode;
-  /** куда ведёт «назад» (по умолчанию — главное меню) */
+  /** куда ведёт «назад»; нет — кнопки нет */
   backTo?: string;
   subtitle?: ReactNode;
   /** место под кнопку/бейдж справа */
@@ -16,21 +15,22 @@ interface ScreenHeaderProps {
   eyebrow?: ReactNode;
 }
 
-export function ScreenHeader({ title, backTo = '/', subtitle, action, eyebrow }: ScreenHeaderProps) {
+export function ScreenHeader({ title, backTo, subtitle, action, eyebrow }: ScreenHeaderProps) {
   const navigate = useNavigate();
   return (
-    <header className="screen-head">
-      <div className="screen-head-row">
-        <button className="back-btn" aria-label={t('Back')} onClick={() => navigate(backTo)}>
-          <Icon name="arrow" size={18} className="back-arrow" />
-        </button>
-        <div className="screen-head-title">
-          {eyebrow && <span className="overline">{eyebrow}</span>}
-          <h1>{title}</h1>
-        </div>
-        {action && <div className="screen-head-action">{action}</div>}
+    <header className="vo-head">
+      <div>
+        {backTo && (
+          <button className="rp-btn rp-btn--ghost rp-btn--sm vo-back" onClick={() => navigate(backTo)}>
+            <GuitarIcon name="arrow-left" size="sm" />
+            {t('Back')}
+          </button>
+        )}
+        {eyebrow && <span className="rp-label">{eyebrow}</span>}
+        <h1 className="rp-h1">{title}</h1>
+        {subtitle && <p className="rp-muted vo-head__sub">{subtitle}</p>}
       </div>
-      {subtitle && <p className="lead dim">{subtitle}</p>}
+      {action && <div className="vo-head__actions">{action}</div>}
     </header>
   );
 }

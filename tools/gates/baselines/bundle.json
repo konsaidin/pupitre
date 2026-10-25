@@ -1,18 +1,40 @@
 {
-  "entry": "assets/index-DXUd-5Xq.js",
-  "entryGzip": 136097,
-  "entryRaw": 389368,
+  "entry": "assets/index-BlnH7qBF.js",
+  "entryGzip": 143459,
+  "entryRaw": 415721,
+  "css": [
+    "assets/index-8Gxa9bro.css"
+  ],
+  "cssGzip": 15469,
+  "preload": [],
+  "preloadGzip": 0,
+  "startGzip": 158928,
   "chunks": [
     {
-      "name": "assets/index-BXLbnFjN.css",
-      "raw": 93335,
-      "gzip": 19793
+      "name": "assets/GuitarApp-A5W1Xh7L.js",
+      "raw": 187469,
+      "gzip": 69731
     },
     {
-      "name": "assets/index-DXUd-5Xq.js",
-      "raw": 389368,
-      "gzip": 136097
+      "name": "assets/GuitarApp-CF3jAwWR.css",
+      "raw": 31599,
+      "gzip": 6384
+    },
+    {
+      "name": "assets/index-8Gxa9bro.css",
+      "raw": 58946,
+      "gzip": 15469
+    },
+    {
+      "name": "assets/index-BlnH7qBF.js",
+      "raw": 415721,
+      "gzip": 143459
+    },
+    {
+      "name": "assets/scoreClient-3PCxKX8b.js",
+      "raw": 2597834,
+      "gzip": 719592
     }
   ],
-  "date": "2026-10-23T23:11:55.579Z"
+  "date": "2026-10-25T16:55:30.817Z"
 }

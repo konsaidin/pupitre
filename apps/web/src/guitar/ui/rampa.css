@@ -2,7 +2,7 @@
    Разделы 0–8 перенесены из design/mockups.html (строки 18–446) почти дословно, раздел А — адаптив из раздела 10 макета
    (только классы разделов 0–8 и оболочки), раздел Б — раздел внутри легаси-обёртки MobileLandscape.
    Отличия от макета помечены «Пюпитр:». CSS грузит только ленивый чанк раздела, но после загрузки он глобален, поэтому
-   все селекторы — внутри .rampa, с префиксом .rp- или под html[data-section='guitar'] (атрибут ставит оболочка раздела
+   все селекторы — внутри .rampa, с префиксом .rp- или под html[data-section] (атрибут ставит оболочка раздела
    на время пребывания в нём). Контраст токенов проверяет tokens.test.ts. */
 
 /* =====================================================================================================
@@ -23,7 +23,7 @@
    иначе сигнальный текст на .rp-chip--onart теряет контраст) и экран «поверни телефон» (он вне .rampa, см. раздел Б). */
 .rampa,
 .rampa[data-theme='light'] .rp-poster,
-html[data-section='guitar'] .orientation-gate {
+html[data-section] .orientation-gate {
   color-scheme: dark;
   /* зал и поверхности: от самой глубокой тьмы к ближнему свету */
   --rp-hall: #040509;
@@ -69,7 +69,7 @@ html[data-section='guitar'] .orientation-gate {
   --rp-foil-line: linear-gradient(90deg, #FF959C, #FFBE73, #EEDA67, #8CE06D, #77CDFB, #DE7CF4);
 }
 .rampa,
-html[data-section='guitar'] .orientation-gate {
+html[data-section] .orientation-gate {
   /* типографика */
   --rp-font-sans: 'Rampa Accidentals', 'Rampa Sans', system-ui, sans-serif;
   --rp-font-mono: 'Rampa Accidentals', 'Rampa Mono', ui-monospace, monospace;
@@ -127,7 +127,7 @@ html[data-section='guitar'] .orientation-gate {
    2. База. Сброс только внутри .rampa
    ===================================================================================================== */
 /* Пюпитр: в макете — голые html, body; здесь — только пока открыт раздел (вокальный UI не меняется) */
-html[data-section='guitar'], html[data-section='guitar'] body { margin: 0; height: 100%; background: #040509; }
+html[data-section], html[data-section] body { margin: 0; height: 100%; background: #040509; }
 .rampa, .rampa *, .rampa *::before, .rampa *::after { box-sizing: border-box; }
 /* Пюпитр: изоляция от легаси (ui-spec §13.2). Что styles.css задаёт глобально (* { margin; padding }, button:disabled,
    touch-action), раздел задаёт себе сам — вид не зависит от того, подключены ли старые стили. Стоит до всех правил
@@ -505,20 +505,20 @@ html[data-reduced-motion='true'] .rampa *, html[data-reduced-motion='true'] .ram
    ===================================================================================================== */
 /* Короб 16:9 и отступ рельса вокала (landscape.css:23-32, 76-86) в разделе не действуют: раскладка Рампы рассчитана
    на 844×390 (≈ 2.16:1). contain: none — fixed-слои (зерно, тосты) снова считаются от окна, а не от короба. */
-html[data-section='guitar'] .mobile-viewport { background: #040509; }
-html[data-section='guitar'] .mobile-viewport .app-frame { width: 100%; height: 100%; aspect-ratio: auto; contain: none; }
-html[data-section='guitar'] .mobile-viewport .app-main { margin-left: 0; }
+html[data-section] .mobile-viewport { background: #040509; }
+html[data-section] .mobile-viewport .app-frame { width: 100%; height: 100%; aspect-ratio: auto; contain: none; }
+html[data-section] .mobile-viewport .app-main { margin-left: 0; }
 /* «Поверни телефон» в стиле Рампы (ui-spec §11.1): знак раздела (c-mark), заголовок, пояснение. Рисунок и надпись
    «PUPITRE · 16:9» вокального экрана в разделе скрыты — раскладка раздела не 16:9. Токены — из блока цветов и типографики. */
-html[data-section='guitar'] .orientation-gate { gap: var(--rp-s-3); padding: var(--rp-s-8) var(--rp-s-6); color: var(--rp-fg-1);
+html[data-section] .orientation-gate { gap: var(--rp-s-3); padding: var(--rp-s-8) var(--rp-s-6); color: var(--rp-fg-1);
   background: radial-gradient(560px 320px at 50% -60px, var(--rp-haze), transparent 70%), var(--rp-hall);
   font-family: var(--rp-font-sans); font-size: var(--rp-fs-body); font-weight: 420; line-height: 1.5;
   -webkit-font-smoothing: antialiased; font-synthesis: none; }
-html[data-section='guitar'] .orientation-gate::before { content: ''; width: 64px; height: 64px; margin-bottom: var(--rp-s-2);
+html[data-section] .orientation-gate::before { content: ''; width: 64px; height: 64px; margin-bottom: var(--rp-s-2);
   background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23F5F7FF' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'><path d='M12 4.5 3.5 20M12 4.5 6.9 20M12 4.5 10.3 20M12 4.5 13.7 20M12 4.5 17.1 20M12 4.5 20.5 20'/><path d='M12 3.6h.01' stroke-width='3'/></svg>") center / contain no-repeat;
   filter: drop-shadow(0 0 12px var(--rp-beam)); }
-html[data-section='guitar'] .orientation-gate > .rotate-phone,
-html[data-section='guitar'] .orientation-gate > .overline { display: none; }
-html[data-section='guitar'] .orientation-gate h1 { font-size: var(--rp-fs-h1); font-weight: 760; font-stretch: 125%;
+html[data-section] .orientation-gate > .rotate-phone,
+html[data-section] .orientation-gate > .overline { display: none; }
+html[data-section] .orientation-gate h1 { font-size: var(--rp-fs-h1); font-weight: 760; font-stretch: 125%;
   letter-spacing: -0.025em; line-height: 1.04; text-wrap: balance; }
-html[data-section='guitar'] .orientation-gate p { max-width: 320px; color: var(--rp-fg-2); font-size: var(--rp-fs-sm); line-height: 1.45; }
+html[data-section] .orientation-gate p { max-width: 320px; color: var(--rp-fg-2); font-size: var(--rp-fs-sm); line-height: 1.45; }

@@ -1,8 +1,8 @@
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, useState, type ReactNode } from 'react';
 import { HashRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { ProfileProvider } from './state/ProfileContext';
 import { BackendSetupBanner } from './components/BackendSetupBanner';
-import { TopBar } from './components/TopBar';
+import { VocalShell } from './components/VocalShell';
 import { MobileLandscape } from './components/MobileLandscape';
 import { getSavedLang } from './lib/i18n';
 import { GUITAR_ENABLED } from './guitarFlag';
@@ -14,6 +14,11 @@ import { GameScreen } from './screens/GameScreen';
 import { ResultsScreen } from './screens/ResultsScreen';
 import { LibraryScreen } from './screens/LibraryScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
+// «Рампа» — дизайн-система обоих режимов (с 2026-10-25): во входном чанке
+import './guitar/ui/rampa.css';
+
+// раздел до первого кадра — без вспышки без стилей (Chrome уточнит при смене маршрута)
+if (!document.documentElement.dataset.section) document.documentElement.dataset.section = /^#\/guitar(\/|$)/.test(location.hash) ? 'guitar' : 'vocal';
 
 /** Игра и живой шаг визарда занимают всю высоту — там топбар не рисуем. */
 const BARE_ROUTES = new Set(['/play', '/range']);
@@ -30,17 +35,19 @@ function BackendBannerGate() {
 
 function Chrome({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
-  const mainRef = useRef<HTMLElement>(null);
+  const guitar = isGuitar(pathname);
   useEffect(() => {
-    mainRef.current?.scrollTo(0, 0);
     window.scrollTo(0, 0);
-  }, [pathname]);
+    // на телефоне прокручивается рамка 16:9 (MobileLandscape), а не окно
+    document.querySelector('.app-frame')?.scrollTo(0, 0);
+    // раздел — на <html>: фон, «поверни телефон» и рамка телефона Рампы (гитарный раздел ставит своё значение сам)
+    if (!guitar) document.documentElement.dataset.section = 'vocal';
+  }, [pathname, guitar]);
+  if (guitar) return <>{children}</>;
+  // игра и живой шаг визарда — на всю высоту, без панели
   return (
-    <div className={isBare(pathname) ? 'app-shell bare' : 'app-shell'}>
-      {!isBare(pathname) && <TopBar />}
-      <main className="app-main" id="main-content" ref={mainRef}>
-        {children}
-      </main>
+    <div className="rampa" data-ui="vocal-root">
+      {isBare(pathname) ? <main className="rp-main" id="main-content">{children}</main> : <VocalShell>{children}</VocalShell>}
     </div>
   );
 }

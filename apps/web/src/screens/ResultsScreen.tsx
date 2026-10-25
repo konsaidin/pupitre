@@ -3,7 +3,8 @@
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { t } from '../lib/i18n';
-import { Icon } from '../components/Icon';
+import { GuitarIcon } from '../guitar/ui/GuitarIcon';
+import './vocal.css';
 import type { GameSummary } from '../game/scoring';
 import type { TrailPoint } from '../game/engine';
 import type { SongMap, Difficulty } from '../lib/songMap';
@@ -27,9 +28,11 @@ export function ResultsScreen() {
 
   if (!st) {
     return (
-      <div className="screen">
-        <p>{t('No result.')}</p>
-        <button className="btn" onClick={() => navigate('/')}>
+      <div className="screen rp-page vo-page">
+        <div className="rp-empty">
+          <p>{t('No result.')}</p>
+        </div>
+        <button className="rp-btn" onClick={() => navigate('/')}>
           {t('To menu')}
         </button>
       </div>
@@ -37,97 +40,81 @@ export function ResultsScreen() {
   }
 
   const { summary: s } = st;
+  const pct = Math.round(s.accuracy * 100);
   return (
-    <div className="screen results">
-      <header className="result-hero">
-        <div>
-          <span className="overline">{t('Session complete')}</span>
-          <h1>{t(st.title)}</h1>
-          <p>
-            {t('Every note takes you further.')} · {t(DIFFICULTY_META[st.difficulty].label)}
-          </p>
-          <div className="stars" aria-label={t('{n} of 3 stars', { n: s.stars })}>
-            {[1, 2, 3].map((i) => (
-              <span key={i} aria-hidden="true" className={i <= s.stars ? 'star on' : 'star'}>
-                ★
-              </span>
-            ))}
+    <div className="screen results rp-page vo-page" data-ui="vocal-results">
+      <section className="rp-card vo-result">
+        <div className="vo-result__main">
+          <span className="rp-label">
+            {t('Session complete')} · {t(st.title)} · {t(DIFFICULTY_META[st.difficulty].label)}
+          </span>
+          <div className="vo-result__acc">
+            <span className="rp-num">{pct}</span>
+            <span className="vo-result__pct">%</span>
+          </div>
+          <div className="vo-row">
+            <span className="rp-label">{t('accuracy')}</span>
+            <span className="vo-stars" aria-label={t('{n} of 3 stars', { n: s.stars })}>
+              {[1, 2, 3].map((i) => (
+                <GuitarIcon key={i} name={i <= s.stars ? 'star-filled' : 'star'} />
+              ))}
+            </span>
+            <span className="rp-chip rp-chip--plain">{t('Every note takes you further.')}</span>
           </div>
         </div>
-        <div className="accuracy-ring">
-          <svg viewBox="0 0 180 180" aria-hidden="true">
-            <circle cx="90" cy="90" r="78" stroke="#45404b" />
-            <circle
-              cx="90"
-              cy="90"
-              r="78"
-              stroke="var(--accent)"
-              opacity={s.accuracy > 0 ? 1 : 0}
-              strokeDasharray={`${Math.max(0, Math.min(1, s.accuracy)) * 490.1} 490.1`}
-              strokeLinecap="round"
-            />
-          </svg>
-          <div>
-            <strong>{Math.round(s.accuracy * 100)}%</strong>
-            <small>{t('accuracy')}</small>
+        <div className="vo-result__stats">
+          <div className="rp-stat">
+            <span className="rp-label">{t('points')}</span>
+            <span className="rp-stat__v">{s.score}</span>
           </div>
+          <div className="rp-stat">
+            <span className="rp-label">{t('notes on target')}</span>
+            <span className="rp-stat__v">{s.perfect + s.good}</span>
+          </div>
+          <div className="rp-stat">
+            <span className="rp-label">{t('max combo')}</span>
+            <span className="rp-stat__v">×{s.maxCombo}</span>
+          </div>
+          <div className="vo-result__verdicts">
+            <span className="rp-chip rp-chip--ok">Perfect <b className="rp-num">{s.perfect}</b></span>
+            <span className="rp-chip vo-chip--good">Good <b className="rp-num">{s.good}</b></span>
+            <span className="rp-chip vo-chip--miss">Miss <b className="rp-num">{s.miss}</b></span>
+          </div>
+          {(s.tech.vibratoMs >= 500 || s.tech.distortionMs >= 500) && (
+            <p className="rp-xs rp-faint">
+              {s.tech.vibratoMs >= 500 && `〜 ${t('vibrato')} ${(s.tech.vibratoMs / 1000).toFixed(1)} ${t('s')}`}
+              {s.tech.vibratoMs >= 500 && s.tech.distortionMs >= 500 && ' · '}
+              {s.tech.distortionMs >= 500 && `⚡ ${t('rasp')} ${(s.tech.distortionMs / 1000).toFixed(1)} ${t('s')}`}
+            </p>
+          )}
         </div>
-      </header>
-      <div className="results-grid">
-        <div className="stat">
-          <span className="stat-num">{s.score}</span>
-          <span className="dim">{t('points')}</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">{s.perfect + s.good}</span>
-          <span className="dim">{t('notes on target')}</span>
-        </div>
-        <div className="stat">
-          <span className="stat-num">×{s.maxCombo}</span>
-          <span className="dim">{t('max combo')}</span>
-        </div>
-      </div>
-      <div className="verdicts">
-        <span className="v perfect">Perfect {s.perfect}</span>
-        <span className="v good">Good {s.good}</span>
-        <span className="v miss">Miss {s.miss}</span>
-      </div>
-      {(s.tech.vibratoMs >= 500 || s.tech.distortionMs >= 500) && (
-        <p className="dim tech-stats">
-          {s.tech.vibratoMs >= 500 && `〜 ${t('vibrato')} ${(s.tech.vibratoMs / 1000).toFixed(1)} ${t('s')}`}
-          {s.tech.vibratoMs >= 500 && s.tech.distortionMs >= 500 && ' · '}
-          {s.tech.distortionMs >= 500 &&
-            `⚡ ${t('rasp')} ${(s.tech.distortionMs / 1000).toFixed(1)} ${t('s')}`}
-        </p>
-      )}
-      <section className="result-graph-panel">
-        <div className="section-heading">
-          <h2>{t('Your voice, on the map')}</h2>
-          <div className="graph-legend">
+      </section>
+      <section className="rp-card rp-card--pad vo-result__graph">
+        <div className="rp-card__head">
+          <h2 className="rp-label">{t('Your voice, on the map')}</h2>
+          <div className="vo-legend rp-xs rp-muted">
             <span>
-              <i />
+              <i className="vo-legend__notes" />
               {t('Notes')}
             </span>
             <span>
-              <i />
+              <i className="vo-legend__voice" />
               {t('Your voice')}
             </span>
           </div>
         </div>
         <ResultGraph st={st} />
       </section>
-      <div className="btn-row">
-        <button className="btn primary" onClick={() => navigate('/play', { state: st.playState })}>
-          <Icon name="play" size={17} />
+      <div className="vo-row">
+        <button className="rp-btn rp-btn--light rp-btn--lg" onClick={() => navigate('/play', { state: st.playState })}>
+          <GuitarIcon name="player-play-filled" size="sm" />
           {t('Try again')}
         </button>
-        <button
-          className="btn"
-          onClick={() => navigate(st.playState.kind === 'exercise' ? '/exercises' : '/songs')}
-        >
+        <button className="rp-btn rp-btn--lg" onClick={() => navigate(st.playState.kind === 'exercise' ? '/exercises' : '/songs')}>
+          <GuitarIcon name="list-details" size="sm" />
           {t('To the list')}
         </button>
-        <button className="btn ghost" onClick={() => navigate('/')}>
+        <button className="rp-btn rp-btn--ghost rp-btn--lg" onClick={() => navigate('/')}>
           {t('To menu')}
         </button>
       </div>
@@ -155,7 +142,7 @@ function ResultGraph({ st }: { st: ResultsState }) {
       const x = (ms: number) => (ms / dur) * W;
       const y = (midi: number) => H - ((midi - win.lowMidi + 0.5) / semis) * H;
 
-      g.fillStyle = '#1d1f25';
+      g.fillStyle = '#1A1E28';
       g.fillRect(0, 0, W, H);
 
       // ноты, раскрашенные вердиктом
@@ -163,17 +150,17 @@ function ResultGraph({ st }: { st: ResultsState }) {
       for (const n of shiftedMap.notes) {
         const r = byNote.get(n);
         g.fillStyle = !r
-          ? 'rgba(120,130,160,0.5)'
+          ? 'rgba(140,147,167,0.45)'
           : r.judgement === 'perfect'
-            ? 'rgba(178,210,187,0.8)'
+            ? 'rgba(69,227,162,0.8)'
             : r.judgement === 'good'
-              ? 'rgba(221,192,145,0.8)'
-              : 'rgba(221,160,157,0.55)';
+              ? 'rgba(255,198,92,0.8)'
+              : 'rgba(255,106,118,0.55)';
         g.fillRect(x(n.startMs), y(n.midi) - 2.5, Math.max(1.5, x(n.startMs + n.durMs) - x(n.startMs)), 5);
       }
 
       // линия голоса
-      g.strokeStyle = 'rgba(185,172,205,0.95)';
+      g.strokeStyle = 'rgba(141,183,255,0.95)';
       g.lineWidth = 1.5;
       g.beginPath();
       let pen = false;

@@ -3,6 +3,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { RU } from '../lib/i18n';
 import { GUITAR_RU } from './i18n';
 
 const ROOT = new URL('.', import.meta.url).pathname;
@@ -28,7 +29,8 @@ describe('словарь гитарного раздела', () => {
   }
 
   it(`RU N/N: у каждого ключа t() есть перевод (файлов ${files.length})`, () => {
-    const missing = [...used].filter((key) => !Object.hasOwn(GUITAR_RU, key));
+    // общие строки оболочки «Рампы» (голос и гитара) живут в основном словаре lib/i18n
+    const missing = [...used].filter((key) => !Object.hasOwn(GUITAR_RU, key) && !Object.hasOwn(RU, key));
     expect(missing).toEqual([]);
     expect(used.size).toBeGreaterThan(10);
     console.log(`RU ${used.size}/${used.size}`);

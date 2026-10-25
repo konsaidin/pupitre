@@ -5,8 +5,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ensureMic, getAudioContext, stopMic } from '../audio/audioSession';
 import { ExtractionPanel } from '../components/ExtractionPanel';
-import { Icon } from '../components/Icon';
-import { MelodyPreview } from '../components/StudioArtwork';
+import { MelodyPreview } from '../components/MelodyAudition';
+import { GuitarIcon } from '../guitar/ui/GuitarIcon';
+import './vocal.css';
 import { useMobileLandscape } from '../components/MobileLandscape';
 import { PianoRoll } from '../components/PianoRoll';
 import { SeekBar } from '../components/SeekBar';
@@ -137,9 +138,9 @@ export function GameScreen() {
 
   if (!play || !songMap || !shiftedMap || !engineMap || !window_) {
     return (
-      <div className="screen">
-        <p className="error">{!range ? t('Define your vocal range first.') : t('Nothing to play.')}</p>
-        <button className="btn" onClick={() => navigate(range ? '/' : '/range')}>
+      <div className="screen rp-page vo-page">
+        <p className="vo-error">{!range ? t('Define your vocal range first.') : t('Nothing to play.')}</p>
+        <button className="rp-btn" onClick={() => navigate(range ? '/' : '/range')}>
           {range ? t('To menu') : t('To the wizard')}
         </button>
       </div>
@@ -307,296 +308,242 @@ export function GameScreen() {
 
   const meta = DIFFICULTY_META[difficulty];
 
+  const durationSec = Math.round(songMap.durationMs / 1000);
+  const segItem = (active: boolean) => (active ? 'rp-seg__item seg-btn active' : 'rp-seg__item seg-btn');
   return (
-    <div className="screen game">
-      <header className="game-header">
-        <button className="btn ghost" onClick={quit}>
-          {t('← Exit')}
+    <div className="screen game vo-game" data-ui="vocal-game">
+      {/* .game-header .seg .seg-btn — зацепка защищённого e2e ribbon.cjs: [0] — лента, [1] — ролл */}
+      <header className="game-header vo-game__head">
+        <button className="rp-btn rp-btn--ghost rp-btn--sm" onClick={quit}>
+          <GuitarIcon name="arrow-left" size="sm" />
+          {t('Exit')}
         </button>
-        <div className="game-title">
+        <div className="vo-game__title">
           <b>{t(songMap.title)}</b>
-          {songMap.subtitle && <span className="dim">{songMap.subtitle}</span>}
+          {songMap.subtitle && <span className="rp-faint">{songMap.subtitle}</span>}
         </div>
         {play.kind === 'song' && (
-          <div className="octave-badge" title={t('Melody shifted into your octave')}>
+          <div className="rp-stepper vo-game__octave" title={t('Melody shifted into your octave')}>
             <button
-              className="btn tiny"
               disabled={status === 'running'}
+              aria-label={t('Lower octave')}
               onClick={() => {
                 setOctaveShift(shift - 1);
                 restart();
               }}
             >
-              −
+              <GuitarIcon name="minus" size="sm" />
             </button>
-            <span>
-              {shift === 0 ? t('original') : t('{n} oct.', { n: `${shift > 0 ? '+' : ''}${shift}` })}
-            </span>
+            <output>{shift === 0 ? t('original') : t('{n} oct.', { n: `${shift > 0 ? '+' : ''}${shift}` })}</output>
             <button
-              className="btn tiny"
               disabled={status === 'running'}
+              aria-label={t('Higher octave')}
               onClick={() => {
                 setOctaveShift(shift + 1);
                 restart();
               }}
             >
-              +
+              <GuitarIcon name="plus" size="sm" />
             </button>
           </div>
         )}
-        <div className="seg" title={t('View: vocal ribbon or piano roll')}>
-          <button
-            className={profile.vocalView === 'ribbon' ? 'seg-btn active' : 'seg-btn'}
-            onClick={() => update({ vocalView: 'ribbon' })}
-          >
+        <div className="rp-seg rp-seg--sm seg" title={t('View: vocal ribbon or piano roll')}>
+          <button className={segItem(profile.vocalView === 'ribbon')} aria-pressed={profile.vocalView === 'ribbon'} onClick={() => update({ vocalView: 'ribbon' })}>
             {t('Ribbon')}
           </button>
-          <button
-            className={profile.vocalView === 'roll' ? 'seg-btn active' : 'seg-btn'}
-            onClick={() => update({ vocalView: 'roll' })}
-          >
+          <button className={segItem(profile.vocalView === 'roll')} aria-pressed={profile.vocalView === 'roll'} onClick={() => update({ vocalView: 'roll' })}>
             {t('Roll')}
           </button>
         </div>
         <button
-          className="btn tiny"
+          className="rp-btn rp-btn--ghost rp-btn--sm"
           aria-pressed={profile.reduceMotion}
           aria-label={profile.reduceMotion ? t('Stationary notes') : t('Scrolling notes')}
           title={t('Notes stay in place; the playhead moves. Pages change without sliding.')}
           onClick={() => update({ reduceMotion: !profile.reduceMotion })}
         >
-          <Icon name={profile.reduceMotion ? 'sliders' : 'waves'} size={16} className="motion-icon" />
-          <span className="motion-label">
-            {profile.reduceMotion ? t('Stationary notes') : t('Scrolling notes')}
-          </span>
+          <GuitarIcon name={profile.reduceMotion ? 'focus-centered' : 'arrows-horizontal'} size="sm" />
+          <span className="vo-game__motion">{profile.reduceMotion ? t('Stationary notes') : t('Scrolling notes')}</span>
         </button>
         {(status === 'running' || status === 'paused') && (
           <button
-            className={
-              loop?.b != null
-                ? 'btn tiny loop-btn active'
-                : loop
-                  ? 'btn tiny loop-btn armed'
-                  : 'btn tiny loop-btn'
-            }
+            className={`rp-btn rp-btn--sm${loop?.b != null ? ' rp-btn--light' : ''}`}
+            aria-pressed={!!loop}
             onClick={cycleLoop}
             title={t('Phrase loop (L): press at the start, again at the end, third press clears')}
           >
+            <GuitarIcon name="repeat" size="sm" />
             {!loop ? t('Loop A') : loop.b === null ? t('Loop B') : t('Loop ✕')}
           </button>
         )}
-        <div className="hud">
-          <span className="hud-score">{hud.score}</span>
-          {hud.combo > 1 && <span className="hud-combo">×{hud.combo}</span>}
-          <span className="hud-diff">{t(meta.label)}</span>
+        <div className="vo-game__hud">
+          <span className="rp-tag">{t(meta.label)}</span>
+          {hud.combo > 1 && <span className="vo-game__mult rp-num"><small>×</small>{hud.combo}</span>}
+          <span className="rp-num vo-game__score">{hud.score}</span>
         </div>
         {status === 'running' && (
-          <button className="btn ghost game-pause" aria-label={t('Pause')} onClick={pause}>
-            <Icon name="pause" size={15} />
-            <span>{t('Pause')}</span>
+          <button className="rp-btn rp-btn--icon rp-btn--sm" aria-label={t('Pause')} title={t('Pause')} onClick={pause}>
+            <GuitarIcon name="player-pause-filled" size="sm" />
           </button>
         )}
       </header>
 
-      <div className="game-progress">
-        <div style={{ width: `${hud.progress * 100}%` }} />
+      <div className="rp-progress vo-game__progress">
+        <i style={{ width: `${hud.progress * 100}%` }} />
       </div>
 
-      <div className="game-stage">
+      <div className="game-stage vo-game__stage">
         {engine &&
           (profile.vocalView === 'roll' ? (
-            <PianoRoll
-              engine={engine}
-              window={window_}
-              lineMode={lineOn}
-              reduceMotion={profile.reduceMotion}
-            />
+            <PianoRoll engine={engine} window={window_} lineMode={lineOn} reduceMotion={profile.reduceMotion} />
           ) : (
-            <VocalRibbon
-              engine={engine}
-              window={window_}
-              lineMode={lineOn}
-              reduceMotion={profile.reduceMotion}
-            />
+            <VocalRibbon engine={engine} window={window_} lineMode={lineOn} reduceMotion={profile.reduceMotion} />
           ))}
 
         {status === 'setup' && !editing && !tuning && (
-          <div className="overlay setup-overlay">
-            <div className="setup-layout">
-              <aside className="session-intro">
-                <span className="overline">{t('The practice room')}</span>
-                <h2>
-                  {t('Listen.')}
-                  <br />
-                  <span>{t('Find your note.')}</span>
-                  <br />
-                  {t('Make it yours.')}
+          <div className="vo-overlay">
+            <div className="vo-setup">
+              <aside className="rp-card rp-card--pad vo-setup__intro">
+                <span className="rp-label">{t('The practice room')}</span>
+                <h2 className="rp-h2">
+                  {t('Listen.')} <span className="rp-muted">{t('Find your note.')}</span> {t('Make it yours.')}
                 </h2>
-                <p>{t('Follow the melody, see your voice, and enjoy getting closer with every take.')}</p>
-                <div className="session-preview">
+                <p className="rp-sm rp-muted">{t('Follow the melody, see your voice, and enjoy getting closer with every take.')}</p>
+                <div className="vo-melody">
                   <MelodyPreview notes={songMap.notes} />
-                  <div>
-                    <span>
-                      <Icon name="clock" size={14} />
-                      {Math.floor(Math.round(songMap.durationMs / 1000) / 60)}:
-                      {String(Math.round(songMap.durationMs / 1000) % 60).padStart(2, '0')}
+                  <div className="vo-melody__bar rp-xs rp-faint">
+                    <span className="rp-tag">
+                      <GuitarIcon name="clock" size="sm" />
+                      <span className="rp-num">
+                        {Math.floor(durationSec / 60)}:{String(durationSec % 60).padStart(2, '0')}
+                      </span>
                     </span>
-                    <span>{t('{n} notes', { n: songMap.notes.length })}</span>
+                    <span className="rp-tag">{t('{n} notes', { n: songMap.notes.length })}</span>
                   </div>
                 </div>
-                <span className="session-tip">
-                  <Icon name="headphones" size={17} />
+                <span className="rp-xs rp-faint vo-setup__tip">
+                  <GuitarIcon name="headphones" size="sm" />
                   {t('Headphones on. Everything else can wait.')}
                 </span>
               </aside>
-              <div className="panel setup-panel">
-                <div className="setup-heading">
-                  <span className="session-emblem">
-                    <Icon name={play.kind === 'song' ? 'note' : 'waves'} size={23} />
+              <div className="rp-card rp-card--raised rp-card--pad vo-setup__panel">
+                <div>
+                  <span className="rp-label">{t('Your next take')}</span>
+                  <h2 className="rp-h2">{t(songMap.title)}</h2>
+                </div>
+                <div className="rp-field">
+                  <span className="rp-field__head rp-sm">{t('Difficulty')}</span>
+                  <div className="rp-seg rp-seg--fill" role="radiogroup" aria-label={t('Difficulty')}>
+                    {(Object.keys(DIFFICULTY_META) as Difficulty[]).map((d) => (
+                      <button key={d} className="rp-seg__item" role="radio" aria-checked={d === difficulty} onClick={() => setDifficulty(d)}>
+                        {t(DIFFICULTY_META[d].label)}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="rp-field__hint">
+                    {t('±{cents} cents tolerance{octave}', {
+                      cents: DIFFICULTY_META[difficulty].toleranceCents,
+                      octave: DIFFICULTY_META[difficulty].octaveAgnostic ? t(', octave ignored') : t(', octave matters'),
+                    })}
                   </span>
-                  <span className="overline">{t('Your next take')}</span>
-                  <h2>{t(songMap.title)}</h2>
                 </div>
-                <div className="setup-controls">
-                  <label className="field">
-                    {t('Difficulty')}
-                    <div className="seg">
-                      {(Object.keys(DIFFICULTY_META) as Difficulty[]).map((d) => (
-                        <button
-                          key={d}
-                          className={d === difficulty ? 'seg-btn active' : 'seg-btn'}
-                          onClick={() => setDifficulty(d)}
-                        >
-                          {t(DIFFICULTY_META[d].label)}
-                        </button>
-                      ))}
+                {play.kind === 'exercise' && (
+                  <div className="vo-toggles">
+                    {(
+                      [
+                        ['Guide notes', guideNotes, setGuideNotes],
+                        ['Metronome', metronome, setMetronome],
+                      ] as const
+                    ).map(([label, on, set]) => (
+                      <div className="rp-toggle-row" key={label}>
+                        <button type="button" role="switch" className="rp-switch" aria-checked={on} aria-label={t(label)} onClick={() => set(!on)} />
+                        <span className="rp-toggle-row__text">{t(label)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {play.kind === 'song' && (
+                  <div className="rp-field">
+                    <span className="rp-field__head rp-sm">{t('Playback')}</span>
+                    <div className="rp-seg rp-seg--fill" role="radiogroup" aria-label={t('Playback')}>
+                      <button className="rp-seg__item" role="radio" aria-checked={backingVariant === 'minus'} onClick={() => setBackingVariant('minus')}>
+                        {t('No vocals')}
+                      </button>
+                      <button className="rp-seg__item" role="radio" aria-checked={backingVariant === 'mix'} onClick={() => setBackingVariant('mix')}>
+                        {t('With vocals')}
+                      </button>
+                      <button
+                        className="rp-seg__item"
+                        role="radio"
+                        aria-checked={backingVariant === 'vocal'}
+                        disabled={!songMap.hasVocal}
+                        title={songMap.hasVocal ? undefined : t('vocals not separated for this track')}
+                        onClick={() => setBackingVariant('vocal')}
+                      >
+                        {t('Vocals only')}
+                      </button>
                     </div>
-                    <span className="dim small">
-                      {t('±{cents} cents tolerance{octave}', {
-                        cents: DIFFICULTY_META[difficulty].toleranceCents,
-                        octave: DIFFICULTY_META[difficulty].octaveAgnostic
-                          ? t(', octave ignored')
-                          : t(', octave matters'),
-                      })}
+                    <span className="rp-field__hint">
+                      {backingVariant === 'minus' && t('instrumental — you sing the vocals')}
+                      {backingVariant === 'mix' && t('the full original — sing along (headphones recommended)')}
+                      {backingVariant === 'vocal' && t('extracted vocals only — as a guide (headphones recommended)')}
                     </span>
-                  </label>
-                  {play.kind === 'exercise' && (
-                    <>
-                      <label className="check">
-                        <input
-                          type="checkbox"
-                          checked={guideNotes}
-                          onChange={(e) => setGuideNotes(e.target.checked)}
-                        />{' '}
-                        {t('Guide notes')}
-                      </label>
-                      <label className="check">
-                        <input
-                          type="checkbox"
-                          checked={metronome}
-                          onChange={(e) => setMetronome(e.target.checked)}
-                        />{' '}
-                        {t('Metronome')}
-                      </label>
-                    </>
-                  )}
-                  {play.kind === 'song' && (
-                    <label className="field">
-                      {t('Playback')}
-                      <div className="seg">
-                        <button
-                          className={backingVariant === 'minus' ? 'seg-btn active' : 'seg-btn'}
-                          onClick={() => setBackingVariant('minus')}
-                        >
-                          {t('No vocals')}
-                        </button>
-                        <button
-                          className={backingVariant === 'mix' ? 'seg-btn active' : 'seg-btn'}
-                          onClick={() => setBackingVariant('mix')}
-                        >
-                          {t('With vocals')}
-                        </button>
-                        <button
-                          className={backingVariant === 'vocal' ? 'seg-btn active' : 'seg-btn'}
-                          disabled={!songMap.hasVocal}
-                          title={songMap.hasVocal ? undefined : t('vocals not separated for this track')}
-                          onClick={() => setBackingVariant('vocal')}
-                        >
-                          {t('Vocals only')}
-                        </button>
-                      </div>
-                      <span className="dim small">
-                        {backingVariant === 'minus' && t('instrumental — you sing the vocals')}
-                        {backingVariant === 'mix' &&
-                          t('the full original — sing along (headphones recommended)')}
-                        {backingVariant === 'vocal' &&
-                          t('extracted vocals only — as a guide (headphones recommended)')}
-                      </span>
-                    </label>
-                  )}
-                  {canLineMode && (
-                    <label className="field">
-                      {t('Target')}
-                      <div className="seg">
-                        <button
-                          className={lineMode ? 'seg-btn' : 'seg-btn active'}
-                          onClick={() => setLineMode(false)}
-                        >
-                          {t('Notes')}
-                        </button>
-                        <button
-                          className={lineMode ? 'seg-btn active' : 'seg-btn'}
-                          onClick={() => setLineMode(true)}
-                        >
-                          {t('Line 🧪')}
-                        </button>
-                      </div>
-                      <span className="dim small">
-                        {lineMode
-                          ? t('experimental: sing along the contour line, points for staying close')
-                          : t('classic: hit the note bars with your voice')}
-                      </span>
-                    </label>
-                  )}
-                  {play.kind === 'song' && (
-                    <p className="dim small">
-                      {t('Octave: {mode}. Use the ± buttons up top to change.', {
-                        mode:
-                          shift === 0
-                            ? t('as in the original')
-                            : t('shift {shift} — melody moved into your range', {
-                                shift: `${shift > 0 ? '+' : ''}${shift}`,
-                              }),
-                      })}
-                    </p>
-                  )}
-                  {!profile.headphonesWarned && (
-                    <p className="hint">
-                      {t(
-                        '🎧 Put on headphones — otherwise the mic hears the backing track and your line jumps around.',
-                      )}
-                    </p>
-                  )}
-                  {error && <p className="error">⚠️ {error}</p>}
-                </div>
+                  </div>
+                )}
+                {canLineMode && (
+                  <div className="rp-field">
+                    <span className="rp-field__head rp-sm">{t('Target')}</span>
+                    <div className="rp-seg rp-seg--fill" role="radiogroup" aria-label={t('Target')}>
+                      <button className="rp-seg__item" role="radio" aria-checked={!lineMode} onClick={() => setLineMode(false)}>
+                        {t('Notes')}
+                      </button>
+                      <button className="rp-seg__item" role="radio" aria-checked={lineMode} onClick={() => setLineMode(true)}>
+                        {t('Line 🧪')}
+                      </button>
+                    </div>
+                    <span className="rp-field__hint">
+                      {lineMode
+                        ? t('experimental: sing along the contour line, points for staying close')
+                        : t('classic: hit the note bars with your voice')}
+                    </span>
+                  </div>
+                )}
+                {play.kind === 'song' && (
+                  <p className="rp-field__hint">
+                    {t('Octave: {mode}. Use the ± buttons up top to change.', {
+                      mode:
+                        shift === 0
+                          ? t('as in the original')
+                          : t('shift {shift} — melody moved into your range', { shift: `${shift > 0 ? '+' : ''}${shift}` }),
+                    })}
+                  </p>
+                )}
+                {!profile.headphonesWarned && (
+                  <p className="rp-chip rp-chip--info vo-setup__warn">
+                    {t('🎧 Put on headphones — otherwise the mic hears the backing track and your line jumps around.')}
+                  </p>
+                )}
+                {error && <p className="vo-error">{error}</p>}
+                {/* .btn.primary.big — зацепка защищённого e2e ribbon.cjs (старт игры) */}
                 <button
-                  className="btn primary big setup-start"
+                  className="rp-btn rp-btn--light rp-btn--xl btn primary big setup-start"
                   onClick={() => {
                     update({ headphonesWarned: true });
                     void start();
                   }}
                 >
-                  <Icon name="play" size={18} />
+                  <GuitarIcon name="player-play-filled" />
                   {t('Let’s go')}
-                  <Icon name="arrow" size={18} />
                 </button>
                 {play.kind === 'song' && (
-                  <div className="btn-row tight">
-                    <button className="btn ghost" onClick={openEditor}>
-                      {t('✎ Edit notes')}
+                  <div className="vo-row">
+                    <button className="rp-btn rp-btn--ghost rp-btn--sm" onClick={openEditor}>
+                      <GuitarIcon name="wand" size="sm" />
+                      {t('Edit notes')}
                     </button>
-                    <button className="btn ghost" onClick={() => setTuning(true)}>
-                      {t('⚙ Extraction')}
+                    <button className="rp-btn rp-btn--ghost rp-btn--sm" onClick={() => setTuning(true)}>
+                      <GuitarIcon name="adjustments-alt" size="sm" />
+                      {t('Extraction')}
                     </button>
                   </div>
                 )}
@@ -606,36 +553,41 @@ export function GameScreen() {
         )}
 
         {status === 'loading' && (
-          <div className="overlay">
-            <div className="panel">
+          <div className="vo-overlay">
+            <div className="rp-card rp-card--raised rp-card--pad vo-panel">
+              <GuitarIcon name="loader-2" className="vo-spin" />
               <p>{t('Getting mic and audio ready…')}</p>
             </div>
           </div>
         )}
 
         {status === 'running' && hud.countdown > 0.05 && (
-          <div className="overlay transparent">
-            <span className="countdown">{Math.ceil(hud.countdown)}</span>
+          <div className="vo-overlay vo-overlay--clear">
+            <span className="vo-countdown rp-num">{Math.ceil(hud.countdown)}</span>
           </div>
         )}
 
         {status === 'paused' && !editing && (
-          <div className="overlay">
-            <div className="panel">
-              <h2>{t('Pause')}</h2>
-              <div className="btn-col">
-                <button className="btn primary" onClick={resume}>
+          <div className="vo-overlay">
+            <div className="rp-card rp-card--raised rp-card--pad vo-panel">
+              <h2 className="rp-h2">{t('Pause')}</h2>
+              <div className="vo-col">
+                <button className="rp-btn rp-btn--light rp-btn--lg" onClick={resume}>
+                  <GuitarIcon name="player-play-filled" size="sm" />
                   {t('Resume')}
                 </button>
                 {play.kind === 'song' && (
-                  <button className="btn" onClick={openEditor}>
-                    {t('✎ Edit notes')}
+                  <button className="rp-btn" onClick={openEditor}>
+                    <GuitarIcon name="wand" size="sm" />
+                    {t('Edit notes')}
                   </button>
                 )}
-                <button className="btn" onClick={restart}>
+                <button className="rp-btn" onClick={restart}>
+                  <GuitarIcon name="refresh" size="sm" />
                   {t('Restart')}
                 </button>
-                <button className="btn" onClick={quit}>
+                <button className="rp-btn rp-btn--ghost" onClick={quit}>
+                  <GuitarIcon name="arrow-left" size="sm" />
                   {t('Exit')}
                 </button>
               </div>
@@ -666,10 +618,10 @@ export function GameScreen() {
         )}
 
         {status === 'error' && (
-          <div className="overlay">
-            <div className="panel">
-              <p className="error">⚠️ {error}</p>
-              <button className="btn" onClick={() => setStatus('setup')}>
+          <div className="vo-overlay">
+            <div className="rp-card rp-card--raised rp-card--pad vo-panel">
+              <p className="vo-error">{error}</p>
+              <button className="rp-btn" onClick={() => setStatus('setup')}>
                 {t('Back')}
               </button>
             </div>
@@ -677,17 +629,17 @@ export function GameScreen() {
         )}
       </div>
 
-      <div className="game-shortcuts">
+      <div className="vo-game__foot rp-xs rp-faint">
         <span>
-          <Icon name="headphones" size={14} />
+          <GuitarIcon name="headphones" size="sm" />
           {t('Your voice. Your pace.')}
         </span>
-        <span className="desktop-shortcut">
-          <kbd>Space</kbd>
+        <span className="vo-game__keys">
+          <kbd className="rp-kbd">Space</kbd>
           {t('Play / pause')}
-          <kbd>← →</kbd>
+          <kbd className="rp-kbd">← →</kbd>
           {t('Seek')}
-          <kbd>L</kbd>
+          <kbd className="rp-kbd">L</kbd>
           {t('Loop')}
         </span>
         <span>{profile.reduceMotion ? t('Stationary notes') : t('Scrolling notes')}</span>

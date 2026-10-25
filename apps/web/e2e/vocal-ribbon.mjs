@@ -31,8 +31,8 @@ function countRibbon() {
   if (!canvas) return { error: 'canvas не найден' };
   const { width: w, height: h } = canvas;
   const img = canvas.getContext('2d').getImageData(0, 0, w, h).data;
-  const BG = [29, 31, 37]; // C.bg '#1d1f25'
-  const COLORS = [[165, 175, 200], [178, 210, 187], [218, 172, 123]]; // мимо, в допуске, расщепление
+  const BG = [26, 30, 40]; // C.bg '#1A1E28' (--rp-surface-3)
+  const COLORS = [[141, 183, 255], [69, 227, 162], [255, 160, 110]]; // мимо, в допуске, расщепление (палитра Рампы)
   const dirs = COLORS.map((c) => c.map((v, i) => v - BG[i]));
   const nowX = Math.floor(w * 0.3);
   let ribbon = 0;
@@ -82,8 +82,8 @@ await scenario(async (track) => {
       vocalView: 'ribbon', reduceMotion: false,
     } });
     await page.goto(`${vite.url}#/exercises`);
-    await page.waitForSelector('.exercise-card-actions .btn.primary', { visible: true });
-    await page.click('.exercise-card-actions .btn.primary');
+    await page.waitForSelector('.card-head .btn.primary', { visible: true });
+    await page.click('.card-head .btn.primary');
     await page.waitForSelector('.setup-start', { visible: true });
     await page.click('.setup-start');
     // Отсчёт 3 с: ленты ещё нет — негатив.

@@ -29,22 +29,22 @@ const TRAIL_MS = 3000;
 const TRAIL_BREAK_SEMIS = 6;
 
 const C = {
-  bg: '#1d1f25',
+  bg: '#1A1E28',
   rowWhite: 'rgba(255,255,255,0.030)',
   rowLine: 'rgba(255,255,255,0.055)',
   octaveLine: 'rgba(255,255,255,0.16)',
-  note: '#776a8b',
-  noteBorder: '#a99ab9',
-  noteActive: '#b9a5cf',
-  ghost: 'rgba(160,170,200,0.16)',
-  hit: '#708c7a',
-  perfect: '#b2d2bb',
-  good: '#ddc091',
-  miss: '#dda09d',
-  trailHit: '#b2d2bb',
+  note: '#3A4256',
+  noteBorder: '#8C93A7',
+  noteActive: '#8DB7FF',
+  ghost: 'rgba(140,147,167,0.16)',
+  hit: '#1F8A62',
+  perfect: '#45E3A2',
+  good: '#FFC65C',
+  miss: '#FF6A76',
+  trailHit: '#45E3A2',
   trailMiss: 'rgba(200,205,215,0.55)',
-  pitch: '#b9accd',
-  pitchDim: 'rgba(185,172,205,0.35)',
+  pitch: '#8DB7FF',
+  pitchDim: 'rgba(141,183,255,0.35)',
   nowLine: 'rgba(255,255,255,0.35)',
   text: 'rgba(230,235,245,0.85)',
   textDim: 'rgba(230,235,245,0.45)',
@@ -92,10 +92,10 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         s.lineTo(W, y + rowH);
         s.stroke();
         // клавиша
-        s.fillStyle = isBlackKey(m) ? '#282832' : '#f0ece6';
+        s.fillStyle = isBlackKey(m) ? '#13161E' : '#F4F6FB';
         s.fillRect(0, y + 0.5, KEYBOARD_W - 6, rowH - 1);
         if (m % 12 === 0 || rowH > 16) {
-          s.fillStyle = isBlackKey(m) ? C.textDim : '#4f4751';
+          s.fillStyle = isBlackKey(m) ? C.textDim : '#5F6679';
           s.font = `${Math.min(11, rowH - 3)}px system-ui, sans-serif`;
           s.textBaseline = 'middle';
           s.fillText(midiToName(m), 4, y + rowH / 2 + 0.5);
@@ -162,7 +162,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         let border = C.noteBorder;
         if (res) {
           border = res.judgement === 'perfect' ? C.perfect : res.judgement === 'good' ? C.good : C.miss;
-          fill = res.judgement === 'miss' ? 'rgba(221,160,157,0.25)' : 'rgba(112,140,122,0.35)';
+          fill = res.judgement === 'miss' ? 'rgba(255,106,118,0.25)' : 'rgba(69,227,162,0.35)';
         }
         // левый край обрезается клавиатурой, правый — настоящий x2 (ширина
         // x2−x1 от обрезанного края «растягивала» уезжающую ноту)
@@ -302,7 +302,7 @@ export function PianoRoll({ engine, window: win, lookaheadMs = 4000, showPitchli
         if (y < -4) drawArrow(ctx2d, nowX, 14, 'up');
         else if (y > H + 4) drawArrow(ctx2d, nowX, H - 14, 'down');
         else {
-          ctx2d.fillStyle = lf.cents !== null && Math.abs(lf.cents) <= 100 ? C.trailHit : '#f0ece6';
+          ctx2d.fillStyle = lf.cents !== null && Math.abs(lf.cents) <= 100 ? C.trailHit : '#F4F6FB';
           ctx2d.beginPath();
           ctx2d.arc(nowX, y, 6, 0, Math.PI * 2);
           ctx2d.fill();
@@ -352,7 +352,7 @@ function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numbe
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, x: number, y: number, dir: 'up' | 'down') {
-  ctx.fillStyle = '#ddc091';
+  ctx.fillStyle = '#FFC65C';
   ctx.beginPath();
   const s = dir === 'up' ? -1 : 1;
   ctx.moveTo(x, y + 8 * s);

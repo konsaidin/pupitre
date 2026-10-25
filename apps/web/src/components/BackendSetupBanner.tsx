@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { desktopBridge } from '../lib/api';
 import { t } from '../lib/i18n';
+import { GuitarIcon } from '../guitar/ui/GuitarIcon';
 
 interface Status {
   stage: string;
@@ -29,17 +30,21 @@ export function BackendSetupBanner() {
   const isError = status.stage === 'error';
 
   return (
-    <div className={isError ? 'backend-banner error' : 'backend-banner'}>
-      {!isError && <span className="backend-spinner" aria-hidden="true" />}
-      <span className="backend-banner-text">
-        {t(STAGE_LABEL[status.stage] ?? status.stage)}
-        {status.progress != null && ` ${status.progress}%`}
-        {status.detail && <span className="dim small"> · {status.detail}</span>}
-      </span>
-      {isError && desktopBridge()?.retrySetup && (
-        <button className="btn tiny" onClick={() => desktopBridge()?.retrySetup?.()}>{t('Retry')}</button>
-      )}
-      <span className="dim small">{t('Warm-ups and exercises already work')}</span>
+    <div className="rampa vo-banner" data-ui="backend-banner">
+      <div className={`rp-toast${isError ? ' rp-toast--bad' : ''} vo-banner__toast`} role="status">
+        <GuitarIcon name={isError ? 'alert-triangle' : 'loader-2'} className={isError ? undefined : 'vo-spin'} />
+        <span>
+          <b>{t(STAGE_LABEL[status.stage] ?? status.stage)}</b>
+          {status.progress != null && <span className="rp-num"> {status.progress}%</span>}
+          {status.detail && <span className="rp-faint"> · {status.detail}</span>}
+          <small>{t('Warm-ups and exercises already work')}</small>
+        </span>
+        {isError && desktopBridge()?.retrySetup && (
+          <button className="rp-btn rp-btn--sm" onClick={() => desktopBridge()?.retrySetup?.()}>
+            {t('Retry')}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

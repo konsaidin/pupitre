@@ -71,10 +71,10 @@ function bundleRoot(name, { css = '', preload = null } = {}) {
 check('bundle: контроль — без изменений BUNDLE_OK', () => expect(gate('bundle-report.mjs', bundleRoot('bundle-control')), 0, /BUNDLE_OK/));
 check('bundle (а): входной CSS +200 КБ → провал', () =>
   expect(gate('bundle-report.mjs', bundleRoot('bundle-css', { css: `.x{content:"${noise(200 * 1024)}"}` })), 1, /Превышен бюджет: Входной CSS/));
-check('bundle (б): .rampa и Rampa Sans во входном CSS → провал', () =>
-  expect(gate('bundle-report.mjs', bundleRoot('bundle-rampa', { css: '.rampa{font-family:"Rampa Sans"}' })), 1, /index\.css содержит маркер rampa/));
-check('bundle (б′): .rp- во входном CSS → провал', () =>
-  expect(gate('bundle-report.mjs', bundleRoot('bundle-rp', { css: '.rp-btn{color:red}' })), 1, /index\.css содержит маркер \.rp-/));
+check('bundle (б): Рампа во входном CSS — общий слой, не маркер (размер — по бюджету)', () =>
+  expect(gate('bundle-report.mjs', bundleRoot('bundle-rampa', { css: '.rampa .rp-btn{font-family:"Rampa Sans"}' })), 0, /BUNDLE_OK/));
+check('bundle (б′): fretfall в modulepreload-чанке → провал', () =>
+  expect(gate('bundle-report.mjs', bundleRoot('bundle-ff', { preload: 'export const fretfall = 1;\n' })), 1, /vendor\.js содержит маркер fretfall/));
 check('bundle (в): modulepreload-чанк с маркером alphaTab → провал', () =>
   expect(gate('bundle-report.mjs', bundleRoot('bundle-preload', { preload: 'export const alphaTab = 1;\n' })), 1, /vendor\.js содержит маркер alphatab/));
 check('bundle: dev-маршрут в чанке → провал', () => {

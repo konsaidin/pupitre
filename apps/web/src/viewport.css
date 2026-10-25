@@ -1,0 +1,17 @@
+/* Корень приложения и рамка телефона (MobileLandscape): телефон — строгая сцена 16:9 в ландшафте, портрет — экран
+   «поверни телефон» (его вид — rampa.css, раздел Б). Всё остальное оформление — дизайн-система «Рампа». */
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { min-height: 100%; margin: 0; }
+body { background: #040509; color: #F4F6FB; font-family: 'Rampa Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.viewport, .app-frame { min-height: 100vh; }
+.mobile-viewport {
+  --available-width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  --available-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  position: fixed; inset: 0; min-height: 0; display: grid; place-items: center; overflow: hidden;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+.mobile-viewport .app-frame { position: relative; contain: layout paint; min-height: 0; overflow: auto;
+  width: min(var(--available-width), calc(var(--available-height) * 16 / 9)); height: min(var(--available-height), calc(var(--available-width) * 9 / 16)); }
+.mobile-viewport.portrait .app-frame { visibility: hidden; pointer-events: none; }
+.orientation-gate { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }

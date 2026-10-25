@@ -36,17 +36,17 @@ const NEW_NOTE_MS = 400;
 const RULER_H = 18;
 
 const C = {
-  bg: '#1d1f25',
+  bg: '#1A1E28',
   rowWhite: 'rgba(255,255,255,0.030)',
   rowLine: 'rgba(255,255,255,0.055)',
   octaveLine: 'rgba(255,255,255,0.16)',
-  note: '#776a8b',
-  noteBorder: '#a99ab9',
+  note: '#3A4256',
+  noteBorder: '#8C93A7',
   noteSel: '#6d8ad4',
   noteSelBorder: '#a9c0ff',
-  pitch: '#b9accd',
-  selRange: 'rgba(251,191,36,0.10)',
-  selRangeEdge: 'rgba(251,191,36,0.6)',
+  pitch: '#8DB7FF',
+  selRange: 'rgba(255,198,92,0.10)',
+  selRangeEdge: 'rgba(255,198,92,0.6)',
   playhead: 'rgba(255,255,255,0.5)',
   ruler: '#151a24',
   rulerLine: 'rgba(255,255,255,0.2)',
@@ -215,10 +215,10 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         ctx2d.moveTo(KEYBOARD_W, y + rowH);
         ctx2d.lineTo(W, y + rowH);
         ctx2d.stroke();
-        ctx2d.fillStyle = isBlackKey(m) ? '#282832' : '#f0ece6';
+        ctx2d.fillStyle = isBlackKey(m) ? '#13161E' : '#F4F6FB';
         ctx2d.fillRect(0, y + 0.5, KEYBOARD_W - 6, rowH - 1);
         if (m % 12 === 0 || rowH > 16) {
-          ctx2d.fillStyle = isBlackKey(m) ? C.textDim : '#4f4751';
+          ctx2d.fillStyle = isBlackKey(m) ? C.textDim : '#5F6679';
           ctx2d.font = `${Math.min(11, rowH - 3)}px system-ui, sans-serif`;
           ctx2d.textBaseline = 'middle';
           ctx2d.fillText(midiToName(m), 4, y + rowH / 2 + 0.5);
@@ -347,7 +347,7 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
         }
       }
       // playhead-маркер на линейке
-      ctx2d.fillStyle = '#f0ece6';
+      ctx2d.fillStyle = '#F4F6FB';
       ctx2d.beginPath();
       ctx2d.moveTo(playX - 5, 0);
       ctx2d.lineTo(playX + 5, 0);
@@ -539,15 +539,15 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
       <div className="editor">
         <header className="editor-head">
           <b>{t('Note editor')} · {t(map.title)}</b>
-          <span className="dim small">{t('{n} notes', { n: notesRef.current.length })}</span>
+          <span className="rp-xs rp-faint">{t('{n} notes', { n: notesRef.current.length })}</span>
           <div className="editor-spacer" />
           {vocalOk && (
-            <button className="btn tiny" onClick={togglePlay}>
+            <button className="rp-btn rp-btn--sm" onClick={togglePlay}>
               {playing ? '⏸' : '▶'} {t('Vocals')}
             </button>
           )}
           <button
-            className="btn tiny"
+            className="rp-btn rp-btn--sm"
             disabled={selRange === null && selected === null}
             title={t('Octave down: selection (Shift+drag) or the selected note')}
             onClick={() => transpose(-12)}
@@ -555,20 +555,20 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
             −12
           </button>
           <button
-            className="btn tiny"
+            className="rp-btn rp-btn--sm"
             disabled={selRange === null && selected === null}
             title={t('Octave up: selection (Shift+drag) or the selected note')}
             onClick={() => transpose(12)}
           >
             +12
           </button>
-          <button className="btn tiny danger" disabled={selected === null} onClick={deleteSelected}>
+          <button className="rp-btn rp-btn--sm rp-btn--danger" disabled={selected === null} onClick={deleteSelected}>
             🗑 {t('Delete note')}
           </button>
-          <button className="btn tiny primary" disabled={!dirty || saving} onClick={() => void save()}>
+          <button className="rp-btn rp-btn--sm rp-btn--light" disabled={!dirty || saving} onClick={() => void save()}>
             {saving ? t('Saving…') : t('Save')}
           </button>
-          <button className="btn tiny ghost" onClick={onClose}>✕</button>
+          <button className="rp-btn rp-btn--sm rp-btn--ghost" onClick={onClose}>✕</button>
         </header>
 
         <div
@@ -592,17 +592,17 @@ export function SongEditor({ map, window: win, vocalUrl, onSave, onClose }: Prop
             value={centerMs}
             onChange={(e) => seekTo(+e.target.value)}
           />
-          <span className="dim small mono">{fmt(centerMs)} / {fmt(map.durationMs)}</span>
+          <span className="rp-xs rp-faint rp-num">{fmt(centerMs)} / {fmt(map.durationMs)}</span>
         </div>
 
-        <p className="dim small editor-hint">
+        <p className="rp-xs rp-faint editor-hint">
           {t('drag a note — move; drag its right edge — length; double-click — add; Delete — remove. Timeline on top seeks.')}
           {' '}{t('Shift+drag selects a phrase; ±12 (or Shift+↑/↓) fixes a wrong octave.')}
           {selNote && ` · ${midiToName(selNote.midi)}, ${Math.round(selNote.durMs)} ms`}
         </p>
-        {notice && <p className="hint small">{notice}</p>}
-        {!vocalOk && vocalUrl && <p className="hint small">{t('Vocals unavailable — edit along the contour.')}</p>}
-        {error && <p className="error small">⚠️ {error}</p>}
+        {notice && <p className="rp-xs rp-muted">{notice}</p>}
+        {!vocalOk && vocalUrl && <p className="rp-xs rp-muted">{t('Vocals unavailable — edit along the contour.')}</p>}
+        {error && <p className="vo-error">{error}</p>}
 
         {vocalUrl && (
           <audio
