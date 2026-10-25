@@ -69,10 +69,12 @@ interface State {
   told: GuitarStatus;
   hitRun: number;
   settled: boolean;
+  /** Сыграно во время ожидания (режим обучения) — попадание, кадры после продолжения его не пересчитывают. */
+  held: boolean;
 }
 
 const fresh = (): State => ({
-  attackMs: NaN, pitches: [], legatoMs: NaN, run: 0, runFrom: NaN, runAfterOther: false, pitchOnsetMs: NaN, told: 'none', hitRun: 0, settled: false,
+  attackMs: NaN, pitches: [], legatoMs: NaN, run: 0, runFrom: NaN, runAfterOther: false, pitchOnsetMs: NaN, told: 'none', hitRun: 0, settled: false, held: false,
 });
 
 /** Разница высот, сведённая в октаву [−6, 6). */
@@ -108,7 +110,13 @@ export function guitarSummary(results: NoteResult[], score: number, maxCombo: nu
   return { score, accuracy, stars: starsFor(accuracy), perfect, good, miss, maxCombo, results, tech: { vibratoMs: 0, distortionMs: 0 } };
 }
 
-export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions): NoteJudge<TabMap, GuitarFrame> {
+/** Судья гитары: + отметка «сыграно во время ожидания» для режима обучения. */
+export interface GuitarJudge extends NoteJudge<TabMap, GuitarFrame> {
+  /** Событие сыграно, пока игра ждала его (часы стояли на начале): попадание вовремя, сразу — дорожке. */
+  markHeld(i: number): void;
+}
+
+export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions): GuitarJudge {
   const events = host.map.notes;
   const win = WINDOWS[options.strictness];
   // поправка эталона: YIN считает от A4 = 440
@@ -226,6 +234,7 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
     const s = states[i];
     if (!judged(e)) return { judgement: 'miss', hitRatio: 0, points: 0, kind: 'skipped' };
     const timed = (at: number, ratio: number) => timedAt(i, at, ratio);
+    if (s.held) return timed(e.startMs, 1);
     if (e.judge === 'legato' && !Number.isNaN(s.legatoMs)) return timed(Number.isNaN(s.attackMs) ? e.startMs : s.attackMs, 1);
     if (Number.isNaN(s.attackMs)) {
       if (!Number.isNaN(s.pitchOnsetMs)) return timed(s.pitchOnsetMs, 0.9);
@@ -277,6 +286,13 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
       return v;
     },
     progress: (i) => (Number.isNaN(states[i].attackMs) ? 0 : 1),
+    markHeld(i) {
+      const s = states[i];
+      s.held = true;
+      s.settled = true;
+      if (Number.isNaN(s.attackMs)) s.attackMs = events[i].startMs;
+      tell(i, verdict(i));
+    },
     frameTime: (f) => options.toClock(f.atMs),
     summarize: guitarSummary,
   };

@@ -515,6 +515,8 @@ export interface GuitarSettings {
     timingHint: boolean;
   };
   strictness: Strictness;
+  /** Учить песню: игра ждёт каждую несыгранную ноту (только с выбранным входом). */
+  learn: boolean;
   /** startLevel: % для новых аранжировок; overrideToMax: arrId → прежний выбор. */
   dd: { enabled: boolean; startLevel: number | 'max'; overrideToMax: Record<string, LevelSelection> };
   mix: { backing: number; reference: number; metronome: number; guide: number; monitor: number };

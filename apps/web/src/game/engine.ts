@@ -10,7 +10,8 @@ import type { FrameSource, JudgeHost, NoteJudge, VerdictKind } from './judge';
 import { VocalJudge } from './judges/vocalJudge';
 export type { TrailPoint } from './judges/vocalJudge';
 
-export type GamePhase = 'idle' | 'countdown' | 'playing' | 'paused' | 'finished';
+/** waiting — ожидание ноты в режиме обучения гитары (wait/proceed): часы стоят, минус молчит, меню паузы не открыто. */
+export type GamePhase = 'idle' | 'countdown' | 'playing' | 'paused' | 'waiting' | 'finished';
 
 export interface JudgementEvent {
   noteIndex: number;
@@ -95,7 +96,7 @@ export class GameEngine<M extends SongMap = SongMap, F = AnalysisFrame> {
 
   /** Текущее время песни в мс (отрицательное во время отсчёта). */
   songMs(): number {
-    if (this.phase === 'paused' || this.phase === 'idle') return this.pausedAtMs;
+    if (this.phase === 'paused' || this.phase === 'idle' || this.phase === 'waiting') return this.pausedAtMs;
     if (this.phase === 'finished') return this.map.durationMs;
     return this.transport.songMs();
   }
@@ -117,6 +118,10 @@ export class GameEngine<M extends SongMap = SongMap, F = AnalysisFrame> {
   }
 
   pause(): void {
+    if (this.phase === 'waiting') {
+      this.phase = 'paused';
+      return;
+    }
     if (this.phase !== 'playing' && this.phase !== 'countdown') return;
     this.pausedAtMs = Math.max(this.fromMs, this.songMs());
     this.phase = 'paused';
@@ -132,6 +137,26 @@ export class GameEngine<M extends SongMap = SongMap, F = AnalysisFrame> {
   }
 
   /**
+   * Ожидание ноты (режим обучения): часы песни встают на atMs, минус и метроном молчат, кадры входа судье не идут —
+   * сыграно ли, решает вызывающий (и отмечает в своём судье). Только из «играет».
+   */
+  wait(atMs: number): void {
+    if (this.phase !== 'playing') return;
+    this.pausedAtMs = Math.max(this.fromMs, atMs);
+    this.phase = 'waiting';
+    this.transport.halt();
+    this.unsubscribe?.();
+    this.unsubscribe = null;
+    this.stopClock();
+  }
+
+  /** Продолжить после ожидания с той же точки — без отсчёта, с коротким разгоном расписания минуса. */
+  proceed(leadSec = 0.05): void {
+    if (this.phase !== 'waiting') return;
+    this.beginAt(this.pausedAtMs, leadSec);
+  }
+
+  /**
    * Перемотка. Ноты впереди новой позиции переигрываются заново, не начатые
    * позади — помечаются «пропущено» (results[i] = null, в итог не попадают).
    * Счёт пересобирается из оставшихся вердиктов, комбо сбрасывается.
@@ -139,7 +164,7 @@ export class GameEngine<M extends SongMap = SongMap, F = AnalysisFrame> {
   seekTo(ms: number): void {
     if (this.phase === 'finished' || this.phase === 'idle') return;
     const target = Math.max(0, Math.min(ms, this.map.durationMs - 1));
-    const wasPlaying = this.phase === 'playing' || this.phase === 'countdown';
+    const wasPlaying = this.phase === 'playing' || this.phase === 'countdown' || this.phase === 'waiting';
     if (wasPlaying) {
       this.transport.halt();
       this.unsubscribe?.();

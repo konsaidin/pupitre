@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { createPlaybackContext } from '../../../audio/guitar/playback';
 import { onInputFrames } from '../../../audio/instrument/session';
 import { currentLang, t } from '../../../lib/i18n';
+import { midiToName } from '../../../lib/music';
 import type { GamePhase } from '../../../game/engine';
 import { comboMultiplier, type GameSummary } from '../../../game/scoring';
 import { GameInputPill } from '../../input/InputPill';
@@ -28,6 +29,26 @@ export function playIds(pathname: string): [string, string] | null {
 export const playHref = (songId: string, arrId: string) => `#/guitar/play/${encodeURIComponent(songId)}/${encodeURIComponent(arrId)}`;
 export const songHref = (songId: string) => `#/guitar/song/${encodeURIComponent(songId)}`;
 
+const noteName = (midi: number) => midiToName(midi).replace('#', '♯');
+
+/** Режим обучения: чем ждём — лад и нота (у аккорда — имя или ноты). */
+function WaitingChip({ event }: { event: TabMap['notes'][number] }) {
+  const single = event.notes.length === 1 ? event.notes[0] : null;
+  return (
+    <div className="game__waiting" role="status" data-ui="play-waiting">
+      <span className="rp-chip rp-chip--light">
+        <GuitarIcon name="hand-finger" size="sm" />
+        {t('Play it to go on')}
+        <b className="rp-num">
+          {single
+            ? `${single.fret ? `${t('fret')} ${single.fret}` : t('open string')} · ${noteName(single.midi)}`
+            : event.notes.map((n) => noteName(n.midi)).join(' ')}
+        </b>
+      </span>
+    </div>
+  );
+}
+
 export const clock = (ms: number) => {
   const s = Math.max(0, Math.floor(ms / 1000));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -44,6 +65,10 @@ interface Hud {
   combo: number;
   /** Доля по оценённым событиям; NaN — ещё ни одного. */
   accuracy: number;
+  /** Режим обучения: событие, которого ждём (−1 — не ждём). */
+  waitingFor: number;
+  /** Остаток отсчёта, с (короткий разгон после ожидания — не отсчёт). */
+  countdownSec: number;
 }
 
 /** «96,4» / «96.4». */
@@ -99,7 +124,7 @@ export function PlayScreen() {
       const current = loadGuitarSettings();
       const scoring =
         current.input.deviceId !== null
-          ? { frames: { onFrame: onInputFrames }, a4Hz: current.reference.a4Hz, strictness: current.strictness }
+          ? { frames: { onFrame: onInputFrames }, a4Hz: current.reference.a4Hz, strictness: current.strictness, learn: current.learn }
           : undefined;
       session = createPlaySession({
         ctx, arr, layers: backingLayers(buffers, current.mix), speed: 1, metronome: false, scoring,
@@ -137,10 +162,12 @@ export function PlayScreen() {
       setHud({
         phase: engine.phase, songMs: ms, countdown: Math.ceil(engine.countdownRemaining()), section: where.section, bar: where.bar, loop,
         score: engine.score, combo: engine.combo, accuracy: judged ? ratio / judged : NaN,
+        waitingFor: load.session.learn?.waitingFor() ?? -1,
+        countdownSec: engine.countdownRemaining(),
       });
     };
     poll();
-    const timer = setInterval(poll, 120);
+    const timer = setInterval(poll, 80);
     return () => clearInterval(timer);
   }, [load]);
 
@@ -237,7 +264,7 @@ export function PlayScreen() {
       <header className="hud-top">
         <div className="hud-left">
           <button type="button" className="hud-btn" data-ui="play-pause"
-            aria-label={hud?.phase === 'playing' || hud?.phase === 'countdown' ? t('Pause (Esc)') : t('Play')}
+            aria-label={hud?.phase === 'playing' || hud?.phase === 'countdown' || hud?.phase === 'waiting' ? t('Pause (Esc)') : t('Play')}
             onClick={() => {
               const engine = ready?.engine;
               if (!engine) return;
@@ -245,7 +272,7 @@ export function PlayScreen() {
               else if (engine.phase === 'paused') engine.resume();
               else engine.pause();
             }}>
-            <GuitarIcon name={hud?.phase === 'playing' || hud?.phase === 'countdown' ? 'player-pause-filled' : 'player-play-filled'} />
+            <GuitarIcon name={hud?.phase === 'playing' || hud?.phase === 'countdown' || hud?.phase === 'waiting' ? 'player-pause-filled' : 'player-play-filled'} />
           </button>
           <div className="hud-song">
             <b>{song?.title ?? ''}</b>
@@ -320,7 +347,8 @@ export function PlayScreen() {
           </div>
         </footer>
       )}
-      {hud?.phase === 'countdown' && hud.countdown > 0 && <div className="game__count" data-ui="play-countdown">{hud.countdown}</div>}
+      {hud?.phase === 'countdown' && hud.countdownSec > 0.3 && <div className="game__count" data-ui="play-countdown">{hud.countdown}</div>}
+      {ready && hud?.phase === 'waiting' && hud.waitingFor >= 0 && <WaitingChip event={ready.map.notes[hud.waitingFor]} />}
       {load.phase !== 'ready' && (
         <div className="game__overlay" data-ui="play-preparing">
           <span className="rp-chip rp-chip--spin rp-chip--light">
@@ -336,6 +364,29 @@ export function PlayScreen() {
             {ready.scoring
               ? t('Play the highway: notes light up when you hit them. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature.')
               : t('Play along with the highway. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature.')}
+          </p>
+          <div className="rp-seg game__mode" role="radiogroup" aria-label={t('How to play')} data-ui="play-mode">
+            {([false, true] as const).map((learn) => (
+              <button
+                key={String(learn)}
+                type="button"
+                className="rp-seg__item"
+                role="radio"
+                aria-checked={settings.learn === learn && (ready.scoring || !learn)}
+                disabled={learn && !ready.scoring}
+                title={learn && !ready.scoring ? t('Learning needs an input: choose it in Input and sound') : undefined}
+                onClick={() => {
+                  updateGuitarSettings((st) => ({ ...st, learn }));
+                  ready.setLearn(learn);
+                }}
+              >
+                <GuitarIcon name={learn ? 'hand-finger' : 'player-play'} size="sm" />
+                {learn ? t('Learn the song') : t('Play through')}
+              </button>
+            ))}
+          </div>
+          <p className="rp-sm rp-faint game__mode-hint">
+            {settings.learn && ready.scoring ? t('The song waits on every note until you play it.') : t('The song plays on; misses are counted.')}
           </p>
           <button type="button" className="rp-btn rp-btn--light rp-btn--lg" onClick={() => void ready.engine.start()} data-ui="play-go">
             <GuitarIcon name="player-play-filled" size="sm" />

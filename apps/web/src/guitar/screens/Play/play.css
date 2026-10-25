@@ -109,3 +109,9 @@
 /* Пюпитр: итоги после песни (полноценный экран — этап 19c): пары «подпись — число» под крупной точностью */
 .rampa .results__rows { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; margin: 4px 0 10px; font-size: 14px; color: var(--rp-fg-2); }
 .rampa .results__rows b { font-family: var(--rp-font-mono); font-stretch: 87.5%; font-weight: 700; color: var(--rp-fg-1); text-align: right; }
+/* Режим обучения: выбор на старте и плашка «ждём ноту» над линией удара */
+.rampa .game__mode { margin-top: 4px; }
+.rampa .game__mode-hint { margin-top: -6px; }
+.rampa .game__waiting { position: absolute; left: 50%; bottom: 31%; z-index: 16; transform: translateX(-50%); pointer-events: none; }
+.rampa .game__waiting .rp-chip { animation: rp-rise var(--rp-dur-3) var(--rp-ease-out); height: 34px; padding: 0 14px; font-size: 13.5px; gap: 8px; box-shadow: 0 0 24px -6px var(--rp-beam); }
+.rampa .game__waiting b { color: var(--rp-fg-1); }

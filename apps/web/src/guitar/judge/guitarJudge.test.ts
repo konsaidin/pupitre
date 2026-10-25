@@ -123,6 +123,14 @@ describe('одиночные ноты', () => {
     expect(statuses.at(-1)).toEqual([3, 'none']);
   });
 
+  it('сыграно во время ожидания (режим обучения) — попадание вовремя, кадры после него не пересчитывают', () => {
+    const { j, told, finalize } = judgeFor(map);
+    j.markHeld(2);
+    expect(told.at(-1)).toEqual([2, 'hit', expect.objectContaining({ offsetMs: 0 })]);
+    for (let d = 20; d <= 160; d += 10) j.onFrame({ atMs: 1000 + d, midi: midis[2] + 3, clarity: 0.9, levelDb: -20, onset: false }, 1000 + d);
+    expect(finalize()[2]).toMatchObject({ judgement: 'perfect', kind: 'hit' });
+  });
+
   it('кадры без высоты не портят медиану; редкие чужие кадры — не «не та нота»', () => {
     const { j, finalize } = judgeFor(map);
     j.onFrame({ atMs: 0, midi: NaN, clarity: 0, levelDb: -20, onset: true }, 0);

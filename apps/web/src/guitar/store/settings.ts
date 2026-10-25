@@ -17,6 +17,7 @@ export const DEFAULT_SETTINGS: GuitarSettings = {
   // Нижняя струна сверху — «как смотришь на гитару», как в fretfall и Rocksmith; табулатурный порядок — high-top.
   view: { mode: '3d', stringOrder: 'low-top', palette: 'default', gemLabel: 'fret', noteSpeed: 1, timingHint: false },
   strictness: 'normal',
+  learn: false,
   dd: { enabled: true, startLevel: 'max', overrideToMax: {} },
   // гайд — партия игрока соло под минусом, тихо (ui-spec: −18 дБ ≈ 0.125); мониторинг себя — тихий (§8.9: ≈ −10 дБ)
   mix: { backing: 1, reference: 1, metronome: 0.6, guide: 0.125, monitor: 0.3 },

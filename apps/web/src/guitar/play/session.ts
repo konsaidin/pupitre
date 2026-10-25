@@ -4,6 +4,7 @@
 // транспорт. dispose — освобождение транспорта и движка; вызывается из того же эффекта, что создал сессию.
 import type { InputFrame } from '../../audio/instrument/session';
 import { heardClock, outputDelayMs, type PlaybackContext } from '../../audio/guitar/playback';
+import { learnController, type LearnController } from './learn';
 import { WebAudioTransport } from '../../audio/transport/WebAudioTransport';
 import type { BackingLayer } from '../../audio/transport/Transport';
 import { GameEngine } from '../../game/engine';
@@ -11,7 +12,7 @@ import type { FrameSource } from '../../game/judge';
 import { noneJudge } from '../../game/judges/noneJudge';
 import type { GameSummary } from '../../game/scoring';
 import { adaptMap, setVerdict, type AdaptedMap } from '../highway/adapter';
-import { guitarJudge, type GuitarStatus } from '../judge/guitarJudge';
+import { guitarJudge, type GuitarJudge, type GuitarStatus } from '../judge/guitarJudge';
 import { buildPlayableMap } from '../model/playable';
 import type { GuitarArrangement, Strictness, TabMap } from '../model/types';
 import { STATUS } from '../vendor/fretfall/highway.js';
@@ -23,6 +24,10 @@ export interface PlaySession {
   transport: WebAudioTransport;
   /** Идёт ли оценка (выбран вход). */
   scoring: boolean;
+  /** Режим обучения (только с оценкой): ждёт ли игра несыгранную ноту, какую сейчас (−1 — не ждёт). */
+  learn: LearnController | null;
+  setLearn(on: boolean): void;
+  learnOn(): boolean;
   dispose(): void;
 }
 
@@ -30,6 +35,8 @@ export interface PlayScoring {
   frames: FrameSource<InputFrame>;
   a4Hz: number;
   strictness: Strictness;
+  /** Учить песню: не пускать дальше несыгранной ноты. */
+  learn?: boolean;
 }
 
 export interface PlaySessionOptions {
@@ -62,22 +69,52 @@ export function createPlaySession({ ctx, arr, layers, speed, metronome, scoring,
     metronome, countIn: true,
   });
   const adapted = adaptMap(map);
+  let judge: GuitarJudge | null = null;
   const engine = new GameEngine<TabMap, InputFrame>({
     ctx, input: scoring?.frames ?? NO_INPUT, map, difficulty: 'medium', latencyMs: 0, guideNotes: false, metronome, transport,
     judge: scoring
       ? (host) =>
-          guitarJudge(host, {
+          (judge = guitarJudge(host, {
             toClock: heardClock(ctx), a4Hz: scoring.a4Hz, strictness: scoring.strictness,
             // события закрываются по расписанию минуса, кадры — во времени слышимого (позже на вывод) и с доставкой
             finalizeDelayMs: Math.max(60, outputDelayMs(ctx)) + FRAME_SLACK_MS,
             onStatus: (event, status, v) => setVerdict(adapted, event, STATUS_CODE[status], v?.offsetMs, v?.heardMidi),
-          })
+          }))
       : (host) => noneJudge<TabMap, InputFrame>(host),
     onFinish,
   });
+  // Режим обучения: свой шаг часов (движок своих колбэков на шаг не даёт) и своя подписка на вход — во время ожидания
+  // движок кадры судье не передаёт.
+  const HIT_CODES: readonly number[] = [STATUS.hit, STATUS.early, STATUS.late];
+  let learnOn = !!scoring?.learn;
+  const learn =
+    scoring && (judge as GuitarJudge | null)
+      ? learnController({
+          events: map.notes,
+          hit: (i) => HIT_CODES.includes(adapted.arr.status[adapted.ffOfEvent[i][0]] ?? STATUS.none),
+          attacked: (i) => adapted.arr.status[adapted.ffOfEvent[i][0]] === STATUS.attacked,
+          heardMs: () => transport.heardSongMs(),
+          phase: () => engine.phase,
+          wait: (atMs) => engine.wait(atMs),
+          proceed: () => engine.proceed(),
+          markHeld: (i) => (judge as GuitarJudge | null)?.markHeld(i),
+          a4Hz: scoring.a4Hz,
+          enabled: () => learnOn,
+        })
+      : null;
+  const learnTimer = learn ? setInterval(() => learn.tick(), 15) : null;
+  const learnOff = learn ? scoring!.frames.onFrame((f) => learn.onFrame(f)) : null;
   return {
-    map, adapted, engine, transport, scoring: !!scoring,
+    map, adapted, engine, transport, scoring: !!scoring, learn,
+    setLearn: (on) => {
+      learnOn = on && !!learn;
+      // выключили во время ожидания — едем дальше без этой ноты
+      if (!learnOn && engine.phase === 'waiting') engine.proceed();
+    },
+    learnOn: () => learnOn,
     dispose: () => {
+      if (learnTimer !== null) clearInterval(learnTimer);
+      learnOff?.();
       engine.quit();
       transport.halt();
     },
