@@ -37,20 +37,6 @@
     ],
     "extraResources": [
       {
-        "from": "../../packages/native-audio",
-        "to": "native",
-        "filter": [
-          "*.node"
-        ]
-      },
-      {
-        "from": "../../packages/engine",
-        "to": "engine",
-        "filter": [
-          "*.node"
-        ]
-      },
-      {
         "from": "../../services/api/app",
         "to": "api/app",
         "filter": [
@@ -67,7 +53,23 @@
         "AppImage"
       ],
       "category": "Audio",
-      "artifactName": "Pupitre-${version}-linux-${arch}.${ext}"
+      "artifactName": "Pupitre-${version}-linux-${arch}.${ext}",
+      "extraResources": [
+        {
+          "from": "../../packages/native-audio",
+          "to": "native",
+          "filter": [
+            "*.linux-x64.node"
+          ]
+        },
+        {
+          "from": "../../packages/engine",
+          "to": "engine",
+          "filter": [
+            "*.linux-x64.node"
+          ]
+        }
+      ]
     },
     "win": {
       "target": [
@@ -75,7 +77,23 @@
         "portable"
       ],
       "artifactName": "Pupitre-${version}-win-${arch}.${ext}",
-      "signAndEditExecutable": false
+      "signAndEditExecutable": false,
+      "extraResources": [
+        {
+          "from": "../../packages/native-audio",
+          "to": "native",
+          "filter": [
+            "*.win32-x64.node"
+          ]
+        },
+        {
+          "from": "../../packages/engine",
+          "to": "engine",
+          "filter": [
+            "*.win32-x64.node"
+          ]
+        }
+      ]
     },
     "nsis": {
       "oneClick": true,
