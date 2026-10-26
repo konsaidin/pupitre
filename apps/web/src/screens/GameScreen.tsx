@@ -308,6 +308,8 @@ export function GameScreen() {
 
   const meta = DIFFICULTY_META[difficulty];
 
+  // название песни из имени файла: «HIM_-_Join_Me…» → «HIM - Join Me…» (только показ)
+  const shownTitle = t(songMap.title).replace(/_+/g, ' ').replace(/\s+/g, ' ').trim();
   const durationSec = Math.round(songMap.durationMs / 1000);
   const segItem = (active: boolean) => (active ? 'rp-seg__item seg-btn active' : 'rp-seg__item seg-btn');
   return (
@@ -319,7 +321,7 @@ export function GameScreen() {
           {t('Exit')}
         </button>
         <div className="vo-game__title">
-          <b>{t(songMap.title)}</b>
+          <b>{shownTitle}</b>
           {songMap.subtitle && <span className="rp-faint">{songMap.subtitle}</span>}
         </div>
         {play.kind === 'song' && (
@@ -429,7 +431,7 @@ export function GameScreen() {
               <div className="rp-card rp-card--raised rp-card--pad vo-setup__panel">
                 <div>
                   <span className="rp-label">{t('Your next take')}</span>
-                  <h2 className="rp-h2">{t(songMap.title)}</h2>
+                  <h2 className="rp-h2">{shownTitle}</h2>
                 </div>
                 <div className="rp-field">
                   <span className="rp-field__head rp-sm">{t('Difficulty')}</span>

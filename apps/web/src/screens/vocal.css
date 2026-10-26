@@ -285,3 +285,9 @@
 .rampa[data-ui='vocal-root'] { min-height: 100vh; background: var(--rp-bg); }
 .mobile-viewport .rampa[data-ui='vocal-root'] { min-height: 100%; }
 .rampa .vo-song__error { flex-basis: 100%; } .rampa .vo-song__error summary { cursor: pointer; }
+
+/* подготовка к игре: длинное название (имя файла) переносится, колонки не распираются, карточки — по высоте содержимого */
+.rampa .vo-setup { align-items: start; }
+.rampa .vo-setup > * { min-width: 0; }
+.rampa .vo-setup__panel .rp-h2 { overflow-wrap: anywhere; }
+.rampa .vo-game__title b { overflow-wrap: anywhere; }
