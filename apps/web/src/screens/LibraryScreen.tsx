@@ -88,6 +88,8 @@ export function LibraryScreen() {
       setError(e instanceof Error ? e.message : t('Something went wrong'));
     }
   };
+  // сервер закрыт токеном (внешний или развёрнутый с PUPITRE_API_TOKEN), а токен не введён или неверный
+  const needsToken = !!error && /токен|token/i.test(error);
   const ready = songs?.filter((s) => s.status === 'done').length ?? 0;
   const processing = songs?.filter((s) => s.status === 'processing' || s.status === 'queued').length ?? 0;
   const visible = songs?.filter((s) => {
@@ -158,17 +160,28 @@ export function LibraryScreen() {
         <div className="rp-card rp-card--pad vo-notice" role="alert">
           <GuitarIcon name="alert-triangle" />
           <div>
-            <b>{t('The library needs a moment.')}</b>
-            <p className="rp-sm rp-muted">{t('Check your connection or the song server in settings, then try again.')}</p>
+            <b>{needsToken ? t('The song server needs its token.') : t('The library needs a moment.')}</b>
+            <p className="rp-sm rp-muted">
+              {needsToken
+                ? t('Enter the server token in Settings → Song processing server, then try again.')
+                : t('Check your connection or the song server in settings, then try again.')}
+            </p>
             <details className="rp-xs rp-faint">
               <summary>{t('Details')}</summary>
               <p>{error}</p>
             </details>
           </div>
-          <button className="rp-btn" onClick={() => void refresh()}>
-            <GuitarIcon name="refresh" size="sm" />
-            {t('Retry')}
-          </button>
+          {needsToken ? (
+            <button className="rp-btn rp-btn--light" onClick={() => navigate('/settings')}>
+              <GuitarIcon name="lock" size="sm" />
+              {t('Open settings')}
+            </button>
+          ) : (
+            <button className="rp-btn" onClick={() => void refresh()}>
+              <GuitarIcon name="refresh" size="sm" />
+              {t('Retry')}
+            </button>
+          )}
         </div>
       )}
       <div className="vo-filters">

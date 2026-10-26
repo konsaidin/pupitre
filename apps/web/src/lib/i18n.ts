@@ -64,6 +64,9 @@ export const RU: Record<string, string> = {
   // — оболочка «Рампы» (общая для голоса и гитары) —
   Guitar: 'Гитара',
   Sections: 'Разделы',
+  'The song server needs its token.': 'Серверу песен нужен токен.',
+  'Enter the server token in Settings → Song processing server, then try again.': 'Введи токен в «Настройки» → «Сервер обработки песен» и попробуй снова.',
+  'Open settings': 'Открыть настройки',
   Cancel: 'Отмена',
   'Edit notes': 'Редактировать ноты',
   Extraction: 'Извлечение',
