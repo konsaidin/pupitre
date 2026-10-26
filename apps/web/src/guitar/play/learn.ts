@@ -1,11 +1,11 @@
 // Режим обучения («Учить песню», ui-spec §11.6): игра не пускает дальше несыгранной ноты. Когда слышимое время доходит
 // до начала события, которое ещё не засчитано, движок встаёт (engine.wait) — нота стоит на линии удара, минус молчит.
 // Пока ждём, вход слушает этот модуль: удар или смена высоты, а затем нужная высота PITCH_RUN кадров подряд (у аккорда
-// и глушёного удара — сам удар) → судья отмечает «сыграно» (markHeld) → движок продолжает с той же точки (proceed).
+// по кадрам 20–150 мс после удара — chordEvidence, как у судьи; у глушёного удара — сам удар) → судья отмечает «сыграно» (markHeld) → движок продолжает с той же точки (proceed).
 // Прыжки времени (перемотка, луп) ожидание не запускают: встаём только на событиях, которые часы пересекли плавно.
 import type { InputFrame } from '../../audio/instrument/session';
 import type { GamePhase } from '../../game/engine';
-import { pitchMatches } from '../judge/guitarJudge';
+import { chordEvidence, pitchMatches } from '../judge/guitarJudge';
 import type { TabEvent } from '../model/types';
 
 const PITCH_RUN = 3;
@@ -53,12 +53,17 @@ export function learnController(host: LearnHost): LearnController {
   let lastMatched = false;
   /** Пересечённое событие с замеченным ударом: ждём вердикт судьи до startMs + GRACE_MS. */
   let pending = -1;
+  /** Аккорд: время удара (perf, мс) и кадры после него. */
+  let chordAt = NaN;
+  const chordPitches: number[] = [];
+  const chordClarities: number[] = [];
 
   const startWaiting = (i: number, struck = false) => {
     waiting = i;
     pending = -1;
     // удар уже был (судья заметил) — звучащей нужной высоты достаточно
     onset = struck;
+    chordAt = NaN;
     run = 0;
     afterOther = false;
     // прошлая нота ещё может звучать той же высотой: «смена высоты» — только после другой высоты или тишины
@@ -116,15 +121,32 @@ export function learnController(host: LearnHost): LearnController {
     onFrame(f) {
       if (waiting < 0 || host.phase() !== 'waiting') return;
       const e = host.events[waiting];
+      const expected = e.notes.map((n) => n.midi);
+      const bend = e.notes.some((n) => n.techs.includes('bend') || n.techs.includes('prebend'));
       if (f.onset) {
         onset = true;
-        // аккорд и глушёный удар — ясны по удару (высота аккорда ненадёжна)
-        if (e.judge === 'onsetOnly' || e.notes.length > 1) played(waiting);
+        if (e.judge === 'onsetOnly') played(waiting);
+        else if (e.notes.length > 1) {
+          chordAt = f.atMs;
+          chordPitches.length = 0;
+          chordClarities.length = 0;
+        }
         return;
       }
       const midi = Number.isFinite(f.midi) && f.clarity >= MIN_CLARITY ? f.midi - tune : NaN;
-      const expected = e.notes.map((n) => n.midi);
-      const bend = e.notes.some((n) => n.techs.includes('bend') || n.techs.includes('prebend'));
+      if (e.notes.length > 1) {
+        // аккорд: кадры 20–150 мс после удара, затем вердикт; не он — ждём следующий удар
+        if (Number.isNaN(chordAt)) return;
+        if (f.atMs >= chordAt + 20 && f.atMs <= chordAt + 150 && Number.isFinite(midi)) {
+          chordPitches.push(midi);
+          chordClarities.push(f.clarity);
+        }
+        if (f.atMs > chordAt + 150) {
+          chordAt = NaN;
+          if (chordEvidence(chordPitches, chordClarities, expected, bend).kind === 'hit') played(waiting);
+        }
+        return;
+      }
       const match = Number.isFinite(midi) && pitchMatches(midi, expected, bend);
       if (match) {
         if (run === 0) afterOther = !lastMatched;

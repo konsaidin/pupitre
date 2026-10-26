@@ -3,8 +3,8 @@
 // высоты и детектор атак), в имитации AudioWorklet → кадры → гитарный судья. Почти все события засчитаны, «не та
 // нота» — редкость; по ходу печатается сводка по видам вердиктов. Атак детектор находит не все (в переборе новая нота
 // звучит поверх прошлой) — остальные судья берёт по смене высоты; атак при этом не больше, чем событий × 1.5.
-// Отклик дорожке: попадание сообщается по кадрам, а не по закрытию события — медиана меньше 30 мс после удара, 90 % —
-// меньше 80 мс; ранний отклик почти всегда совпадает с итогом. Двузвучия на низких струнах YIN слышит плохо (редкие
+// Отклик дорожке: попадание сообщается по кадрам, а не по закрытию события — у одиночных нот медиана меньше 40 мс
+// после удара, 90 % — меньше 80 мс, у аккордов — по концу окна высоты (< 220 мс); ранний отклик почти всегда совпадает с итогом. Двузвучия на низких струнах YIN слышит плохо (редкие
 // ложные кадры) — они засчитаны по удару, не «не та нота».
 import * as alphaTab from '@coderline/alphatab';
 import { readFileSync } from 'node:fs';
@@ -129,12 +129,17 @@ describe('распознавание на звуке синтезатора', ()
         `не та ${wrong}, пропуск ${count(['missed'])}; атак ${onsets}; медиана смещения ${offsets[offsets.length >> 1]} мс`,
     );
     const hitKinds = ['hit', 'early', 'late'];
-    const delays = toldEarly.filter((x) => x && hitKinds.includes(x.kind)).map((x) => x!.delayMs).sort((a, b) => a - b);
+    // аккорд отзывается по концу окна высоты (≈ 150 мс): одна высота YIN ещё не аккорд
+    const single = (i: number) => map.notes[i].notes.length === 1;
+    const delays = toldEarly.filter((x, i) => x && single(i) && hitKinds.includes(x.kind)).map((x) => x!.delayMs).sort((a, b) => a - b);
+    const chordDelays = toldEarly.filter((x, i) => x && !single(i) && hitKinds.includes(x.kind)).map((x) => x!.delayMs);
     const flips = verdicts.filter((v, i) => toldEarly[i] && hitKinds.includes(toldEarly[i]!.kind) !== hitKinds.includes(v.kind!)).length;
     console.log(`ранний отклик попадания: ${delays.length} событий, медиана ${delays[delays.length >> 1]?.toFixed(1)} мс после удара, ` +
       `90 % — до ${delays[Math.floor(delays.length * 0.9)]?.toFixed(1)} мс; разошлись с итогом: ${flips}`);
-    expect(delays.length).toBeGreaterThanOrEqual(hits * 0.9);
-    expect(delays[delays.length >> 1]).toBeLessThan(30);
+    console.log(`аккорды: ${chordDelays.length}, отклик до ${Math.max(0, ...chordDelays).toFixed(0)} мс`);
+    expect(delays.length + chordDelays.length).toBeGreaterThanOrEqual(hits * 0.9);
+    expect(Math.max(0, ...chordDelays)).toBeLessThan(220);
+    expect(delays[delays.length >> 1]).toBeLessThan(40);
     expect(delays[Math.floor(delays.length * 0.9)]).toBeLessThan(80);
     expect(flips).toBeLessThanOrEqual(2);
     expect(judged.length).toBeGreaterThan(60);

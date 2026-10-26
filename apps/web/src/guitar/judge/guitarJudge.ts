@@ -7,7 +7,10 @@
 //   (приглушённый удар, аккорд) — засчитан с долей 0.7;
 // - удар не пойман (перебор: новая нота звучит поверх прошлой, огибающая почти не растёт), но высота в окне сменилась на
 //   нужную (3 кадра подряд, ≈ 16 мс; кадр перед ними — другая высота или её нет) — засчитан с долей 0.9 по моменту смены;
-// - аккорд: удар и звук аккорда — медиана или хотя бы треть кадров (YIN прыгает между звуками), высоты нет — засчитан;
+// - аккорд (chordEvidence): YIN слышит одну высоту за кадр, поэтому «высота — один из звуков аккорда» почти ничего не
+//   доказывает. Одна чистая устойчивая нота (ясность ≥ CLEAR) вместо аккорда из ≥ 3 классов высоты — «не та нота», даже
+//   если это звук аккорда; иначе — звуки аккорда в трети кадров — попадание, высоты нет — с долей 0.7. Пауэр-корд (≤ 2
+//   класса) по ясности от ноты не отличить — мягкое правило. Ранний отклик аккорда — по концу окна высоты, не по удару;
 // - легато (хаммер, пулл): атаки может не быть — достаточно смены высоты на нужную в окне;
 // - только атака (глушёный «чк»): удар в окне; лига и «не оценивается» — пропуск.
 // Точность — доля по числу событий (у вокального судьи — по длительности нот).
@@ -54,10 +57,38 @@ const MIN_CLARITY = 0.5;
 const PITCH_TOL = 0.6;
 /** Смена высоты как атака: кадров подряд с нужной высотой. */
 const PITCH_RUN = 3;
+/** Ясность «одна чистая нота»: у аккорда YIN редко держит её — периодов несколько. */
+const CLEAR = 0.85;
+
+export type ChordEvidence = { kind: 'hit'; ratio: number } | { kind: 'wrong'; heardMidi: number };
+
+/**
+ * Аккорд по кадрам высоты после удара (высота в полутонах MIDI и её ясность, только конечные): попадание с долей или
+ * «не та нота» с услышанной высотой. Общий для судьи и режима обучения.
+ */
+export function chordEvidence(pitches: number[], clarities: number[], tones: number[], bend: boolean): ChordEvidence {
+  const classes = new Set(tones.map((m) => ((Math.round(m) % 12) + 12) % 12)).size;
+  if (!pitches.length) return { kind: 'hit', ratio: 0.7 };
+  const heard = median(pitches);
+  const near = (list: number[], c: number) => list.filter((m) => Math.abs(m - c) <= PITCH_TOL).length;
+  if (classes >= 3) {
+    const clear = pitches.filter((_, k) => clarities[k] >= CLEAR);
+    const clearMid = median(clear);
+    // одна нота звучит чисто и ровно — это не аккорд
+    if (clear.length >= PITCH_RUN + 1 && clear.length >= pitches.length * 0.6 && near(clear, clearMid) >= clear.length * 0.7)
+      return { kind: 'wrong', heardMidi: clearMid };
+  }
+  const matching = pitches.filter((m) => pitchMatches(m, tones, bend)).length;
+  if (pitchMatches(heard, tones, bend) || matching * 3 >= pitches.length) return { kind: 'hit', ratio: 1 };
+  if (near(pitches, heard) >= PITCH_RUN) return { kind: 'wrong', heardMidi: heard };
+  return { kind: 'hit', ratio: 0.7 };
+}
 
 interface State {
   attackMs: number;
   pitches: number[];
+  /** Ясность каждого кадра в pitches (для аккорда). */
+  clarities: number[];
   legatoMs: number;
   /** Серия кадров с нужной высотой: длина, время первого кадра, была ли перед ней другая высота. */
   run: number;
@@ -74,7 +105,7 @@ interface State {
 }
 
 const fresh = (): State => ({
-  attackMs: NaN, pitches: [], legatoMs: NaN, run: 0, runFrom: NaN, runAfterOther: false, pitchOnsetMs: NaN, told: 'none', hitRun: 0, settled: false, held: false,
+  attackMs: NaN, pitches: [], clarities: [], legatoMs: NaN, run: 0, runFrom: NaN, runAfterOther: false, pitchOnsetMs: NaN, told: 'none', hitRun: 0, settled: false, held: false,
 });
 
 /** Разница высот, сведённая в октаву [−6, 6). */
@@ -164,8 +195,9 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
     if (best < 0) return;
     states[best].attackMs = ms;
     states[best].pitches = [];
+    states[best].clarities = [];
     // только атака и аккорд ясны по удару (у аккорда до итога — по времени удара, высота уточнит)
-    if (events[best].judge === 'onsetOnly' || (events[best].judge === 'attack' && expected[best].length > 1)) tell(best, verdict(best));
+    if (events[best].judge === 'onsetOnly') tell(best, verdict(best));
     // «удар замечен» — только пока вердикта нет (поздняя атака не затирает показанное попадание легато или по высоте)
     else if (states[best].told === 'none') options.onStatus?.(best, 'attacked');
   };
@@ -173,7 +205,7 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
   /** Высота прошлого кадра (NaN — её не было): «другая высота перед серией». */
   let lastPitch = NaN;
 
-  const pitch = (ms: number, midi: number) => {
+  const pitch = (ms: number, midi: number, clarity: number) => {
     const previous = lastPitch;
     lastPitch = midi;
     for (let i = firstOpen(ms); i < events.length && events[i].startMs - early(events[i]) <= ms; i++) {
@@ -186,8 +218,12 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
         if (ms >= s.attackMs + PITCH_FROM && ms <= s.attackMs + PITCH_TO) {
           // кадр без высоты обрывает серию «подряд»
           s.hitRun = Number.isFinite(midi) && pitchMatches(midi, expected[i], bends[i]) ? s.hitRun + 1 : 0;
-          if (Number.isFinite(midi)) s.pitches.push(midi);
-          if (attack && s.told === 'none' && s.hitRun >= PITCH_RUN) tell(i, timedAt(i, s.attackMs, 1));
+          if (Number.isFinite(midi)) {
+            s.pitches.push(midi);
+            s.clarities.push(clarity);
+          }
+          // ранний отклик по серии — только у одиночной ноты: звук аккорда ещё не аккорд
+          if (attack && expected[i].length === 1 && s.told === 'none' && s.hitRun >= PITCH_RUN) tell(i, timedAt(i, s.attackMs, 1));
         }
         if (attack && !s.settled && ms > s.attackMs + PITCH_TO) {
           s.settled = true;
@@ -241,11 +277,13 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
       return { judgement: 'miss', hitRatio: 0, kind: 'missed' };
     }
     if (e.judge === 'onsetOnly') return timed(s.attackMs, 1);
+    if (expected[i].length > 1) {
+      const c = chordEvidence(s.pitches, s.clarities, expected[i], bends[i]);
+      return c.kind === 'hit' ? timed(s.attackMs, c.ratio) : { judgement: 'miss', hitRatio: 0, kind: 'wrong', offsetMs: s.attackMs - e.startMs, heardMidi: c.heardMidi };
+    }
     const heard = median(s.pitches);
     if (Number.isNaN(heard)) return timed(s.attackMs, 0.7);
     if (pitchMatches(heard, expected[i], bends[i])) return timed(s.attackMs, 1);
-    const tones = expected[i];
-    if (tones.length > 1 && s.pitches.filter((m) => pitchMatches(m, tones, bends[i])).length * 3 >= s.pitches.length) return timed(s.attackMs, 1);
     if (s.pitches.filter((m) => Math.abs(m - heard) <= PITCH_TOL).length < PITCH_RUN) return timed(s.attackMs, 0.7);
     return { judgement: 'miss', hitRatio: 0, kind: 'wrong', offsetMs: s.attackMs - e.startMs, heardMidi: heard };
   };
@@ -267,7 +305,7 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
     },
     onFrame(f, songMs) {
       if (f.onset) onset(songMs);
-      else pitch(songMs, Number.isFinite(f.midi) && f.clarity >= MIN_CLARITY ? f.midi - tune : NaN);
+      else pitch(songMs, Number.isFinite(f.midi) && f.clarity >= MIN_CLARITY ? f.midi - tune : NaN, f.clarity);
     },
     onTick(songMs) {
       // промах ясен, когда окно события прошло с запасом на вывод и доставку кадров — раньше закрытия события

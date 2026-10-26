@@ -107,7 +107,7 @@ describe('режим обучения', () => {
     expect(midi).toBeGreaterThan(0);
   });
 
-  it('аккорд — по удару; пауза во время ожидания — снова ждёт после продолжения', () => {
+  it('аккорд — по кадрам после удара (одна чистая нота — не аккорд); пауза во время ожидания — снова ждёт после продолжения', () => {
     const h = harness('chords');
     h.to(10);
     expect(h.c.waitingFor()).toBe(0);
@@ -119,7 +119,16 @@ describe('режим обучения', () => {
     h.jump(-50);
     h.to(10);
     expect(h.log).toEqual(['wait 0', 'wait 0']);
-    h.onset();
+    // одна чистая нота аккорда — не аккорд: ждём дальше
+    const chord = h.map.notes[0].notes.map((n) => n.midi);
+    const frame = (atMs: number, midi: number, clarity: number) => h.c.onFrame({ atMs, midi, clarity, levelDb: -20, onset: false });
+    h.c.onFrame({ atMs: 1000, midi: NaN, clarity: 0, levelDb: -20, onset: true });
+    for (let t = 1030; t <= 1170; t += 20) frame(t, chord[2], 0.95);
+    expect(h.log.at(-1)).toBe('wait 0');
+    // струм: звуки аккорда мутно и вразнобой — едем
+    h.c.onFrame({ atMs: 2000, midi: NaN, clarity: 0, levelDb: -20, onset: true });
+    [0, 1, 2, 3].forEach((k) => frame(2030 + k * 25, chord[k], 0.6));
+    frame(2160, NaN, 0);
     expect(h.log.at(-1)).toBe('go');
   });
 });

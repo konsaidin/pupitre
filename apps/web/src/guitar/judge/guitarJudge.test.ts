@@ -7,7 +7,7 @@ import { convertTex } from '../import/fixtures';
 import { buildPlayableMap } from '../model/playable';
 import type { Strictness, TabMap } from '../model/types';
 import type { JudgeVerdict } from '../../game/judge';
-import { foldSemitones, guitarJudge, pitchMatches, type GuitarStatus } from './guitarJudge';
+import { chordEvidence, foldSemitones, guitarJudge, pitchMatches, type GuitarStatus } from './guitarJudge';
 
 const mapOf = (name: string): TabMap =>
   buildPlayableMap(convertTex(name).arrangements[0], { kind: 'synth', speed: 1, leadInMs: 0 }, { mode: 'max' });
@@ -230,26 +230,34 @@ describe('легато и аккорды', () => {
     expect(j.finalize(i - 1).kind).toBe('hit');
   });
 
-  it('аккорд: удар и одна высота из аккорда — попадание; удар без высоты — засчитан; чужая высота — не та', () => {
+  it('аккорд: удар без высоты — с долей 0.7; звуки аккорда мутно и вразнобой — попадание; чужая высота — не та', () => {
     const map = mapOf('chords');
     const [e0, e1, e2] = map.notes;
     expect(e0.notes).toHaveLength(6);
-    const { play, finalize } = judgeFor(map);
-    play(e0.startMs, e0.notes[0].midi); // бас
+    const { play, finalize, j } = judgeFor(map);
+    // струм: YIN прыгает между звуками, ясность низкая
+    j.onFrame({ atMs: e0.startMs, midi: NaN, clarity: 0, levelDb: -20, onset: true }, e0.startMs);
+    e0.notes.slice(0, 4).forEach((n, k) => j.onFrame({ atMs: e0.startMs + 30 + k * 20, midi: n.midi, clarity: 0.6, levelDb: -20, onset: false }, e0.startMs + 30 + k * 20));
     play(e1.startMs, NaN);
-    play(e2.startMs, e2.notes[0].midi + 1);
+    play(e2.startMs, e2.notes[0].midi + 1, 0.6);
     const v = finalize();
-    expect([v[0].kind, v[1].kind, v[1].hitRatio, v[2].kind]).toEqual(['hit', 'hit', 0.7, 'wrong']);
+    expect([v[0].kind, v[0].hitRatio, v[1].kind, v[1].hitRatio, v[2].kind]).toEqual(['hit', 1, 'hit', 0.7, 'wrong']);
   });
 
-  it('аккорд: отклик дорожке — сразу по удару; звук аккорда в трети кадров — попадание', () => {
+  it('аккорд: одна чистая нота — даже звук аккорда — «не та нота»; отклик — не по удару, а по концу окна высоты', () => {
     const map = mapOf('chords');
     const [e0] = map.notes;
-    const { j, told, finalize } = judgeFor(map);
-    j.onFrame({ atMs: e0.startMs + 15, midi: NaN, clarity: 0, levelDb: -20, onset: true }, e0.startMs + 15);
-    expect(told).toEqual([[0, 'hit', expect.objectContaining({ offsetMs: 15 })]]);
-    const ms = [e0.notes[0].midi - 4, e0.notes[0].midi - 4, e0.notes[1].midi];
-    ms.forEach((m, k) => j.onFrame({ atMs: e0.startMs + 50 + k * 20, midi: m, clarity: 0.7, levelDb: -20, onset: false }, e0.startMs + 50 + k * 20));
-    expect(finalize()[0]).toMatchObject({ kind: 'hit', hitRatio: 1 });
+    const { play, told, finalize, j } = judgeFor(map);
+    play(e0.startMs, e0.notes[2].midi, 0.95); // чисто и ровно одна нота аккорда
+    expect(told.map(([, st]) => st)).toEqual(['attacked']);
+    j.onFrame({ atMs: e0.startMs + 160, midi: NaN, clarity: 0, levelDb: -60, onset: false }, e0.startMs + 160);
+    expect(told.at(-1)).toEqual([0, 'wrong', expect.objectContaining({ heardMidi: e0.notes[2].midi })]);
+    expect(finalize()[0].kind).toBe('wrong');
+  });
+
+  it('пауэр-корд (два класса высоты) — чистая нижняя нота засчитана: по ясности его от ноты не отличить', () => {
+    const v = chordEvidence([40, 40, 40, 40, 40, 40], [0.95, 0.95, 0.95, 0.95, 0.95, 0.95], [40, 47, 52], false);
+    expect(v).toEqual({ kind: 'hit', ratio: 1 });
+    expect(chordEvidence([52, 52, 52, 52, 52], [0.95, 0.95, 0.95, 0.95, 0.95], [40, 44, 47, 52], false).kind).toBe('wrong');
   });
 });
