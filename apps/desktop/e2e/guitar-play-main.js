@@ -24,6 +24,10 @@ const q = (sel) => `document.querySelector(${JSON.stringify(sel)})`;
     await g.run(`${q('[data-ui="song-play"]')}.click()`);
     await g.until(q('[data-ui="play-start"]'), 'минус готов', 60000);
     console.log(`рендер синт-минуса и сессия: ${Date.now() - t0} мс`);
+    // саундфонт MuseScore General через мост preload (под file:// fetch не работает)
+    const sfBytes = await g.run(`window.pupitreAssets.soundFont().then((b) => (b ? b.byteLength : 0))`);
+    console.log(`саундфонт через мост: ${(sfBytes / 1e6).toFixed(1)} МБ`);
+    if (sfBytes < 1e7) throw new Error('саундфонт MuseScore General не пришёл через мост');
     await g.run(`${q('[data-ui="play-go"]')}.click()`);
     await g.until(`(${q('[data-ui="play-time"]')}?.textContent ?? '') >= '0:08'`, '10 с игры', 20000);
     fs.writeFileSync(path.join(OUT, 'play-1440x900.png'), await g.shot());

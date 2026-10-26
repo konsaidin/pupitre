@@ -3,7 +3,7 @@
 // → sniff → parseScore → convertScore. Ответ — только клонируемые данные: tickLookup/MidiFile (built) не отдаются.
 import * as alphaTab from '@coderline/alphatab';
 import { parseScore } from './parseScore';
-import { channelsOf, renderMidi } from '../backing/render';
+import { channelsOf, renderMidi, setSoundFont } from '../backing/render';
 import { createConverter } from '../vendor/fretfall/fromScore.js';
 import { ImportError, sha256Hex, type Bytes, type ParseRequest, type ParseResult, type RenderRequest, type RenderResult } from './protocol';
 import { buildTimeline } from './timeline';
@@ -50,6 +50,10 @@ export function handleRender(req: RenderRequest): RenderResult {
     createConverter(alphaTab).prepareScore(score);
     rendered = { key, score, midiFile: buildTimeline(score, settings).midiFile };
   }
+  if (req.soundFont && req.soundFont.byteLength !== soundFontSize) {
+    setSoundFont(req.soundFont);
+    soundFontSize = req.soundFont.byteLength;
+  }
   const track = rendered.score.tracks[req.trackIndex];
   if (!track) throw new ImportError('parse-failed', `нет дорожки ${req.trackIndex}`);
   const player = channelsOf(track);
@@ -59,6 +63,9 @@ export function handleRender(req: RenderRequest): RenderResult {
     guide: renderMidi(rendered.midiFile, req.sampleRate, req.speed, { solo: player }),
   };
 }
+
+/** Размер переданного саундфонта: тот же — не перезагружаем. */
+let soundFontSize = 0;
 
 export type WorkerOp = 'parse' | 'render';
 

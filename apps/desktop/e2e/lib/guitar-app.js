@@ -38,6 +38,7 @@ async function guitarApp({ scaleFactor = 1, width = 1440, height = 900, timeoutM
   const timer = setTimeout(() => finish(new Error('Таймаут Electron-сценария')), timeoutMs);
   try {
     await app.whenReady();
+    require('../../assets').initAssets(require('electron').ipcMain);
     const addon = engine ? require('../../engine').initEngine(require('electron').ipcMain, false, '') : null;
     if (engine && !addon) throw new Error('аддона движка нет — node packages/engine/build.mjs');
     const win = new BrowserWindow({ show: false, width, height, useContentSize: true,

@@ -20,6 +20,10 @@ export interface StereoPcm {
 const CHUNK_MS = 500;
 
 let soundFont: Uint8Array | null = null;
+/** Свой саундфонт (MuseScore General — главный поток передаёт его воркеру); null — встроенный SONiVOX. */
+export function setSoundFont(bytes: Uint8Array | null): void {
+  soundFont = bytes;
+}
 function soundFontBytes(): Uint8Array {
   if (!soundFont) {
     const b64 = sonivox.slice(sonivox.indexOf(',') + 1);

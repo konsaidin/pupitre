@@ -66,6 +66,8 @@ export interface RenderRequest {
   trackIndex: number;
   sampleRate: number;
   speed: number;
+  /** Саундфонт (MuseScore General); нет — встроенный SONiVOX. Копия, не передача: главный поток держит свою. */
+  soundFont?: Uint8Array;
 }
 export interface RenderResult {
   sampleRate: number;

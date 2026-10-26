@@ -19,6 +19,9 @@ await scenario(async (track) => {
     const log = track(page, { knownPreexisting: [emojiWoff2Firefox] });
     await page.goto(vite.url);
     await seedAndReload(page);
+    // запросы вокальной главной (/api/songs) — до раздела: ждём, пока она отрисуется и сходит в сеть
+    await page.waitForSelector('.screen.home', { visible: true });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const sectionStart = log.all().length;
     await page.goto(new URL('#/guitar', vite.url).href);
     await page.waitForSelector('[data-ui="library-empty"]', { timeout: 20000 });

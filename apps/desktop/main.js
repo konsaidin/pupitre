@@ -4,6 +4,7 @@
 
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
 const path = require('node:path');
+const { initAssets } = require('./assets');
 const { randomBytes } = require('node:crypto');
 const { Backend, PORT } = require('./backend');
 const { initNativeAudio } = require('./native-audio');
@@ -71,6 +72,7 @@ app.whenReady().then(() => {
     if (backend && lastStatus.stage === 'error') void backend.start().catch(() => {});
   });
   ipcMain.handle('backend-ensure', () => backend.start());
+  initAssets(ipcMain);
 
   // код бэкенда: в собранном приложении лежит в resources/api,
   // при разработке — из репозитория

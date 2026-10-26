@@ -21,6 +21,11 @@ contextBridge.exposeInMainWorld('desktop', {
   },
 });
 
+// Ресурсы страницы, которые под file:// не достать fetch: саундфонт синт-минуса гитары (lib/soundFont.ts)
+contextBridge.exposeInMainWorld('pupitreAssets', {
+  soundFont: () => ipcRenderer.invoke('assets:soundfont'),
+});
+
 // нативный захват (этап 4): мост появляется только когда main загрузил аддон;
 // рендерер по наличию window.nativeAudio выбирает бэкенд AudioInput
 if (process.argv.includes('--pupitre-native-audio')) {

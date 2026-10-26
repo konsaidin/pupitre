@@ -33,6 +33,7 @@
       "native-audio.js",
       "engine.js",
       "engine-host.js",
+      "assets.js",
       "dist-web/**"
     ],
     "extraResources": [

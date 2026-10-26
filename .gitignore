@@ -5,3 +5,4 @@ __pycache__/
 *.pyc
 services/api/data/
 .DS_Store
+apps/web/public/soundfonts/
