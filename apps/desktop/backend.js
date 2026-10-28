@@ -19,12 +19,22 @@ const PORT = 8123;
 const UV_VERSION = '0.7.13';
 
 const IS_WIN = process.platform === 'win32';
+const IS_MAC = process.platform === 'darwin';
 
 function urls() {
   if (IS_WIN) {
     return {
       uv: `https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-pc-windows-msvc.zip`,
       ffmpeg: 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip',
+    };
+  }
+  if (IS_MAC) {
+    // ffmpeg для macOS: сборка evermeet.cx (x86_64; на Apple Silicon — через Rosetta), если нет Homebrew-ffmpeg
+    const arch = process.arch === 'arm64' ? 'aarch64' : 'x86_64';
+    return {
+      uv: `https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${arch}-apple-darwin.tar.gz`,
+      ffmpeg: 'https://evermeet.cx/ffmpeg/getrelease/zip',
+      ffmpegArchive: 'ffmpeg-macos.zip',
     };
   }
   return {
@@ -120,11 +130,13 @@ class Backend {
   async ensureFfmpeg() {
     // системный ffmpeg подходит (типично для Linux)
     if (spawnSync(IS_WIN ? 'where' : 'which', ['ffmpeg'], { stdio: 'ignore' }).status === 0) return null;
+    // у приложений macOS из Finder в PATH нет Homebrew: смотрим его каталоги сами
+    if (IS_MAC) for (const dir of ['/opt/homebrew/bin', '/usr/local/bin']) if (fs.existsSync(path.join(dir, 'ffmpeg'))) return dir;
     const ffBin = path.join(this.root, 'bin', IS_WIN ? 'ffmpeg.exe' : 'ffmpeg');
     if (fs.existsSync(ffBin)) return path.dirname(ffBin);
     fs.mkdirSync(path.dirname(ffBin), { recursive: true });
     this.onStatus({ stage: 'download-ffmpeg' });
-    const archive = path.join(this.root, 'tmp', path.basename(urls().ffmpeg));
+    const archive = path.join(this.root, 'tmp', urls().ffmpegArchive ?? path.basename(urls().ffmpeg));
     await download(urls().ffmpeg, archive, (p) => this.onStatus({ stage: 'download-ffmpeg', progress: p }));
     const tmpDir = path.join(this.root, 'tmp', 'ffmpeg');
     await extract(archive, tmpDir);
