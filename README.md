@@ -31,7 +31,9 @@ interface is available in English and Russian.
 ## Download
 
 Ready-made builds for Linux (`.AppImage`) and Windows (installer and portable `.exe`) are on the
-[Releases](../../releases) page. CI builds them on `v*` tags (`.github/workflows/desktop.yml`).
+[Releases](../../releases) page. They are built and published locally with `node tools/release.mjs X.Y.Z`
+(checks, Linux and Windows packages, tag and GitHub Release); the GitHub Actions workflows in `.github/` are kept but
+disabled.
 
 Warm-ups, exercises and guitar work right away. The song processing server is set up by the app itself the first time
 you open "My songs": it downloads a Python environment, dependencies (≈ 2.5 GB, once) and ffmpeg. You can also point it

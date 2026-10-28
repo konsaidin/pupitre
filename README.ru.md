@@ -30,7 +30,8 @@
 ## Скачать
 
 Готовые сборки для Linux (`.AppImage`) и Windows (установщик и portable `.exe`) — на странице
-[Releases](../../releases). CI собирает их по тегу `v*` (`.github/workflows/desktop.yml`).
+[Releases](../../releases). Их собирает и выкладывает локально `node tools/release.mjs X.Y.Z` (проверки, пакеты Linux и
+Windows, тег и GitHub Release); workflow GitHub Actions в `.github/` сохранены, но отключены.
 
 Распевки, упражнения и гитара работают сразу. Сервер обработки песен приложение разворачивает само при первом
 открытии «Моих песен»: скачивает Python-окружение, зависимости (≈ 2,5 ГБ, один раз) и ffmpeg. Можно указать и
