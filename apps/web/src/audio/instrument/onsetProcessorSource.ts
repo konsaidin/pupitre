@@ -1,12 +1,19 @@
 // Исходник AudioWorklet-процессора атак (браузерный путь входа гитары) — строкой, как pitchProcessorSource.ts. Тот же
-// алгоритм, что в движке (packages/engine/src/analysis.rs, Onsets): блоки по 64 сэмпла; атака — пик блока в 1.5 раза
-// выше огибающей предыдущих 21 мс (скользящий максимум 16 блоков) или всплеск производной (щелчок медиатора) вдвое выше её
-// огибающей; громче порогов, не чаще раза в 60 мс. Сообщение — { t: время контекста начала блока, peak }.
+// алгоритм, что в движке (packages/engine/src/analysis.rs, Onsets): блоки по 64 сэмпла; атака — пик блока в 2.5 раза
+// выше огибающей предыдущих 21 мс (скользящий максимум 16 блоков) или всплеск производной (щелчок медиатора) вчетверо выше
+// её огибающей (калибровка на GuitarSet, harness/judge-guitarset.ts: лишних атак вдвое меньше при той же полноте); громче порогов, не чаще раза в 60 мс. Сообщение — { t: время контекста начала блока, peak }.
+// Пороги — processorOptions (rise, riseHf, gate, gateHf, refractory); по умолчанию — как в движке.
 
 export const ONSET_PROCESSOR_SOURCE = /* js */ `
 class OnsetProcessor extends AudioWorkletProcessor {
-  constructor() {
+  constructor(options) {
     super();
+    const o = (options && options.processorOptions) || {};
+    this.rise = o.rise ?? 2.5;
+    this.riseHf = o.riseHf ?? 4;
+    this.gate = o.gate ?? 0.0032;
+    this.gateHf = o.gateHf ?? 0.0016;
+    this.refractory = o.refractory ?? 0.06;
     this.peaks = new Float32Array(16);
     this.peaksHf = new Float32Array(16);
     this.pos = 0;
@@ -38,9 +45,9 @@ class OnsetProcessor extends AudioWorkletProcessor {
       this.peaks[this.pos] = this.peak;
       this.peaksHf[this.pos] = this.peakHf;
       this.pos = (this.pos + 1) % 16;
-      const rose = this.peak > 0.0032 && this.peak > env * 1.5;
-      const clicked = this.peakHf > 0.0016 && this.peakHf > envHf * 2;
-      if ((rose || clicked) && (this.last < 0 || this.blockStart - this.last >= 0.06)) {
+      const rose = this.peak > this.gate && this.peak > env * this.rise;
+      const clicked = this.peakHf > this.gateHf && this.peakHf > envHf * this.riseHf;
+      if ((rose || clicked) && (this.last < 0 || this.blockStart - this.last >= this.refractory)) {
         this.last = this.blockStart;
         this.port.postMessage({ t: this.blockStart, peak: this.peak });
       }

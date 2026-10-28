@@ -1,0 +1,174 @@
+{
+  "task": "judge-guitarset",
+  "date": "2026-10-28T19:24:21.303Z",
+  "metrics": {
+    "recall_mic": {
+      "value": 0.7916074563236646,
+      "kind": "share"
+    },
+    "false_accept_mic": {
+      "value": 9.278609044554042,
+      "kind": "error"
+    },
+    "chord_recall_mic": {
+      "value": 0.7575030012004802,
+      "kind": "share"
+    },
+    "chord_false_accept_mic": {
+      "value": 17.069327731092436,
+      "kind": "error"
+    },
+    "cross_accept_mic": {
+      "value": 15.977657157283515,
+      "kind": "error"
+    },
+    "stray_onsets_mic": {
+      "value": 10.984245876783415,
+      "kind": "rate"
+    },
+    "wrong_mic": {
+      "value": 5.8680932876368805,
+      "kind": "error"
+    },
+    "recall_mic_solo": {
+      "value": 0.9253321689227122,
+      "kind": "share"
+    },
+    "false_accept_mic_solo": {
+      "value": 4.3478260869565215,
+      "kind": "error"
+    },
+    "chord_recall_mic_solo": {
+      "value": 0.8196078431372549,
+      "kind": "share"
+    },
+    "chord_false_accept_mic_solo": {
+      "value": 12.026143790849673,
+      "kind": "error"
+    },
+    "cross_accept_mic_solo": {
+      "value": 10.238617857395738,
+      "kind": "error"
+    },
+    "stray_onsets_mic_solo": {
+      "value": 9.91207845056351,
+      "kind": "rate"
+    },
+    "wrong_mic_solo": {
+      "value": 3.41837689476639,
+      "kind": "error"
+    },
+    "recall_mic_comp": {
+      "value": 0.6836539429952664,
+      "kind": "share"
+    },
+    "false_accept_mic_comp": {
+      "value": 13.25913989324202,
+      "kind": "error"
+    },
+    "chord_recall_mic_comp": {
+      "value": 0.7537212449255751,
+      "kind": "share"
+    },
+    "chord_false_accept_mic_comp": {
+      "value": 17.376422828942133,
+      "kind": "error"
+    },
+    "cross_accept_mic_comp": {
+      "value": 20.59208653572445,
+      "kind": "error"
+    },
+    "stray_onsets_mic_comp": {
+      "value": 12.056413303003296,
+      "kind": "rate"
+    },
+    "wrong_mic_comp": {
+      "value": 7.845704501963945,
+      "kind": "error"
+    },
+    "recall_pickup": {
+      "value": 0.7655827690935941,
+      "kind": "share"
+    },
+    "false_accept_pickup": {
+      "value": 6.938059015297167,
+      "kind": "error"
+    },
+    "chord_recall_pickup": {
+      "value": 0.6897509003601441,
+      "kind": "share"
+    },
+    "chord_false_accept_pickup": {
+      "value": 13.768007202881153,
+      "kind": "error"
+    },
+    "cross_accept_pickup": {
+      "value": 13.115374905326938,
+      "kind": "error"
+    },
+    "stray_onsets_pickup": {
+      "value": 13.150461697105245,
+      "kind": "rate"
+    },
+    "wrong_pickup": {
+      "value": 6.623199308980468,
+      "kind": "error"
+    },
+    "recall_pickup_solo": {
+      "value": 0.9356247270912607,
+      "kind": "share"
+    },
+    "false_accept_pickup_solo": {
+      "value": 2.395358991953091,
+      "kind": "error"
+    },
+    "chord_recall_pickup_solo": {
+      "value": 0.8104575163398693,
+      "kind": "share"
+    },
+    "chord_false_accept_pickup_solo": {
+      "value": 9.411764705882353,
+      "kind": "error"
+    },
+    "cross_accept_pickup_solo": {
+      "value": 8.440133116193444,
+      "kind": "error"
+    },
+    "stray_onsets_pickup_solo": {
+      "value": 9.496340060804775,
+      "kind": "rate"
+    },
+    "wrong_pickup_solo": {
+      "value": 3.324808184143223,
+      "kind": "error"
+    },
+    "recall_pickup_comp": {
+      "value": 0.6283110081579213,
+      "kind": "share"
+    },
+    "false_accept_pickup_comp": {
+      "value": 10.605297613052674,
+      "kind": "error"
+    },
+    "chord_recall_pickup_comp": {
+      "value": 0.6824007004696331,
+      "kind": "share"
+    },
+    "chord_false_accept_pickup_comp": {
+      "value": 14.033272307569847,
+      "kind": "error"
+    },
+    "cross_accept_pickup_comp": {
+      "value": 16.874466268146886,
+      "kind": "error"
+    },
+    "stray_onsets_pickup_comp": {
+      "value": 16.804583333405684,
+      "kind": "rate"
+    },
+    "wrong_pickup_comp": {
+      "value": 9.28593010373653,
+      "kind": "error"
+    }
+  }
+}

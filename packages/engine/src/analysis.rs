@@ -13,8 +13,8 @@ const ONSET_BLOCK: usize = 64;
 /// Огибающая — максимум пиков за столько блоков (≈ 21 мс при 48 кГц: дольше периода 47 Гц).
 const ONSET_SPAN: usize = 16;
 /// Рост пика над огибающей — атака (×1.5 ≈ 3.5 дБ); у производной — ×2.
-const ONSET_RISE: f32 = 1.5;
-const ONSET_RISE_HF: f32 = 2.0;
+const ONSET_RISE: f32 = 2.5;
+const ONSET_RISE_HF: f32 = 4.0;
 /// Пауза после атаки, с.
 const ONSET_REFRACTORY_S: f64 = 0.06;
 /// Пороги громкости атаки: сигнал −50 dBFS, производная — −56.

@@ -40,6 +40,11 @@ export interface GuitarJudgeOptions {
    * во времени того, что слышно (позже на задержку вывода), и приходят с задержкой анализа и доставки.
    */
   finalizeDelayMs?: number;
+  /** Правила аккорда (по умолчанию CHORD_RULES). */
+  chordRules?: ChordRules;
+  /** Сравнение высот (по умолчанию PITCH_MATCH) и кадров подряд для попадания по смене высоты без атаки. */
+  match?: Partial<PitchMatch>;
+  pitchOnsetRun?: number;
   /** Отклик дорожке: событие атаковано (до вердикта), вердикт (с подробностями — смещение, высота), снова ждёт. */
   onStatus?(event: number, status: GuitarStatus, verdict?: JudgeVerdict): void;
 }
@@ -62,13 +67,25 @@ const CLEAR = 0.85;
 
 export type ChordEvidence = { kind: 'hit'; ratio: number } | { kind: 'wrong'; heardMidi: number };
 
+/** Правила аккорда (калибровка на GuitarSet — apps/web/harness/judge-guitarset.ts). Доля 0 — не засчитано. */
+export interface ChordRules {
+  /** Доля за удар без кадров высоты. */
+  noPitch: number;
+  /** Доля, когда высота есть, но ни звуков аккорда, ни устойчивой чужой ноты. */
+  unclear: number;
+  /** Доля кадров со звуками аккорда, достаточная для попадания. */
+  matchShare: number;
+}
+// GuitarSet: «невнятная высота» засчитывала чужие аккорды — не засчитывается; удар без высоты — с долей 0.5
+export const CHORD_RULES: ChordRules = { noPitch: 0.5, unclear: 0, matchShare: 1 / 3 };
+
 /**
  * Аккорд по кадрам высоты после удара (высота в полутонах MIDI и её ясность, только конечные): попадание с долей или
  * «не та нота» с услышанной высотой. Общий для судьи и режима обучения.
  */
-export function chordEvidence(pitches: number[], clarities: number[], tones: number[], bend: boolean): ChordEvidence {
+export function chordEvidence(pitches: number[], clarities: number[], tones: number[], bend: boolean, rules: ChordRules = CHORD_RULES, match: PitchMatch = PITCH_MATCH): ChordEvidence {
   const classes = new Set(tones.map((m) => ((Math.round(m) % 12) + 12) % 12)).size;
-  if (!pitches.length) return { kind: 'hit', ratio: 0.7 };
+  if (!pitches.length) return rules.noPitch > 0 ? { kind: 'hit', ratio: rules.noPitch } : { kind: 'wrong', heardMidi: NaN };
   const heard = median(pitches);
   const near = (list: number[], c: number) => list.filter((m) => Math.abs(m - c) <= PITCH_TOL).length;
   if (classes >= 3) {
@@ -78,10 +95,10 @@ export function chordEvidence(pitches: number[], clarities: number[], tones: num
     if (clear.length >= PITCH_RUN + 1 && clear.length >= pitches.length * 0.6 && near(clear, clearMid) >= clear.length * 0.7)
       return { kind: 'wrong', heardMidi: clearMid };
   }
-  const matching = pitches.filter((m) => pitchMatches(m, tones, bend)).length;
-  if (pitchMatches(heard, tones, bend) || matching * 3 >= pitches.length) return { kind: 'hit', ratio: 1 };
+  const matching = pitches.filter((m) => pitchMatches(m, tones, bend, match)).length;
+  if (pitchMatches(heard, tones, bend, match) || matching >= pitches.length * rules.matchShare) return { kind: 'hit', ratio: 1 };
   if (near(pitches, heard) >= PITCH_RUN) return { kind: 'wrong', heardMidi: heard };
-  return { kind: 'hit', ratio: 0.7 };
+  return rules.unclear > 0 ? { kind: 'hit', ratio: rules.unclear } : { kind: 'wrong', heardMidi: heard };
 }
 
 interface State {
@@ -114,10 +131,19 @@ export function foldSemitones(diff: number): number {
 }
 
 /** Совпадает ли высота с одной из ожидаемых (до октавы; у бенда — до 2.6 полутона вверх). */
-export function pitchMatches(midi: number, expected: number[], bend: boolean): boolean {
+/** Сравнение высот: допуск, полутоны; сколько октав прощаем (ошибка октавы YIN — одна). */
+export interface PitchMatch {
+  tol: number;
+  octaves: number;
+}
+export const PITCH_MATCH: PitchMatch = { tol: PITCH_TOL, octaves: Infinity };
+
+export function pitchMatches(midi: number, expected: number[], bend: boolean, match: PitchMatch = PITCH_MATCH): boolean {
   return expected.some((m) => {
-    const d = foldSemitones(midi - m);
-    return Math.abs(d) <= PITCH_TOL || (bend && d > 0 && d <= 2 + PITCH_TOL);
+    const k = Math.round((midi - m) / 12);
+    if (Math.abs(k) > match.octaves) return false;
+    const d = midi - m - 12 * k;
+    return Math.abs(d) <= match.tol || (bend && d > 0 && d <= 2 + match.tol);
   });
 }
 
@@ -149,6 +175,9 @@ export interface GuitarJudge extends NoteJudge<TabMap, GuitarFrame> {
 
 export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions): GuitarJudge {
   const events = host.map.notes;
+  const match: PitchMatch = { ...PITCH_MATCH, ...options.match };
+  const pm = (midi: number, tones: number[], bend: boolean) => pitchMatches(midi, tones, bend, match);
+  const onsetRun = options.pitchOnsetRun ?? PITCH_RUN;
   const win = WINDOWS[options.strictness];
   // поправка эталона: YIN считает от A4 = 440
   const tune = 12 * Math.log2(options.a4Hz / 440);
@@ -217,7 +246,7 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
         const attack = e.judge === 'attack';
         if (ms >= s.attackMs + PITCH_FROM && ms <= s.attackMs + PITCH_TO) {
           // кадр без высоты обрывает серию «подряд»
-          s.hitRun = Number.isFinite(midi) && pitchMatches(midi, expected[i], bends[i]) ? s.hitRun + 1 : 0;
+          s.hitRun = Number.isFinite(midi) && pm(midi, expected[i], bends[i]) ? s.hitRun + 1 : 0;
           if (Number.isFinite(midi)) {
             s.pitches.push(midi);
             s.clarities.push(clarity);
@@ -232,13 +261,13 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
       }
       // смена высоты на нужную — атака, если удар не пойман
       if (e.judge === 'attack' && Number.isNaN(s.attackMs) && Number.isNaN(s.pitchOnsetMs)) {
-        if (Number.isFinite(midi) && pitchMatches(midi, expected[i], bends[i])) {
+        if (Number.isFinite(midi) && pm(midi, expected[i], bends[i])) {
           if (s.run === 0) {
             s.runFrom = ms;
-            s.runAfterOther = Number.isNaN(previous) || !pitchMatches(previous, expected[i], bends[i]);
+            s.runAfterOther = Number.isNaN(previous) || !pm(previous, expected[i], bends[i]);
           }
           s.run++;
-          if (s.run >= PITCH_RUN && s.runAfterOther && s.runFrom >= e.startMs - early(e) && s.runFrom <= e.startMs + late(e)) {
+          if (s.run >= onsetRun && s.runAfterOther && s.runFrom >= e.startMs - early(e) && s.runFrom <= e.startMs + late(e)) {
             s.pitchOnsetMs = s.runFrom;
             tell(i, verdict(i));
           }
@@ -246,7 +275,7 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
       }
       // легато: смена высоты на нужную в окне, атаки может не быть
       if (e.judge === 'legato' && Number.isNaN(s.legatoMs) && ms >= e.startMs - early(e) && ms <= openUntil(e) &&
-          pitchMatches(midi, expected[i], bends[i])) {
+          pm(midi, expected[i], bends[i])) {
         s.legatoMs = ms;
         tell(i, verdict(i));
       }
@@ -278,12 +307,12 @@ export function guitarJudge(host: JudgeHost<TabMap>, options: GuitarJudgeOptions
     }
     if (e.judge === 'onsetOnly') return timed(s.attackMs, 1);
     if (expected[i].length > 1) {
-      const c = chordEvidence(s.pitches, s.clarities, expected[i], bends[i]);
+      const c = chordEvidence(s.pitches, s.clarities, expected[i], bends[i], options.chordRules, match);
       return c.kind === 'hit' ? timed(s.attackMs, c.ratio) : { judgement: 'miss', hitRatio: 0, kind: 'wrong', offsetMs: s.attackMs - e.startMs, heardMidi: c.heardMidi };
     }
     const heard = median(s.pitches);
     if (Number.isNaN(heard)) return timed(s.attackMs, 0.7);
-    if (pitchMatches(heard, expected[i], bends[i])) return timed(s.attackMs, 1);
+    if (pm(heard, expected[i], bends[i])) return timed(s.attackMs, 1);
     if (s.pitches.filter((m) => Math.abs(m - heard) <= PITCH_TOL).length < PITCH_RUN) return timed(s.attackMs, 0.7);
     return { judgement: 'miss', hitRatio: 0, kind: 'wrong', offsetMs: s.attackMs - e.startMs, heardMidi: heard };
   };

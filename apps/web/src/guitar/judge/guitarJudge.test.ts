@@ -230,7 +230,7 @@ describe('легато и аккорды', () => {
     expect(j.finalize(i - 1).kind).toBe('hit');
   });
 
-  it('аккорд: удар без высоты — с долей 0.7; звуки аккорда мутно и вразнобой — попадание; чужая высота — не та', () => {
+  it('аккорд: удар без высоты — с долей 0.5; звуки аккорда мутно и вразнобой — попадание; чужая высота — не та', () => {
     const map = mapOf('chords');
     const [e0, e1, e2] = map.notes;
     expect(e0.notes).toHaveLength(6);
@@ -241,7 +241,7 @@ describe('легато и аккорды', () => {
     play(e1.startMs, NaN);
     play(e2.startMs, e2.notes[0].midi + 1, 0.6);
     const v = finalize();
-    expect([v[0].kind, v[0].hitRatio, v[1].kind, v[1].hitRatio, v[2].kind]).toEqual(['hit', 1, 'hit', 0.7, 'wrong']);
+    expect([v[0].kind, v[0].hitRatio, v[1].kind, v[1].hitRatio, v[2].kind]).toEqual(['hit', 1, 'hit', 0.5, 'wrong']);
   });
 
   it('аккорд: одна чистая нота — даже звук аккорда — «не та нота»; отклик — не по удару, а по концу окна высоты', () => {
