@@ -1,6 +1,5 @@
-// Сборка фронта для npm run dev с гитарным разделом (VITE_PUPITRE_GUITAR=1): десктоп в разработке берёт свежий фронт, а
-// не старую apps/web/dist. Переменная окружения — из Node (одинаково в Linux и Windows). Релизные pack/dist раздел не
-// включают (флаг в desktop.yml), им этот скрипт не нужен.
+// Сборка фронта для десктопа (npm run dev, CI): саундфонт синт-минуса, затем vite build. Гитарный раздел включён по
+// умолчанию; флаг ниже — явный, на случай VITE_PUPITRE_GUITAR=0 в окружении.
 import { execSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

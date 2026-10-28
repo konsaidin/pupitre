@@ -6,3 +6,12 @@ __pycache__/
 services/api/data/
 .DS_Store
 apps/web/public/soundfonts/
+*.tsbuildinfo
+# артефакты сборок и прогонов
+apps/desktop/release/
+apps/desktop/dist-web/
+target/
+*.node
+# скриншоты защищённого e2e ribbon.cjs (пишет в каталог запуска)
+apps/web/ribbon.png
+apps/web/roll.png

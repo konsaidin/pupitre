@@ -29,7 +29,7 @@ async function preview(flag) {
   // Dev-сервер того же процесса выставляет NODE_ENV=development, и build() без этого собрал бы dev-бандл (DEV=true).
   const env = { flag: process.env.VITE_PUPITRE_GUITAR, node: process.env.NODE_ENV };
   if (flag) process.env.VITE_PUPITRE_GUITAR = '1';
-  else delete process.env.VITE_PUPITRE_GUITAR;
+  else process.env.VITE_PUPITRE_GUITAR = '0';
   process.env.NODE_ENV = 'production';
   try {
     await build({ root: webRoot, mode: 'production', logLevel: 'warn', build: { outDir, emptyOutDir: true } });

@@ -41,7 +41,10 @@ jobs:
           npm ci
           npm run build:dsp
           npm test
-          npm run build
+
+      # саундфонт синт-минуса гитары (≈ 40 МБ, не в git) + vite build — тем же скриптом, что npm run dev
+      - name: Soundfont and web bundle
+        run: node apps/desktop/build-web.mjs
 
       - name: Install desktop deps
         working-directory: apps/desktop
@@ -57,6 +60,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev
           npm run build:native
+          # низколатентный движок гитары (JACK/PipeWire, грузит libjack при открытии)
+          npm run build:engine
 
       - name: Build desktop
         working-directory: apps/desktop

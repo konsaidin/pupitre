@@ -1,32 +1,31 @@
-# Уведомления о сторонних компонентах
+# Сторонние компоненты
 
-Полный документ генерируется на этапе 50 по результатам лицензионных гейтов.
+Pupitre распространяется под лицензией MIT (см. [LICENSE](LICENSE)). В него входят или им используются
+следующие сторонние компоненты. Полные тексты лицензий шрифтов, иконок и саундфонтов лежат в
+[`apps/web/public/licenses/`](apps/web/public/licenses/) и поставляются вместе с приложением; машинный
+реестр — [`content/content-licenses.json`](content/content-licenses.json), его сверяет гейт
+`tools/gates/check-licenses.mjs` (в сборку не допускаются GPL/LGPL/AGPL-зависимости).
 
-## npm
+## Встроено в приложение
 
-Будет заполнено на этапе 50.
+| Компонент | Лицензия | Где используется |
+|---|---|---|
+| [alphaTab](https://github.com/CoderLine/alphaTab) 1.8.4 (с TinySoundFont, SFZero, NVorbis, libvorbis, SharpZipLib, Haxe Std) | MPL-2.0 (alphaTab), MIT / BSD-3-Clause (встроенные части) | разбор Guitar Pro / MusicXML, синтез минуса |
+| [fretfall/player](https://github.com/fretfall/player) 0.5.0 | MIT | 3D-дорожка гитары (вендорено с патчами, см. `apps/web/src/guitar/vendor/fretfall/VENDOR.md`) |
+| [MuseScore General](https://ftp.osuosl.org/pub/musescore/soundfont/MuseScore_General/) 0.2 (на основе FluidR3) | MIT | саундфонт синт-минуса (скачивается при сборке `tools/soundfont/fetch.mjs`) |
+| SONiVOX EAS GM (из пакета alphaTab) | Apache-2.0 | запасной саундфонт, если MuseScore General недоступен |
+| [Martian Grotesk](https://github.com/evilmartians/grotesk), [Martian Mono](https://github.com/evilmartians/mono) | OFL-1.1 | шрифты интерфейса «Рампа» |
+| [Noto Music](https://github.com/notofonts/music) (только ♭ ♮ ♯) | OFL-1.1 | знаки альтерации |
+| [Tabler Icons](https://github.com/tabler/tabler-icons) | MIT | иконки интерфейса |
+| React, React Router, idb, fflate | MIT / ISC | веб-приложение |
 
-## Rust
+## Rust-ядро (`packages/*`)
 
-Будет заполнено на этапе 50.
+`cpal`, `jack`, `rtrb`, `napi`/`napi-derive` и их зависимости — MIT и/или Apache-2.0.
+Политика лицензий проверяется `cargo deny` (`packages/*/deny.toml`).
 
-## Python-бэкенд (ставится у пользователя)
+## Песенный сервер (`services/api`, ставится на машине пользователя)
 
-Будет заполнено на этапе 50.
-
-## Шрифты и иконки
-
-Будет заполнено на этапе 50.
-
-## Встроенные библиотеки
-
-Будет заполнено на этапе 50.
-
-## Саундфонт
-
-Будет заполнено на этапе 50.
-
-## Контент
-
-Будет заполнено на этапе 50.
-
+FastAPI, Uvicorn, NumPy, SciPy, librosa, soundfile, mutagen — MIT/BSD/ISC; PyTorch и torchaudio — BSD-3-Clause;
+[Demucs](https://github.com/facebookresearch/demucs) — MIT (веса модели htdemucs скачиваются при первом
+разделении). ffmpeg вызывается как отдельная программа и в приложение не встраивается.

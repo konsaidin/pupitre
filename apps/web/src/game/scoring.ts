@@ -35,8 +35,8 @@ export function matchPitch(
 
 // Октавных поправок ОТОБРАЖЕНИЯ больше нет: точка на ролле — всегда сырой
 // голос (см. engine.onPitchFrame). Прощение октавы на beginner/medium живёт
-// только здесь, в matchPitch. Историю с display-fold (три починки, всё равно
-// телепортировало) см. PLAN.md «Санация Windows-сборки», пункт 5.
+// только здесь, в matchPitch: сворачивание октавы при показе (display-fold)
+// заставляло точку «телепортироваться» и было убрано.
 
 export function judge(hitRatio: number): Judgement {
   if (hitRatio >= 0.8) return 'perfect';
