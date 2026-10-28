@@ -1,60 +1,60 @@
 # Pupitre
 
-**Pupitre** — тренажёр для голоса и гитары. Поёшь в микрофон или играешь на гитаре, приложение в реальном времени слышит
-ноты и показывает, попал ли ты. Работает в браузере и как десктоп-приложение (Linux, Windows).
+**English** · [Русский](README.ru.md)
 
-*Pupitre is a practice app for voice and guitar: sing or play along, and it hears your notes in real time. Runs in the
-browser and as a desktop app (Linux, Windows). The UI and docs are in Russian with an English UI option.*
+**Pupitre** is a practice app for voice and guitar. Sing into the mic or play your guitar, and the app hears your notes
+in real time and shows whether you hit them. It runs in the browser and as a desktop app (Linux, Windows). The
+interface is available in English and Russian.
 
-| Голос | Гитара |
+| Voice | Guitar |
 |---|---|
-| ![Голосовой режим: обзор](docs/screens/voice.png) | ![Гитарный режим: 3D-дорожка](docs/screens/guitar.png) |
+| ![Voice mode: overview](docs/screens/voice.png) | ![Guitar mode: 3D highway](docs/screens/guitar.png) |
 
-## Возможности
+## Features
 
-**Голос**
-- Мастер диапазона за минуту: упражнения и песни подстраиваются под твой голос.
-- Распевки и упражнения (длинные ноты, сирены, гаммы, интервалы, вибрато) генерируются под твой диапазон; темп,
-  тональность и повторы настраиваются.
-- Свои песни: загрузи mp3/wav/flac — сервер отделит вокал (Demucs), снимет мелодию (pYIN) и сдвинет её в твою октаву.
-  Петь можно под минус, с оригиналом или с одним вокалом; ноты правятся в редакторе.
-- Лента голоса и пиано-ролл, техники (вибрато, расщепление), очки, серия, итоги.
+**Voice**
+- A one-minute range wizard: exercises and songs adapt to your voice.
+- Warm-ups and exercises (long tones, sirens, scales, intervals, vibrato) are generated for your range; tempo, key and
+  repeats are adjustable.
+- Your own songs: upload mp3/wav/flac — the server separates the vocals (Demucs), extracts the melody (pYIN) and moves
+  it into your octave. Sing over the instrumental, the original or the isolated vocal; notes can be fixed in an editor.
+- Vocal ribbon and piano roll, techniques (vibrato, distortion), score, streak and results.
 
-**Гитара**
-- Импорт Guitar Pro (GP3–GP8, GPX) и MusicXML, 3D-дорожка летящих нот и табулатура.
-- Минус синтезируется из партитуры (саундфонт MuseScore General), твоя партия звучит тихой подсказкой.
-- Распознавание нот и аккордов с подсчётом очков: отклик на каждое попадание, «рано / поздно», «не та нота».
-- Режим обучения: песня ждёт на каждой ноте, пока ты её не сыграешь.
-- Экран «Вход и звук»: выбор интерфейса и канала, уровень, мониторинг. В десктопе для Linux — низколатентный
-  нативный движок (JACK/PipeWire, ≈ 7 мс туда-обратно).
+**Guitar**
+- Import Guitar Pro (GP3–GP8, GPX) and MusicXML; a 3D note highway and a tablature view.
+- The backing track is synthesized from the score (MuseScore General soundfont); your part plays as a quiet guide.
+- Note and chord recognition with scoring: feedback on every hit, "early / late", "wrong note".
+- Learn mode: the song waits on every note until you play it.
+- "Input and sound" screen: interface and channel, level, monitoring. The Linux desktop app has a low-latency native
+  engine (JACK/PipeWire, ≈ 7 ms round trip).
 
-## Скачать
+## Download
 
-Готовые сборки для Linux (`.AppImage`) и Windows (установщик и portable `.exe`) — на странице
-[Releases](../../releases). CI собирает их по тегу `v*` (`.github/workflows/desktop.yml`).
+Ready-made builds for Linux (`.AppImage`) and Windows (installer and portable `.exe`) are on the
+[Releases](../../releases) page. CI builds them on `v*` tags (`.github/workflows/desktop.yml`).
 
-Распевки, упражнения и гитара работают сразу. Сервер обработки песен приложение разворачивает само при первом
-открытии «Моих песен»: скачивает Python-окружение, зависимости (≈ 2,5 ГБ, один раз) и ffmpeg. Можно указать и
-внешний сервер: «Настройки → Сервер обработки песен».
+Warm-ups, exercises and guitar work right away. The song processing server is set up by the app itself the first time
+you open "My songs": it downloads a Python environment, dependencies (≈ 2.5 GB, once) and ffmpeg. You can also point it
+to an external server in Settings → Song processing server.
 
-## Разработка
+## Development
 
-Нужны Node 22+, Rust (версия — в `rust-toolchain.toml`, цель `wasm32-unknown-unknown`), для песенного сервера —
-Python 3.11+ и ffmpeg.
+You need Node 22+, Rust (version in `rust-toolchain.toml`, target `wasm32-unknown-unknown`), and for the song server
+Python 3.11+ and ffmpeg.
 
-### Веб
+### Web
 
 ```bash
 cd apps/web
 npm install
-npm run build:dsp                  # DSP-ядро (Rust → WASM)
-node ../../tools/soundfont/fetch.mjs   # саундфонт синт-минуса гитары (≈ 40 МБ, не хранится в git)
-npm run dev                        # http://localhost:5173
+npm run build:dsp                      # DSP core (Rust → WASM)
+node ../../tools/soundfont/fetch.mjs   # guitar backing soundfont (≈ 40 MB, not stored in git)
+npm run dev                            # http://localhost:5173
 ```
 
-Микрофон браузер даёт только на `localhost` или по HTTPS.
+Browsers only allow microphone access on `localhost` or over HTTPS.
 
-### Песенный сервер
+### Song server
 
 ```bash
 cd services/api
@@ -64,51 +64,52 @@ python3 -m venv .venv
 .venv/bin/uvicorn app.main:app --port 8000
 ```
 
-Dev-сервер веба проксирует `/api` на `127.0.0.1:8000`. Первый запуск Demucs скачает веса модели htdemucs. Без
-torch/demucs сервер тоже работает — мелодия снимается с полного микса. На aarch64 (ARM-серверы) ставь
-`demucs==4.0.1`: у 4.1 нет готовых колёс для этой платформы. Для доступа не с localhost задай
-`PUPITRE_API_TOKEN` и `PUPITRE_ALLOWED_ORIGINS` (подробности — `services/api/README.md`).
+The web dev server proxies `/api` to `127.0.0.1:8000`. The first Demucs run downloads the htdemucs model weights.
+Without torch/demucs the server still works — the melody is taken from the full mix. On aarch64 (ARM servers) install
+`demucs==4.0.1`: 4.1 has no prebuilt wheels for that platform. For access from other hosts set `PUPITRE_API_TOKEN` and
+`PUPITRE_ALLOWED_ORIGINS` (see `services/api/README.md`).
 
-### Десктоп
+### Desktop
 
 ```bash
 cd apps/desktop
 npm install
-npm run dev     # собирает веб, нативные модули (Linux) и запускает Electron
-npm run dist    # пакеты в apps/desktop/release/
+npm run dev     # builds the web app and native modules (Linux), then starts Electron
+npm run dist    # packages in apps/desktop/release/
 ```
 
-### Браузерная версия на своём сервере
+### Self-hosting the browser version
 
-`node apps/desktop/build-web.mjs` собирает `apps/web/dist` (вместе с саундфонтом). Для раздачи подойдёт любой
-статический сервер с HTTPS; в `tools/deploy/static-https.mjs` — минимальный сервер без зависимостей, который ещё и
-проксирует `/api` на песенный сервер.
+`node apps/desktop/build-web.mjs` builds `apps/web/dist` (including the soundfont). Any static server with HTTPS will
+do; `tools/deploy/static-https.mjs` is a minimal dependency-free server that also proxies `/api` to the song server.
 
-## Структура
+## Repository layout
 
 ```
-apps/web          веб-приложение (React + TypeScript + Vite): голос, гитара, дизайн-система «Рампа»
-apps/desktop      Electron-оболочка, встроенный песенный сервер, мосты к нативным модулям
-packages/dsp      DSP-ядро на Rust (YIN, техники голоса) → WASM и нативная библиотека
-packages/engine   низколатентный звуковой движок гитары (Rust, JACK, N-API)
-packages/native-audio  нативный захват голоса (Rust, cpal, N-API)
-services/api      песенный сервер (FastAPI, Demucs, pYIN)
-tools/gates       проверки сборки: бюджет бандла, исходники, лицензии, защита вокального режима
-content           реестр лицензий шрифтов, иконок и саундфонтов
+apps/web               web app (React + TypeScript + Vite): voice, guitar, the "Rampa" design system
+apps/desktop           Electron shell, bundled song server, bridges to native modules
+packages/dsp           Rust DSP core (YIN, vocal techniques) → WASM and a native library
+packages/engine        low-latency guitar audio engine (Rust, JACK, N-API)
+packages/native-audio  native voice capture (Rust, cpal, N-API)
+services/api           song server (FastAPI, Demucs, pYIN)
+tools/gates            build checks: bundle budget, source rules, licenses, vocal-mode protection
+content                license registry for fonts, icons and soundfonts
 ```
 
-## Проверки
+## Checks
 
 ```bash
-cd apps/web && npm test                    # юнит-тесты (vitest)
-node tools/gates/check-build.mjs           # сборка + бюджет входного бандла
-node tools/gates/check-sources.mjs         # правила исходников гитарного раздела
-node tools/gates/check-licenses.mjs        # лицензии зависимостей и контента
-node tools/gates/check-vocal.mjs --browser # вокальный режим не сломан (эталоны + e2e в Firefox)
+cd apps/web && npm test                    # unit tests (vitest)
+node tools/gates/check-build.mjs           # build + entry bundle budget
+node tools/gates/check-sources.mjs         # guitar section source rules
+node tools/gates/check-licenses.mjs        # dependency and content licenses
+node tools/gates/check-vocal.mjs --browser # vocal mode intact (golden files + Firefox e2e)
 ```
 
-Сквозные сценарии в Firefox и Electron лежат в `apps/web/e2e` и `apps/desktop/e2e` (см. `apps/web/e2e/lib/README.md`).
+End-to-end scenarios for Firefox and Electron live in `apps/web/e2e` and `apps/desktop/e2e` (see
+`apps/web/e2e/lib/README.md`). Code comments and internal docs are in Russian.
 
-## Лицензия
+## License
 
-[MIT](LICENSE). Сторонние компоненты и их лицензии — в [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+[MIT](LICENSE). Third-party components and their licenses are listed in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
