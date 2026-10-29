@@ -41,6 +41,12 @@ export async function synthBuffers(ctx: PlaybackContext, src: SynthSource): Prom
   return hit;
 }
 
+/** Своя партия в аккомпанементе (громкость гайда, mix.guide): не слышно, тихо (ui-spec: −18 дБ) или как в песне. */
+export const PART_LEVELS = { off: 0, quiet: 0.125, full: 1 } as const;
+export type PartLevel = keyof typeof PART_LEVELS;
+/** Ближайший уровень к сохранённой громкости гайда. */
+export const partLevelOf = (gain: number): PartLevel => (gain <= 0 ? 'off' : gain >= 0.5 ? 'full' : 'quiet');
+
 /** Слои транспорта: минус и гайд (партия игрока соло, тихо — ui-spec: −18 дБ по умолчанию). */
 export function backingLayers(buffers: { minus: AudioBuffer; guide: AudioBuffer }, mix: GuitarSettings['mix']): BackingLayer[] {
   return [

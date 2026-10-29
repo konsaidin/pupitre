@@ -89,6 +89,11 @@ export const GUITAR_RU: Record<string, string> = {
   Backing: 'Аккомпанемент',
   Recording: 'Запись',
   'Recordings will come later': 'Игра под запись появится позже',
+  'Your part in the backing': 'Своя партия в аккомпанементе',
+  'Your part': 'Своя партия',
+  Off: 'Не слышно',
+  Quiet: 'Тихо',
+  Loud: 'Громко',
   'Without scoring: play along with the highway': 'Без оценки: играй вдоль дорожки',
   // — игра —
   'Could not open the song': 'Не получилось открыть песню',
@@ -97,8 +102,8 @@ export const GUITAR_RU: Record<string, string> = {
   Bars: 'Такты',
   'No scoring': 'Без оценки',
   'Preparing the backing track…': 'Готовим аккомпанемент…',
-  'Play along with the highway. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature.':
-    'Играй вдоль дорожки. Пробел — пауза, ←/→ — ±5 с, L — повторять секцию, T — табулатура.',
+  'Play along with the highway. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature, M — your part.':
+    'Играй вдоль дорожки. Пробел — пауза, ←/→ — ±5 с, L — повторять секцию, T — табулатура, M — своя партия.',
   Pause: 'Пауза',
   Continue: 'Продолжить',
   'Start over': 'Начать сначала',
@@ -229,8 +234,8 @@ export const GUITAR_RU: Record<string, string> = {
   Score: 'Очки',
   Multiplier: 'Множитель',
   'Choose an input in Input and sound to get scored': 'Выбери вход в «Вход и звук» — тогда игра будет оцениваться',
-  'Play the highway: notes light up when you hit them. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature.':
-    'Играй по дорожке: попадания вспыхивают на нотах. Пробел — пауза, ←/→ — ±5 с, L — повторять секцию, T — табулатура.',
+  'Play the highway: notes light up when you hit them. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature, M — your part.':
+    'Играй по дорожке: попадания вспыхивают на нотах. Пробел — пауза, ←/→ — ±5 с, L — повторять секцию, T — табулатура, M — своя партия.',
   Hits: 'Попаданий',
   'of them on the beat': 'из них точно в долю',
   Misses: 'Промахов',

@@ -1,7 +1,7 @@
 // Саундфонт синт-минуса гитары — MuseScore General 0.2 (MIT, apps/web/public/licenses/MuseScore_General-MIT.md):
 // ≈ 40 МБ, в git не хранится. Скачивает в apps/web/public/soundfonts, если файла нет или sha256 не тот. Без сети —
 // предупреждение и выход 0: сборка остаётся рабочей на встроенном SONiVOX.
-// Запуск: node tools/soundfont/fetch.mjs (вызывает apps/desktop/build-web.mjs)
+// Запуск: node tools/soundfont/fetch.mjs (вызывают apps/desktop/build-web.mjs и npm run dev веба)
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

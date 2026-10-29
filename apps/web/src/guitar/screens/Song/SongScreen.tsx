@@ -1,5 +1,6 @@
 // Подготовка песни (ui-spec §11.3; этап 13a, срез 1 — подмножество): постер, партии радио-карточками (роль, строй,
-// капо, сложность по плотности событий), вид [3D | Табулатура], порядок струн, левша, CTA «Играть Space».
+// капо, сложность по плотности событий), вид [3D | Табулатура], порядок струн, левша, своя партия в аккомпанементе
+// (не слышно · тихо · громко), CTA «Играть Space».
 // Аккомпанемент — синтез (запись — этап 23), строгость и скорость — позже.
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,6 +10,7 @@ import { importErrorText } from '../../import/workerClient';
 import { guitarLibrary } from '../../store/library';
 import { updateGuitarSettings, useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
+import { PartLevelSeg } from '../../ui/PartLevel';
 import { durationOf, Poster, ROLE } from '../Library/LibraryScreen';
 import { clock, playHref } from '../Play/PlayScreen';
 import './song.css';
@@ -175,6 +177,10 @@ export function SongScreen() {
               {t('Recording')}
             </button>
           </div>
+        </div>
+        <div>
+          <span className="rp-label">{t('Your part in the backing')}</span>
+          <PartLevelSeg />
         </div>
       </section>
 

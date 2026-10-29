@@ -3,7 +3,7 @@
 // → sniff → parseScore → convertScore. Ответ — только клонируемые данные: tickLookup/MidiFile (built) не отдаются.
 import * as alphaTab from '@coderline/alphatab';
 import { parseScore } from './parseScore';
-import { channelsOf, renderMidi, setSoundFont } from '../backing/render';
+import { renderSong, setSoundFont, voicesOf, type TrackVoice } from '../backing/render';
 import { createConverter } from '../vendor/fretfall/fromScore.js';
 import { ImportError, sha256Hex, type Bytes, type ParseRequest, type ParseResult, type RenderRequest, type RenderResult } from './protocol';
 import { buildTimeline } from './timeline';
@@ -39,7 +39,7 @@ export async function handleParse(req: ParseRequest): Promise<ParseResult> {
 }
 
 // Последняя разобранная для рендера партитура: смена скорости не разбирает файл заново.
-let rendered: { key: string; score: alphaTab.model.Score; midiFile: alphaTab.midi.MidiFile } | null = null;
+let rendered: { key: string; score: alphaTab.model.Score; midiFile: alphaTab.midi.MidiFile; voices: TrackVoice[] } | null = null;
 
 export function handleRender(req: RenderRequest): RenderResult {
   const key = `${req.fileSha256}|${req.encoding ?? ''}`;
@@ -48,20 +48,14 @@ export function handleRender(req: RenderRequest): RenderResult {
     if (!sniffed.ok) throw new ImportError(sniffed.error, sniffed.detail);
     const { score, settings } = parseScore(req.bytes, sniffed.format, { encoding: req.encoding });
     createConverter(alphaTab).prepareScore(score);
-    rendered = { key, score, midiFile: buildTimeline(score, settings).midiFile };
+    rendered = { key, score, midiFile: buildTimeline(score, settings).midiFile, voices: voicesOf(score) };
   }
   if (req.soundFont && req.soundFont.byteLength !== soundFontSize) {
     setSoundFont(req.soundFont);
     soundFontSize = req.soundFont.byteLength;
   }
-  const track = rendered.score.tracks[req.trackIndex];
-  if (!track) throw new ImportError('parse-failed', `нет дорожки ${req.trackIndex}`);
-  const player = channelsOf(track);
-  return {
-    sampleRate: req.sampleRate,
-    minus: renderMidi(rendered.midiFile, req.sampleRate, req.speed, { muted: player }),
-    guide: renderMidi(rendered.midiFile, req.sampleRate, req.speed, { solo: player }),
-  };
+  if (!rendered.score.tracks[req.trackIndex]) throw new ImportError('parse-failed', `нет дорожки ${req.trackIndex}`);
+  return { sampleRate: req.sampleRate, ...renderSong(rendered.midiFile, rendered.voices, req.trackIndex, req.sampleRate, req.speed) };
 }
 
 /** Размер переданного саундфонта: тот же — не перезагружаем. */

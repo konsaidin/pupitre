@@ -115,3 +115,4 @@
 .rampa .game__waiting { position: absolute; left: 50%; bottom: 31%; z-index: 16; transform: translateX(-50%); pointer-events: none; }
 .rampa .game__waiting .rp-chip { animation: rp-rise var(--rp-dur-3) var(--rp-ease-out); height: 34px; padding: 0 14px; font-size: 13.5px; gap: 8px; box-shadow: 0 0 24px -6px var(--rp-beam); }
 .rampa .game__waiting b { color: var(--rp-fg-1); }
+.rampa .game__part { display: grid; justify-items: center; gap: 6px; }

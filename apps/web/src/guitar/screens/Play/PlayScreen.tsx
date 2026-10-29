@@ -1,7 +1,8 @@
 // Игра (ui-spec §11.6, §10.3; этап 13b–c, срез 1; оценка — M2): дорожка на весь экран под синт-минус, HUD сверху
 // («СЕКЦИЯ · ТАКТ n / N · м:сс»; с выбранным входом — точность, серия, очки, множитель; без него — «Без оценки»), снизу
 // слева — пилюля входа, отсчёт крупной цифрой, пауза, итоги. Клавиши: Space — старт/пауза/дальше, Esc — пауза, на паузе
-// — выход; ←/→ — ±5 с; PgUp/PgDn — секции; L — луп секции; F — во весь экран; T — 3D/табулатура.
+// — выход; ←/→ — ±5 с; PgUp/PgDn — секции; L — луп секции; F — во весь экран; T — 3D/табулатура; M — своя партия в
+// аккомпанементе (не слышно → тихо → громко).
 // HUD обновляется опросом ~8 Гц (как GameScreen), не из кадра дорожки.
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -12,13 +13,14 @@ import { midiToName } from '../../../lib/music';
 import type { GamePhase } from '../../../game/engine';
 import { comboMultiplier, type GameSummary } from '../../../game/scoring';
 import { GameInputPill } from '../../input/InputPill';
-import { backingLayers, synthBuffers } from '../../backing/synthBacking';
+import { backingLayers, partLevelOf, synthBuffers } from '../../backing/synthBacking';
 import { GuitarHighway } from '../../highway/GuitarHighway';
 import type { GuitarSong, TabMap } from '../../model/types';
 import { createPlaySession, type PlaySession } from '../../play/session';
 import { guitarLibrary, renderBacking } from '../../store/library';
 import { loadGuitarSettings, updateGuitarSettings, useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
+import { cyclePartLevel, PART_LEVEL_UI, PartLevelSeg } from '../../ui/PartLevel';
 import './play.css';
 
 /** /guitar/play/:songId/:arrId → [songId, arrId] (разбор пути сам: useParams утяжелил бы входной чанк). */
@@ -144,6 +146,11 @@ export function PlayScreen() {
     };
   }, [pathname, navigate, round]);
 
+  // Своя партия: громкость слоя гайда — из настроек, на лету (сегмент, пауза, клавиша M).
+  useEffect(() => {
+    if (load.phase === 'ready') load.session.transport.setLayerGain('guide', settings.mix.guide);
+  }, [load, settings.mix.guide]);
+
   // HUD — опросом ~8 Гц.
   useEffect(() => {
     if (load.phase !== 'ready') return;
@@ -226,6 +233,9 @@ export function PlayScreen() {
           break;
         case 'KeyT':
           updateGuitarSettings((st) => ({ ...st, view: { ...st.view, mode: st.view.mode === '3d' ? 'tab' : '3d' } }));
+          break;
+        case 'KeyM':
+          cyclePartLevel();
           break;
       }
     };
@@ -362,8 +372,8 @@ export function PlayScreen() {
           <h1 className="rp-h1">{song?.title}</h1>
           <p>
             {ready.scoring
-              ? t('Play the highway: notes light up when you hit them. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature.')
-              : t('Play along with the highway. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature.')}
+              ? t('Play the highway: notes light up when you hit them. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature, M — your part.')
+              : t('Play along with the highway. Space — pause, ←/→ — ±5 s, L — loop the section, T — tablature, M — your part.')}
           </p>
           <div className="rp-seg game__mode" role="radiogroup" aria-label={t('How to play')} data-ui="play-mode">
             {([false, true] as const).map((learn) => (
@@ -388,6 +398,10 @@ export function PlayScreen() {
           <p className="rp-sm rp-faint game__mode-hint">
             {settings.learn && ready.scoring ? t('The song waits on every note until you play it.') : t('The song plays on; misses are counted.')}
           </p>
+          <div className="game__part">
+            <span className="rp-label">{t('Your part in the backing')}</span>
+            <PartLevelSeg />
+          </div>
           <button type="button" className="rp-btn rp-btn--light rp-btn--lg" onClick={() => void ready.engine.start()} data-ui="play-go">
             <GuitarIcon name="player-play-filled" size="sm" />
             {t('Play')} <span className="rp-kbd">Space</span>
@@ -415,6 +429,11 @@ export function PlayScreen() {
               <GuitarIcon name="eye" />
               {view.mode === '3d' ? t('Show tablature') : t('Show 3D highway')}
               <span className="rp-kbd">T</span>
+            </button>
+            <button type="button" className="pause__item" onClick={cyclePartLevel} data-ui="play-part">
+              <GuitarIcon name={settings.mix.guide > 0 ? 'headphones' : 'headphones-off'} />
+              {t('Your part')}: {t(PART_LEVEL_UI[partLevelOf(settings.mix.guide)].label).toLowerCase()}
+              <span className="rp-kbd">M</span>
             </button>
             <div className="pause__sep" />
             <button type="button" className="pause__item pause__item--danger" onClick={() => navigate(-1)}>

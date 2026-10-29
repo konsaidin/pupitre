@@ -4,6 +4,7 @@
   "version": "0.2.0",
   "type": "module",
   "scripts": {
+    "predev": "node ../../tools/soundfont/fetch.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "test": "vitest run",
