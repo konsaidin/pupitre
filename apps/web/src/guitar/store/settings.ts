@@ -3,6 +3,7 @@
 // дефолтами, как lib/profile.ts; неизвестные ключи сохраняются (их могла записать более новая версия); миграция по
 // version. useGuitarSettings — подписка: одно уведомление на запись, другие вкладки — событие storage.
 import { useSyncExternalStore } from 'react';
+import { DEFAULT_TONE } from '../../audio/guitar/tone';
 import type { GuitarSettings } from '../model/types';
 
 export const SETTINGS_KEY = 'pupitre.guitar.v1';
@@ -22,6 +23,7 @@ export const DEFAULT_SETTINGS: GuitarSettings = {
   // гайд — партия игрока соло под минусом, тихо (ui-spec: −18 дБ ≈ 0.125); мониторинг себя — тихий (§8.9: ≈ −10 дБ)
   mix: { backing: 1, reference: 1, metronome: 0.6, guide: 0.125, monitor: 0.3 },
   monitoring: { mode: 'off' },
+  tone: DEFAULT_TONE,
   features: { ddSuggestions: false, autoLevel: false },
 };
 

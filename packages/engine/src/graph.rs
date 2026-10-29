@@ -1,8 +1,11 @@
-// Граф реального времени (01-architecture §8.3, этап 41a): вход (канал или смесь, DC-блок) → мониторинг (плавный гейн,
-// мягкое ограничение без заглядывания вперёд, глушение) → оба выхода; метры окнами по METER_FRAMES; замер задержки
+// Граф реального времени (01-architecture §8.3, этап 41a): вход (канал или смесь, DC-блок) → гитарный процессор
+// (pupitre_dsp::Tone; только пока мониторинг звучит) → мониторинг (плавный гейн, мягкое ограничение без заглядывания
+// вперёд, глушение) → оба выхода; метры окнами по METER_FRAMES; замер задержки
 // (rtl) на время замера заменяет мониторинг щелчками; сухой сигнал (после канала и DC-блока) уходит отводом в rtrb потоку
 // анализа. В process() — ни аллокаций, ни локов, ни системных вызовов: команды приходят и пакеты уходят через rtrb
 // (переполнение — потеря пакета метров или сэмплов анализа, считается; звук не страдает).
+use pupitre_dsp::tone::PARAM_BYPASS;
+use pupitre_dsp::Tone;
 use rtrb::{Consumer, Producer};
 
 use crate::rtl::{Rtl, RtlReport};
@@ -30,6 +33,8 @@ pub enum Command {
     Mute(bool),
     DcBlock(bool),
     StartRtl { clicks: u16, interval: u32, timeout: u32 },
+    /// Параметр процессора: номер (pupitre_dsp::tone::PARAM_*) и значение.
+    Tone(u32, f32),
 }
 
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
@@ -100,6 +105,8 @@ pub struct Graph {
     frames: u64,
     acc: Acc,
     rtl: Rtl,
+    /// Процессор мониторинга (буферы дилея и комнаты выделены при создании графа).
+    tone: Tone,
     sample_rate: f32,
 }
 
@@ -126,6 +133,12 @@ impl Graph {
             frames: 0,
             acc: Acc::default(),
             rtl: Rtl::default(),
+            tone: {
+                // до команд — в обходе: мониторинг сухой, как без процессора
+                let mut tone = Tone::new(sample_rate);
+                tone.set(PARAM_BYPASS, 1.0);
+                tone
+            },
             sample_rate,
         }
     }
@@ -164,6 +177,7 @@ impl Graph {
             }
             Command::DcBlock(on) => self.dc = on,
             Command::StartRtl { clicks, interval, timeout } => self.rtl.start(clicks, interval, timeout, self.frames),
+            Command::Tone(id, value) => self.tone.set(id, value),
         }
     }
 
@@ -213,7 +227,9 @@ impl Graph {
                 self.ramp_left -= 1;
                 self.gain = if self.ramp_left == 0 { self.target } else { self.gain + self.ramp_step };
             }
-            let mut out = if self.muted { 0.0 } else { soft_clip(dry * self.gain) };
+            // процессор — только пока мониторинг звучит или разгоняется: молчащий не тратит период
+            let wet = if !self.muted && (self.gain > 0.0 || self.ramp_left > 0) { self.tone.tick(dry) } else { dry };
+            let mut out = if self.muted { 0.0 } else { soft_clip(wet * self.gain) };
             if self.rtl.active() {
                 // замер: вместо мониторинга — щелчки (при глушении — тишина), отклик ловится на сыром канале
                 let (click, report) = self.rtl.tick(x, self.frames + i as u64);
@@ -402,6 +418,22 @@ mod tests {
         run(&mut g, &bad, &bad);
         let after = run(&mut g, &ones[..256], &ones[..256]);
         assert!(after.iter().all(|v| v.is_finite() && (v - 0.25).abs() < 1e-6));
+    }
+
+    #[test]
+    fn tone_is_bypassed_until_enabled_and_shapes_monitoring() {
+        let (mut g, mut tx, _ev, _tap) = graph(48000.0);
+        tx.push(Command::DcBlock(false)).unwrap();
+        tx.push(Command::MonitorGain(1.0)).unwrap();
+        let input: Vec<f32> = (0..4800).map(|i| 0.1 * (2.0 * std::f32::consts::PI * 110.0 * i as f32 / 48000.0).sin()).collect();
+        let dry = run(&mut g, &input, &input);
+        // после разгона гейна — сквозной канал
+        assert_eq!(&dry[1000..], &input[1000..]);
+        tx.push(Command::Tone(PARAM_BYPASS, 0.0)).unwrap();
+        let wet = run(&mut g, &input, &input);
+        let diff: f32 = wet[1000..].iter().zip(&input[1000..]).map(|(a, b)| (a - b).abs()).sum();
+        assert!(diff > 1.0, "процессор включён — звук другой");
+        assert!(wet.iter().all(|v| v.is_finite() && v.abs() <= 1.0));
     }
 
     #[test]

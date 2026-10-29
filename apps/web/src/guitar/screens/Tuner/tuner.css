@@ -1,0 +1,100 @@
+/* Тюнер (/guitar/tuner): крупная нота, шкала центов со стрелкой и зоной «в строю», частоты; пресеты строя карточками-радио
+   (как устройства «Вход и звук»), струны плитками в цветах струн (как .rp-tuning). Селекторы под .rampa, токены Рампы.
+   Стрелка — переменная --d на шкале (−1…1 = −50…+50 центов), её пишет кадр анимации. */
+/* шапка страницы — как в input.css и song.css (макет, раздел 9.5) */
+.rampa .page-head { display: flex; align-items: center; gap: var(--rp-s-4); flex-wrap: wrap; margin-bottom: 22px; }
+.rampa .page-head__title { display: grid; gap: 6px; margin-right: auto; }
+.rampa .page-head__title .rp-label { color: var(--rp-fg-3); }
+
+.rampa .tuner-page { max-width: 1180px; }
+.rampa .tuner { display: grid; gap: 16px; }
+.rampa .tuner .rp-card { padding: 22px 24px; display: grid; gap: 18px; }
+.rampa .tuner .rp-card__head { margin: 0; flex-wrap: wrap; }
+.rampa .tuner__ref { display: inline-flex; align-items: center; gap: 12px; }
+
+/* нота: буква, знак, октава; в строю — зелёный свет */
+.rampa .tuner__note { display: flex; align-items: baseline; justify-content: center; min-height: 1em; font-size: clamp(76px, 7.4vw, 116px);
+  font-weight: 800; font-stretch: 140%; letter-spacing: -0.04em; line-height: 1; color: var(--rp-fg-1);
+  transition: color var(--rp-dur-3), opacity var(--rp-dur-4), text-shadow var(--rp-dur-3); }
+.rampa .tuner__acc { font-size: 0.55em; align-self: flex-start; margin-top: 0.08em; letter-spacing: 0; }
+.rampa .tuner__oct { font-family: var(--rp-font-mono); font-size: 0.28em; font-weight: 600; font-stretch: 87.5%; letter-spacing: 0; color: var(--rp-fg-3); margin-left: 0.12em; }
+.rampa .tuner__stage[data-status='in'] .tuner__note { color: var(--rp-ok); text-shadow: 0 0 42px color-mix(in oklab, var(--rp-ok) 40%, transparent); }
+.rampa .tuner__stage[data-phase='empty'] .tuner__note { color: var(--rp-fg-4); }
+
+/* шкала −50…+50: деления, зона ±3 цента (3 % ширины на сторону), заливка от нуля до стрелки, стрелка */
+.rampa .tuner__meter { display: grid; gap: 8px; }
+.rampa .tuner__gauge { --d: 0; position: relative; height: 56px; border-radius: var(--rp-r-md); background: var(--rp-well); overflow: hidden;
+  box-shadow: inset 0 0 0 1px var(--rp-line-1), inset 0 1px 3px rgb(0 0 0 / 0.45); }
+.rampa .tuner__tick { position: absolute; bottom: 0; left: calc(50% + var(--x) * 50%); width: 1px; height: 12px; margin-left: -0.5px; background: var(--rp-line-3); }
+.rampa .tuner__tick[data-major] { height: 22px; background: var(--rp-fg-4); }
+.rampa .tuner__zone { position: absolute; top: 0; bottom: 0; left: 47%; width: 6%; background: color-mix(in oklab, var(--rp-ok) 14%, transparent);
+  border-inline: 1px solid color-mix(in oklab, var(--rp-ok) 45%, transparent); }
+.rampa .tuner__fill { position: absolute; top: 50%; height: 4px; margin-top: -2px; border-radius: 2px; opacity: 0.45;
+  left: calc(50% + min(var(--d), 0) * 50%); width: calc(max(var(--d), -1 * var(--d)) * 50%); background: var(--rp-light);
+  transition: left 90ms linear, width 90ms linear; }
+.rampa .tuner__needle { position: absolute; top: 7px; bottom: 7px; left: calc(50% + var(--d) * 50%); width: 3px; margin-left: -1.5px; border-radius: 2px;
+  background: var(--rp-light); box-shadow: var(--rp-glow-light); transition: left 90ms linear, background var(--rp-dur-2), opacity var(--rp-dur-4); }
+.rampa .tuner__stage[data-status='in'] .tuner__needle { background: var(--rp-ok); box-shadow: 0 0 0 1px color-mix(in oklab, var(--rp-ok) 60%, transparent), 0 0 22px color-mix(in oklab, var(--rp-ok) 55%, transparent); }
+.rampa .tuner__stage[data-status='in'] .tuner__fill { background: var(--rp-ok); }
+.rampa .tuner__marks { display: flex; justify-content: space-between; font-family: var(--rp-font-mono); font-size: 10.5px; color: var(--rp-fg-3); }
+
+/* центы, подсказка, частоты */
+.rampa .tuner__readouts { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 16px; }
+.rampa .tuner__cents b, .rampa .tuner__hz b { font-size: 30px; font-weight: 700; line-height: 1.1; color: var(--rp-fg-1); }
+.rampa .tuner__hz { display: grid; justify-items: end; gap: 2px; text-align: right; }
+.rampa .tuner__hz small { font-size: 12px; color: var(--rp-fg-3); font-weight: 560; }
+.rampa .tuner__hint { height: 30px; padding: 0 14px 0 11px; font-size: 13px; }
+.rampa .tuner__hint[data-status='sharp'], .rampa .tuner__hint[data-status='flat'] { --c: var(--rp-fg-1); }
+
+/* без сигнала: удержанное — чуть тише, погасшее — едва видно */
+.rampa .tuner__stage[data-phase='held'] :is(.tuner__note, .tuner__needle, .tuner__cents, .tuner__hz) { opacity: 0.75; }
+.rampa .tuner__stage[data-phase='none'] :is(.tuner__note, .tuner__needle, .tuner__fill, .tuner__cents, .tuner__hz) { opacity: 0.22; }
+.rampa .tuner__stage[data-phase='empty'] :is(.tuner__needle, .tuner__fill) { opacity: 0; }
+.rampa .tuner__stage :is(.tuner__cents, .tuner__hz, .tuner__fill) { transition: opacity var(--rp-dur-4); }
+
+/* пресеты: восемь в ряд, у́же — две строки по четыре (гитарные и 7-струнная + басы) */
+.rampa .tuner__presets { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 8px; }
+.rampa .tuner__preset { display: grid; gap: 1px; padding: 9px 12px; border-radius: var(--rp-r-sm); text-align: left;
+  border: 1px solid var(--rp-line-1); background: var(--rp-well); color: var(--rp-fg-2); transition: border-color var(--rp-dur-2), color var(--rp-dur-2); }
+.rampa .tuner__preset b { font-size: 14px; font-weight: 640; white-space: nowrap; }
+.rampa .tuner__preset small { font-size: 12px; color: var(--rp-fg-3); }
+.rampa .tuner__preset:hover { border-color: var(--rp-line-3); color: var(--rp-fg-1); }
+.rampa .tuner__preset[aria-checked='true'] { border-color: var(--rp-light); color: var(--rp-fg-1); box-shadow: 0 0 0 3px rgb(245 247 255 / 0.08); }
+
+/* струны: плитка в цвете струны (полоса сверху), номер по-гитаристски, нота, состояние последнего замера */
+.rampa .tuner__strings { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 8px; }
+.rampa .tuner__string { position: relative; display: grid; justify-items: center; gap: 2px; padding: 12px 4px 10px; border-radius: var(--rp-r-md);
+  background: color-mix(in oklab, var(--c) 6%, var(--rp-well)); border: 1px solid var(--rp-line-1);
+  transition: border-color var(--rp-dur-2), box-shadow var(--rp-dur-2); }
+.rampa .tuner__string::before { content: ''; position: absolute; left: 12px; right: 12px; top: -1px; height: 2px; border-radius: 1px; background: var(--c); opacity: 0.85; }
+.rampa .tuner__string small { font-size: 10.5px; color: var(--rp-fg-3); }
+.rampa .tuner__string b { font-size: 24px; font-weight: 760; font-stretch: 120%; line-height: 1.1; color: var(--c); }
+.rampa .tuner__string sub { font-family: var(--rp-font-mono); font-size: 0.45em; font-weight: 600; color: var(--rp-fg-3); vertical-align: baseline; margin-left: 1px; }
+.rampa .tuner__string-state { display: inline-flex; align-items: center; gap: 2px; min-height: 18px; font-size: 12.5px; color: var(--rp-fg-4); }
+.rampa .tuner__string-state .rp-i { width: 14px; height: 14px; stroke-width: 2.2; }
+.rampa .tuner__string[data-state='in'] .tuner__string-state { color: var(--rp-ok); }
+.rampa .tuner__string[data-state='sharp'] .tuner__string-state,
+.rampa .tuner__string[data-state='flat'] .tuner__string-state { color: var(--rp-warn); }
+.rampa .tuner__string[data-state='in'] { border-color: color-mix(in oklab, var(--rp-ok) 30%, transparent); }
+.rampa .tuner__string[data-active] { border-color: var(--rp-light); box-shadow: 0 0 0 3px rgb(245 247 255 / 0.08), 0 0 24px -8px var(--rp-beam); }
+
+.rampa .tuner__foot { display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; }
+.rampa .tuner__foot .rp-btn { margin-left: auto; }
+
+.rampa .tuner__empty .rp-i--xl { color: var(--rp-fg-3); margin-bottom: var(--rp-s-2); }
+
+@media (max-width: 1240px) { .rampa .tuner__presets { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (max-width: 760px) {
+  .rampa .tuner__readouts { grid-template-columns: 1fr 1fr; }
+  .rampa .tuner__hint { grid-column: 1 / -1; grid-row: 2; justify-self: center; }
+}
+/* телефон в ландшафте: нота и шкала ниже, пресеты в четыре колонки */
+@media (max-height: 500px) {
+  .rampa .tuner .rp-card { padding: 14px 16px; gap: 12px; }
+  .rampa .tuner__note { font-size: 64px; }
+  .rampa .tuner__gauge { height: 44px; }
+  .rampa .tuner__cents b, .rampa .tuner__hz b { font-size: 22px; }
+  .rampa .tuner__presets { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .rampa .tuner__string { padding: 8px 2px 6px; }
+  .rampa .tuner__string b { font-size: 18px; }
+}

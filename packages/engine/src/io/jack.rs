@@ -128,6 +128,8 @@ pub struct OpenOptions {
     /// Самопроверка без устройств: выход движка → клиент-петля → вход движка (ровно один квант; прямое соединение
     /// выхода клиента с его же входом PipeWire показывает, но данные по нему не идут).
     pub loopback: bool,
+    /// Параметры процессора (номер, значение) — применяются к новому графу при открытии и переоткрытии.
+    pub tone: Vec<(u32, f32)>,
 }
 
 #[derive(Debug, Clone)]
@@ -264,6 +266,9 @@ impl Session {
             Command::MonitorGain(options.monitor_gain),
         ] {
             commands.push(command).map_err(failed)?;
+        }
+        for &(id, value) in &options.tone {
+            commands.push(Command::Tone(id, value)).map_err(failed)?;
         }
         let xruns = Arc::new(AtomicU32::new(0));
         let buffer = Arc::new(AtomicU32::new(client.buffer_size()));

@@ -6,6 +6,7 @@ const FORMS = {
   song: { en: ['song', 'songs'], ru: ['песня', 'песни', 'песен'] },
   part: { en: ['part', 'parts'], ru: ['партия', 'партии', 'партий'] },
   fret: { en: ['fret', 'frets'], ru: ['лад', 'лада', 'ладов'] },
+  string: { en: ['string', 'strings'], ru: ['струна', 'струны', 'струн'] },
 } as const;
 
 /** «1 песня, 3 песни, 5 песен» / «1 song, 3 songs»: число со словом в нужной форме. */
@@ -184,8 +185,8 @@ export const GUITAR_RU: Record<string, string> = {
   'Do not hear': 'Не слышать',
   'The interface sends the guitar straight to your headphones with no delay; Pupitre does not output it.':
     'Интерфейс сам отдаёт гитару в наушники без задержки; Пюпитр её не выводит.',
-  'Pupitre outputs the clean signal; amp and effects will come later. Headphones only: from speakers the sound gets back into the input. In the browser the delay is noticeable — direct monitoring is better.':
-    'Пюпитр выводит чистый сигнал — усилитель и эффекты появятся позже. Только в наушниках: из колонок звук попадёт обратно во вход. В браузере задержка заметна — прямой мониторинг лучше.',
+  'Pupitre outputs the guitar through the processor (the Tone screen). Headphones only: from speakers the sound gets back into the input. In the browser the delay is noticeable — direct monitoring is better.':
+    'Пюпитр выводит гитару через процессор (экран «Тон»). Только в наушниках: из колонок звук попадёт обратно во вход. В браузере задержка заметна — прямой мониторинг лучше.',
   'You hear only the backing track and the strings themselves.': 'Слышно только аккомпанемент и сами струны.',
   'Monitoring volume': 'Громкость себя',
   'Round-trip delay': 'Задержка туда-обратно',
@@ -226,8 +227,33 @@ export const GUITAR_RU: Record<string, string> = {
   'dropouts this session': 'сбоев за сессию',
   'Driver report: device, buffer and engine. Calibration measures the exact delay.':
     'Отчёт драйвера: устройство, буфер и движок. Точную задержку даст калибровка.',
-  'The native engine outputs the clean signal with a delay of a few milliseconds; amp and effects will come later. Headphones only: from speakers the sound gets back into the input.':
-    'Нативный движок выводит чистый сигнал с задержкой в несколько миллисекунд — усилитель и эффекты появятся позже. Только в наушниках: из колонок звук попадёт обратно во вход.',
+  'The native engine outputs the guitar through the processor (the Tone screen) with a delay of a few milliseconds. Headphones only: from speakers the sound gets back into the input.':
+    'Нативный движок выводит гитару через процессор (экран «Тон») с задержкой в несколько миллисекунд. Только в наушниках: из колонок звук попадёт обратно во вход.',
+  // — тюнер —
+  'Tuner mode': 'Режим тюнера',
+  'By strings': 'По струнам',
+  Chromatic: 'Хроматический',
+  'Nearest note': 'Ближайшая нота',
+  String: 'Струна',
+  Strings: 'Струны',
+  Tuning: 'Строй',
+  'In tune': 'В строю',
+  'Loosen the string': 'Ослабь струну',
+  'Tighten the string': 'Подтяни струну',
+  'Above the note': 'Выше ноты',
+  'Below the note': 'Ниже ноты',
+  'in tune': 'в строю',
+  sharp: 'выше',
+  flat: 'ниже',
+  'not measured': 'не снята',
+  'Play an open string': 'Сыграй открытую струну',
+  'Play a note': 'Сыграй ноту',
+  'Strings measured: {n} of {total}': 'Снято струн: {n} из {total}',
+  'Saved tuning': 'Сохранённый строй',
+  'Play every open string — then the tuning can be saved.': 'Сыграй каждую открытую струну — тогда строй можно сохранить.',
+  'Save tuning': 'Сохранить строй',
+  'Tuning saved': 'Строй сохранён',
+  'The tuner listens to the instrument input. Choose it in Input and sound.': 'Тюнер слушает вход инструмента. Выбери его в «Вход и звук».',
   // — оценка игры —
   Accuracy: 'Точность',
   Streak: 'Серия',
@@ -252,4 +278,35 @@ export const GUITAR_RU: Record<string, string> = {
   'This screen is being built': 'Этот экран ещё строится',
   'Not found': 'Такой страницы нет',
   'Back to the library': 'В библиотеку',
+  // — тон —
+  'Reset the sound': 'Сбросить звук',
+  'No input is chosen — the processor has nothing to process.': 'Вход не выбран — процессору нечего обрабатывать.',
+  'Choose an input': 'Выбрать вход',
+  'Hear yourself': 'Слышать себя',
+  Processor: 'Процессор',
+  'Processor on': 'С процессором',
+  'Clean signal': 'Чистый сигнал',
+  'Choose “Through Pupitre” to hear the processor. Headphones only: from speakers the sound gets back into the input.':
+    'Выбери «Через Пюпитр», чтобы слышать процессор. Только в наушниках: из колонок звук попадёт обратно во вход.',
+  'The native engine processes the guitar with a delay of a few milliseconds.': 'Нативный движок обрабатывает гитару с задержкой в несколько миллисекунд.',
+  'In the browser the delay is noticeable; the desktop app on Linux uses the low-latency engine.':
+    'В браузере задержка заметна; десктоп на Linux работает через низколатентный движок.',
+  Amp: 'Усилитель',
+  Gain: 'Гейн',
+  Middle: 'Середина',
+  Treble: 'Верх',
+  Presence: 'Присутствие',
+  Volume: 'Громкость',
+  'Noise gate': 'Гейт',
+  off: 'выкл',
+  'Cabinet 4×12': 'Кабинет 4×12',
+  'No cabinet': 'Без кабинета',
+  Delay: 'Дилей',
+  Room: 'Комната',
+  Threshold: 'Порог',
+  Mix: 'Уровень',
+  Time: 'Время',
+  Clean: 'Чистый',
+  Crunch: 'Кранч',
+  'High gain': 'Хай-гейн',
 };

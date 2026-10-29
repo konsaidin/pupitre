@@ -25,7 +25,8 @@ const OPEN = `['ok', 'no-signal', 'clipping'].includes(document.querySelector('[
     const deadline = Date.now() + ms;
     while (Date.now() < deadline) {
       g.win.webContents.invalidate();
-      if (await g.run(`new Promise((resolve) => requestAnimationFrame(() => resolve(Boolean(${js}))))`)) return;
+      // скрытое окно после capturePage кадров не даёт (снимок экрана входа выше) — запасной таймер, иначе ожидание вечное
+      if (await g.run(`Promise.race([new Promise((r) => requestAnimationFrame(r)), new Promise((r) => setTimeout(r, 200))]).then(() => Boolean(${js}))`)) return;
       await wait(30);
     }
     throw new Error(`Не дождались: ${what}`);

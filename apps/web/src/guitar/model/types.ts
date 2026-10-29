@@ -1,6 +1,7 @@
 // Модель данных гитарного раздела (01-architecture.md §3.2–3.5, схема v1). Внутри модели струна 0 — НИЖНЯЯ; `fret` —
 // абсолютный лад на грифе (капо уже учтён); `midi` — звучащая высота. Время хранится в PerfTick (960 PPQ, порядок
 // исполнения по нотации: повторы, вольты и D.C./D.S. развёрнуты), миллисекунды — только производные (§3.4).
+import type { ToneShape } from '../../audio/guitar/tone';
 import type { MapNote, SongMap } from '../../lib/songMap';
 
 export const ARRANGEMENT_SCHEMA = 1 as const;
@@ -520,8 +521,10 @@ export interface GuitarSettings {
   /** startLevel: % для новых аранжировок; overrideToMax: arrId → прежний выбор. */
   dd: { enabled: boolean; startLevel: number | 'max'; overrideToMax: Record<string, LevelSelection> };
   mix: { backing: number; reference: number; metronome: number; guide: number; monitor: number };
-  /** 'off' по умолчанию. */
+  /** 'off' по умолчанию; 'tone' — себя слышно через Пюпитр, с процессором tone. */
   monitoring: { mode: 'direct' | 'tone' | 'off'; toneId?: string };
+  /** Гитарный процессор мониторинга (ядро packages/dsp/src/tone.rs). */
+  tone: ToneShape;
   /** Юридические ворота, кода за флагами нет. */
   features: { ddSuggestions: false; autoLevel: false };
 }

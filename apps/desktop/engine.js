@@ -95,6 +95,10 @@ function initEngine(ipcMain, isPackaged, resourcesPath) {
     });
   };
 
+  // параметры процессора — плоские пары «номер, значение» (packages/dsp/src/tone.rs), не больше 32 пар
+  const toneOf = (t) =>
+    Array.isArray(t) && t.length % 2 === 0 && t.length <= 64 && t.every((v) => typeof v === 'number' && Number.isFinite(v)) ? t : undefined;
+
   ipcMain.handle('engine:available', () => call('available'));
   ipcMain.handle('engine:list', () => call('listDevices'));
   ipcMain.handle('engine:open', (e, o) => {
@@ -108,6 +112,7 @@ function initEngine(ipcMain, isPackaged, resourcesPath) {
       monitorGain: finite(o?.monitorGain, 0, 1, 0),
       mute: o?.mute === true,
       loopback: o?.loopback === true,
+      tone: toneOf(o?.tone),
     });
   });
   ipcMain.handle('engine:close', () => close());
@@ -117,6 +122,7 @@ function initEngine(ipcMain, isPackaged, resourcesPath) {
       channel: o.channel === undefined ? undefined : channelOf(o.channel),
       monitorGain: o.monitorGain === undefined ? undefined : finite(o.monitorGain, 0, 1, 0),
       mute: typeof o.mute === 'boolean' ? o.mute : undefined,
+      tone: toneOf(o.tone),
     }).catch(() => {});
   });
   ipcMain.handle('engine:rtl', (_e, clicks) => call('measureRtl', finite(clicks, 1, 32, 8)));

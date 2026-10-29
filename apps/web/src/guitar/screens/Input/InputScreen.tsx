@@ -24,13 +24,12 @@ import { formatDb, meterFraction, useInputSnapshot, useLevelFrames } from '../..
 import type { GuitarSettings, InputType } from '../../model/types';
 import { useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
+import { ReferenceStepper } from '../../ui/ReferenceStepper';
 import './input.css';
 
 type Monitoring = GuitarSettings['monitoring']['mode'];
 
 const SCALE = ['−60', '−48', '−36', '−24', '−12'];
-const A4_MIN = 430;
-const A4_MAX = 450;
 const BUFFERS = [64, 128, 256, 512];
 /** Огонёк канала горит от −50 dBFS. */
 const CHANNEL_LIT_DB = -50;
@@ -45,8 +44,8 @@ const MONITOR_NOTES: Record<Monitoring, (engine: boolean) => string> = {
   direct: () => t('The interface sends the guitar straight to your headphones with no delay; Pupitre does not output it.'),
   tone: (engine) =>
     engine
-      ? t('The native engine outputs the clean signal with a delay of a few milliseconds; amp and effects will come later. Headphones only: from speakers the sound gets back into the input.')
-      : t('Pupitre outputs the clean signal; amp and effects will come later. Headphones only: from speakers the sound gets back into the input. In the browser the delay is noticeable — direct monitoring is better.'),
+      ? t('The native engine outputs the guitar through the processor (the Tone screen) with a delay of a few milliseconds. Headphones only: from speakers the sound gets back into the input.')
+      : t('Pupitre outputs the guitar through the processor (the Tone screen). Headphones only: from speakers the sound gets back into the input. In the browser the delay is noticeable — direct monitoring is better.'),
   off: () => t('You hear only the backing track and the strings themselves.'),
 };
 const ADVICE: Record<Advice, () => string> = {
@@ -307,8 +306,6 @@ export function InputScreen() {
     : <span className="rp-chip">{t('not selected')}</span>;
 
   const calibrated = Object.values(settings.latency).sort((a, b) => b.at - a.at)[0];
-  const a4 = settings.reference.a4Hz;
-  const setA4 = (hz: number) => update((s) => ({ ...s, reference: { ...s.reference, a4Hz: Math.min(A4_MAX, Math.max(A4_MIN, hz)) } }));
   const monitorPct = Math.round(mix.monitor * 100);
   const buffer = input.bufferFrames ?? 128;
 
@@ -610,17 +607,7 @@ export function InputScreen() {
                 {t('Tuning reference')}
               </span>
             </div>
-            <div className="rp-stepper" role="group" aria-labelledby="io-a4" data-ui="input-a4">
-              <button type="button" aria-label={t('Lower')} disabled={a4 <= A4_MIN} onClick={() => setA4(a4 - 1)}>
-                <GuitarIcon name="minus" size="sm" />
-              </button>
-              <output>
-                A4 {a4} {t('Hz')}
-              </output>
-              <button type="button" aria-label={t('Higher')} disabled={a4 >= A4_MAX} onClick={() => setA4(a4 + 1)}>
-                <GuitarIcon name="plus" size="sm" />
-              </button>
-            </div>
+            <ReferenceStepper labelledBy="io-a4" ui="input-a4" />
           </div>
         </section>
       </div>

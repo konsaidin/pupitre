@@ -11,9 +11,12 @@
 import { decodeFrame, FRAME_FLOATS } from '../AudioInput';
 import { stopMic } from '../audioSession';
 import { engineBridge, type EngineApi, type EngineEvent, type EngineMeters, type EngineOpenInfo } from '../engine/EngineBridge';
+import { changedToneParams, toneParams } from '../guitar/tone';
+import { TONE_PROCESSOR_SOURCE } from '../guitar/toneProcessorSource';
 import { PITCH_PROCESSOR_SOURCE } from '../pitchProcessorSource';
 // data-URI, а не ?url: под file:// в Electron fetch ассетов не работает (как WorkletAudioInput)
 import dspWasmDataUri from '../../assets/dsp.wasm?inline';
+import toneWasmDataUri from '../../assets/tone.wasm?inline';
 import { ONSET_PROCESSOR_SOURCE } from './onsetProcessorSource';
 
 /**
@@ -61,6 +64,8 @@ export interface InputConfig {
   bufferFrames: number;
   /** Выход мониторинга движка; null — выходы того же устройства. */
   outputDeviceId: string | null;
+  /** Параметры гитарного процессора мониторинга по номерам (audio/guitar/tone.ts: toneParams); обход — сухой сигнал. */
+  tone: readonly number[];
 }
 
 export interface InputSnapshot {
@@ -209,6 +214,7 @@ const CLOSED: InputSnapshot = {
 };
 const NO_INPUT: InputConfig = {
   deviceId: null, deviceLabel: '', channel: -1, monitorGain: 0, noiseDb: NaN, backend: 'auto', bufferFrames: 128, outputDeviceId: null,
+  tone: toneParams(null),
 };
 
 let platform = browser;
@@ -390,7 +396,6 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
     splitter.connect(left, 0);
     splitter.connect(right, 1);
     pick.connect(dry);
-    pick.connect(monitor);
     monitor.connect(ctx.destination);
     const buf = new Float32Array(FFT);
     const peakOf = (node: AnalyserNode) => {
@@ -407,6 +412,7 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
       return typeof latency === 'number' ? latency * 1000 : 0;
     };
     const stopAnalysis = webAnalysis(ctx, pick, inputLatencyMs);
+    const tone = webTone(ctx, pick, monitor);
     return {
       backend: 'web', deviceId: settings.deviceId || requestedId || '', label: track.label, outputLabel: '', channels,
       sampleRate: settings.sampleRate || ctx.sampleRate, requestedFrames: 0, bufferFrames: 0, xruns: 0,
@@ -436,6 +442,7 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
           routed = channel;
         }
         monitor.gain.setTargetAtTime(Math.max(0, next.monitorGain), ctx.currentTime, 0.02);
+        tone.apply(next.tone);
       },
       latency() {
         const s = track.getSettings() as { latency?: unknown };
@@ -445,6 +452,7 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
       close() {
         unwake();
         stopAnalysis();
+        tone.stop();
         for (const t of stream.getTracks()) {
           t.onended = null;
           t.stop();
@@ -457,6 +465,70 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
     void ctx.close().catch(() => {});
     throw e;
   }
+}
+
+// ——— браузер: гитарный процессор мониторинга ———
+
+/**
+ * Ворклет тона между выбранным каналом и мониторингом. Пока он грузится (или без AudioWorklet — тесты), мониторинг
+ * сухой: pick → monitor; готов — pick → тон → monitor, параметры — изменившимися парами.
+ */
+let toneModulePromise: Promise<WebAssembly.Module> | null = null;
+
+/** WASM гитарного процессора (tone.wasm из того же ядра; только гитарный чанк); компилируется один раз на страницу. */
+function toneModule(): Promise<WebAssembly.Module> {
+  if (!toneModulePromise) {
+    const bin = atob(toneWasmDataUri.slice(toneWasmDataUri.indexOf(',') + 1));
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    toneModulePromise = WebAssembly.compile(bytes);
+  }
+  return toneModulePromise;
+}
+
+function webTone(ctx: AudioContext, pick: AudioNode, monitor: AudioNode): { apply(params: readonly number[]): void; stop(): void } {
+  pick.connect(monitor);
+  let node: AudioWorkletNode | null = null;
+  let stopped = false;
+  let wanted: readonly number[] | null = null;
+  let sent: readonly number[] | null = null;
+  const flush = () => {
+    if (!node || !wanted) return;
+    const params = changedToneParams(sent, wanted);
+    if (params.length) node.port.postMessage({ type: 'set', params });
+    sent = wanted;
+  };
+  if (ctx.audioWorklet)
+    void (async () => {
+      const module = await toneModule();
+      const url = URL.createObjectURL(new Blob([TONE_PROCESSOR_SOURCE], { type: 'application/javascript' }));
+      try {
+        await ctx.audioWorklet.addModule(url);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+      if (stopped) return;
+      sent = wanted ?? toneParams(null);
+      node = new AudioWorkletNode(ctx, 'pupitre-tone', {
+        numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1], processorOptions: { module, params: changedToneParams(null, sent) },
+      });
+      pick.disconnect(monitor);
+      pick.connect(node);
+      node.connect(monitor);
+    })().catch(() => {
+      // процессор не завёлся (нет WASM/ворклета) — мониторинг остаётся сухим
+    });
+  return {
+    apply(params) {
+      wanted = params;
+      flush();
+    },
+    stop() {
+      stopped = true;
+      node?.port.close();
+      node?.disconnect();
+    },
+  };
 }
 
 // ——— браузер: анализ на ворклетах ———
@@ -604,9 +676,15 @@ async function engineCapture(api: EngineApi, deviceId: string | null, label: str
       emitFrame({ atMs: f[i] / 1000 + clockMs, midi: f[i + 1], clarity: f[i + 2], levelDb: f[i + 3], onset: f[i + 4] === 1 });
     }
   });
-  const options = (id: string | null) => ({
-    capture: id, playback: config.outputDeviceId, channel: config.channel, bufferFrames: config.bufferFrames, monitorGain: config.monitorGain,
-  });
+  // процессор движка: при открытии — все параметры, потом — изменившиеся
+  let toneSent: readonly number[] | null = null;
+  const options = (id: string | null) => {
+    toneSent = config.tone;
+    return {
+      capture: id, playback: config.outputDeviceId, channel: config.channel, bufferFrames: config.bufferFrames, monitorGain: config.monitorGain,
+      tone: changedToneParams(null, config.tone),
+    };
+  };
   const openEngine = async (): Promise<EngineOpenInfo> => {
     try {
       return await api.open(options(deviceId));
@@ -660,7 +738,9 @@ async function engineCapture(api: EngineApi, deviceId: string | null, label: str
       return true;
     },
     apply(next) {
-      api.set({ channel: next.channel, monitorGain: next.monitorGain });
+      const tone = changedToneParams(toneSent, next.tone);
+      toneSent = next.tone;
+      api.set({ channel: next.channel, monitorGain: next.monitorGain, ...(tone.length ? { tone } : {}) });
     },
     latency() {
       // свежий отчёт драйвера из метров; до первого пакета — значения открытия

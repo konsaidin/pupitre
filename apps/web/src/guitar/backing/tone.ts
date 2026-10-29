@@ -95,8 +95,8 @@ interface AmpVoice {
 }
 
 const AMPS: Record<AmpModel, AmpVoice> = {
-  'high-gain': { tight: 110, push: [800, 6], fizz: 6500, stages: [{ gain: 14, bias: 0.04 }, { gain: 6, bias: 0.02 }], scoop: -5 },
-  crunch: { tight: 70, push: [700, 3], fizz: 8000, stages: [{ gain: 4, bias: 0.06 }, { gain: 1.6, bias: 0.05 }], scoop: -2 },
+  'high-gain': { tight: 110, push: [800, 6], fizz: 6500, stages: [{ gain: 14, bias: 0.01 }, { gain: 6, bias: 0.005 }], scoop: -5 },
+  crunch: { tight: 70, push: [700, 3], fizz: 8000, stages: [{ gain: 4, bias: 0.02 }, { gain: 1.6, bias: 0.02 }], scoop: -2 },
 };
 
 /** Уровень нормированного DI на входе усилителя (по громким блокам) — от него считаются гейны каскадов. */

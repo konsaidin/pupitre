@@ -4,6 +4,13 @@ name = "pupitre-dsp"
 version = "0.1.0"
 edition = "2021"
 
+# Экспорты C-ABI для wasm: analysis — dsp.wasm (высота и техники, входной чанк веба), tone — tone.wasm (процессор,
+# только гитарный раздел). Нативные потребители (движок) берут типы крейта, экспорты им не нужны.
+[features]
+default = ["analysis"]
+analysis = []
+tone = []
+
 [lib]
 name = "pupitre_dsp"
 crate-type = ["cdylib", "rlib"]

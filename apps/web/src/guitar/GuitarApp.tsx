@@ -14,6 +14,8 @@ import { InputScreen } from './screens/Input/InputScreen';
 import { LibraryScreen } from './screens/Library/LibraryScreen';
 import { PlayScreen } from './screens/Play/PlayScreen';
 import { SongScreen } from './screens/Song/SongScreen';
+import { ToneScreen } from './screens/Tone/ToneScreen';
+import { TunerScreen } from './screens/Tuner/TunerScreen';
 import { GUITAR_RU } from './i18n';
 import './ui/rampa.css';
 
@@ -80,10 +82,10 @@ function ShellScreens() {
       <Route index element={<LibraryScreen />} />
       <Route path="song/:songId" element={<SongScreen />} />
       <Route path="results/:sessionId" element={<ScreenStub screen="results" title={t('Results')} />} />
-      <Route path="tuner" element={<ScreenStub screen="tuner" title={t('Tuner')} />} />
+      <Route path="tuner" element={<TunerScreen />} />
       <Route path="calibrate" element={<ScreenStub screen="calibrate" title={t('Calibration')} />} />
       <Route path="sync/:songId" element={<ScreenStub screen="sync" title={t('Sync editor')} />} />
-      <Route path="tone" element={<ScreenStub screen="tone" title={t('Tone')} />} />
+      <Route path="tone" element={<ToneScreen />} />
       <Route path="input" element={<InputScreen />} />
       <Route path="about" element={<ScreenStub screen="about" title={t('Third-party components')} />} />
       {import.meta.env.DEV && <Route path="_system" element={<ScreenStub screen="system" title={t('Design system')} />} />}

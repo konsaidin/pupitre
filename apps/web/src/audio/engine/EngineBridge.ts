@@ -27,6 +27,8 @@ export interface EngineOpenOptions {
   monitorGain: number;
   /** Самопроверка: выход движка соединяется с его же входом, устройства не трогаются. */
   loopback?: boolean;
+  /** Параметры гитарного процессора плоскими парами «номер, значение» (audio/guitar/tone.ts). */
+  tone?: number[];
 }
 
 export interface EngineOpenInfo {
@@ -90,7 +92,7 @@ export interface EngineApi {
   listDevices(): Promise<EngineDevices>;
   open(options: EngineOpenOptions): Promise<EngineOpenInfo>;
   close(): Promise<void>;
-  set(options: { channel?: number; monitorGain?: number; mute?: boolean }): void;
+  set(options: { channel?: number; monitorGain?: number; mute?: boolean; tone?: number[] }): void;
   measureRtl(clicks: number): Promise<EngineRtl>;
   /** Открыт ли движок, квант и устройство (диагностика, e2e). */
   status(): Promise<{ open: boolean; bufferFrames: number; captureId: string }>;

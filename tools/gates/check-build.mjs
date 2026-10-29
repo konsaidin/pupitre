@@ -11,13 +11,17 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const web = join(ROOT, 'apps/web');
-const wasm = join(web, 'src/assets/dsp.wasm');
-const expected = '625cd45ecf17187ced89633b229ee41efe97ebb1ec9419a8fe93962aaedd8671';
+// Модули ядра packages/dsp (npm run build:dsp): анализ и гитарный процессор; пересборка должна дать те же байты.
+const WASM = {
+  'dsp.wasm': '075376c0928172da203ea1e27436baec210a7537ca873c06ba0adefe906d478b',
+  'tone.wasm': 'b47d5cdf30a98935050094c418e76d30903194fe1f2833da885c0abbec1c5816',
+};
+const wasmPath = (name) => join(web, 'src/assets', name);
 const hash = b => createHash('sha256').update(b).digest('hex');
 // Свой каталог на каждое дерево (основное, worktree): копия не восстановится в чужое.
 const BACKUP = join(homedir(), '.cache/pupitre/gates/backup', hash(ROOT).slice(0, 12));
 const MANIFEST = join(BACKUP, 'manifest.json');
-const TRACKED = { 'tsconfig.tsbuildinfo': join(web, 'tsconfig.tsbuildinfo'), 'dsp.wasm': wasm };
+const TRACKED = { 'tsconfig.tsbuildinfo': join(web, 'tsconfig.tsbuildinfo'), ...Object.fromEntries(Object.keys(WASM).map((n) => [n, wasmPath(n)])) };
 let interrupted = null;
 for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => {
   if (!interrupted) console.error(`[check-build] ${signal}: доделываю шаг и восстанавливаю файлы`);
@@ -84,13 +88,16 @@ if (existsSync(MANIFEST)) {
 if (!failure) {
   let backedUp = false;
   try {
-    const before = hash(readFileSync(wasm));
-    if (before !== expected) throw Error(`dsp.wasm: ожидается ${expected}, до сборки ${before}`);
+    const before = Object.fromEntries(Object.keys(WASM).map((n) => [n, existsSync(wasmPath(n)) ? hash(readFileSync(wasmPath(n))) : 'нет файла']));
+    for (const [name, expected] of Object.entries(WASM))
+      if (before[name] !== expected) throw Error(`${name}: ожидается ${expected}, до сборки ${before[name]}`);
     backup();
     backedUp = true;
     await run('npm', ['run', 'build:dsp'], web);
-    const actual = hash(readFileSync(wasm));
-    if (actual !== expected) throw Error(`dsp.wasm: до ${before}, после ${actual}, ожидается ${expected}`);
+    for (const [name, expected] of Object.entries(WASM)) {
+      const actual = hash(readFileSync(wasmPath(name)));
+      if (actual !== expected) throw Error(`${name}: до ${before[name]}, после ${actual}, ожидается ${expected}`);
+    }
     await run('npx', ['tsc', '-b'], web);
     await run('npx', ['vite', 'build'], web, { ...process.env, VITE_PUPITRE_GUITAR: '1' });
     for (const script of ['bundle-report', 'check-sources', 'check-disk']) await run(process.execPath, [`tools/gates/${script}.mjs`]);

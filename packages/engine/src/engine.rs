@@ -85,11 +85,13 @@ pub trait Sink: Send + Sync + 'static {
     fn frames(&self, frames: FramesOut);
 }
 
-#[derive(Debug, Clone, Copy, Default, PartialEq)]
+#[derive(Debug, Clone, Default, PartialEq)]
 pub struct SetOptions {
     pub channel: Option<i32>,
     pub monitor_gain: Option<f32>,
     pub mute: Option<bool>,
+    /// Изменённые параметры процессора: (номер, значение).
+    pub tone: Vec<(u32, f32)>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -124,6 +126,16 @@ enum Msg {
 }
 
 const METER_PERIOD: Duration = Duration::from_millis(33);
+
+/// Текущие параметры процессора (переживают переоткрытие): новые значения поверх, по номеру.
+fn merge_tone(current: &mut Vec<(u32, f32)>, changes: &[(u32, f32)]) {
+    for &(id, value) in changes {
+        match current.iter_mut().find(|(i, _)| *i == id) {
+            Some(slot) => slot.1 = value,
+            None => current.push((id, value)),
+        }
+    }
+}
 
 /// PUPITRE_ENGINE_TRACE=1 — длительность операций потока управления в stderr (диагностика зависаний).
 fn trace(what: &str, started: Instant) {
@@ -365,6 +377,7 @@ impl Actor {
                     if let Some(g) = set.monitor_gain {
                         options.monitor_gain = g;
                     }
+                    merge_tone(&mut options.tone, &set.tone);
                 }
                 if let Some(m) = set.mute {
                     self.mute = m;
@@ -381,6 +394,9 @@ impl Actor {
                     }
                     if let Some(m) = set.mute {
                         let _ = s.commands.push(Command::Mute(m));
+                    }
+                    for &(id, value) in &set.tone {
+                        let _ = s.commands.push(Command::Tone(id, value));
                     }
                 }
             }

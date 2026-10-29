@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../audioSession', () => ({ stopMic: vi.fn() }));
 
+import { changedToneParams, DEFAULT_TONE, TONE_PARAM, toneParams } from '../guitar/tone';
 import type { EngineApi, EngineEvent, EngineFrames, EngineMeters, EngineOpenOptions } from '../engine/EngineBridge';
 import {
   acquireInput,
@@ -236,7 +237,9 @@ function fakePlatform() {
 }
 
 const task = () => new Promise((resolve) => setTimeout(resolve, 0));
-const BASE: InputConfig = { deviceId: null, deviceLabel: '', channel: -1, monitorGain: 0, noiseDb: NaN, backend: 'auto', bufferFrames: 128, outputDeviceId: null };
+const BASE: InputConfig = {
+  deviceId: null, deviceLabel: '', channel: -1, monitorGain: 0, noiseDb: NaN, backend: 'auto', bufferFrames: 128, outputDeviceId: null, tone: toneParams(null),
+};
 const chosen = (patch: Partial<InputConfig> = {}): InputConfig => ({ ...BASE, deviceId: 'a', deviceLabel: 'Interface A', ...patch });
 const state = () => getInputSnapshot().state;
 const sine = (amp: number) => Float32Array.from({ length: 4096 }, (_, i) => amp * Math.sin((2 * Math.PI * i) / 64));
@@ -627,6 +630,11 @@ describe('нативный движок', () => {
     expect(readLevel(200).clipping).toBe(true);
     configureInput(engineInput({ channel: 1, monitorGain: 0.7 }));
     expect(engine.sets.at(-1)).toEqual({ channel: 1, monitorGain: 0.7 });
+    // процессор: при открытии ушли все параметры (обход — сухой мониторинг), дальше — только изменившиеся парами
+    expect(engine.opened[0].tone).toEqual(changedToneParams(null, toneParams(null)));
+    expect(engine.opened[0].tone?.slice(0, 2)).toEqual([TONE_PARAM.bypass, 1]);
+    configureInput(engineInput({ channel: 1, monitorGain: 0.7, tone: toneParams({ ...DEFAULT_TONE, gain: 0.8 }) }));
+    expect(engine.sets.at(-1)).toEqual({ channel: 1, monitorGain: 0.7, tone: [TONE_PARAM.bypass, 0, TONE_PARAM.gain, 0.8] });
     // свежий отчёт драйвера из метров важнее значений открытия
     engine.meter({ captureLatencyFrames: 176, playbackLatencyFrames: 176 });
     expect(readLatency()).toEqual({ kind: 'engine', inputMs: (176 / 48000) * 1000, outputMs: (176 / 48000) * 1000, bufferMs: (128 / 48000) * 1000 });

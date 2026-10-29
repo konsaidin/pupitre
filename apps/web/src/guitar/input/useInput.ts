@@ -1,6 +1,6 @@
 // Вход в разделе: настройки → сессия входа (audio/instrument/session), снимок состояния для экранов и пилюли, уровень по
 // кадрам анимации — прямо в DOM (CSS-переменные и классы), без перерисовки React.
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
 import {
   acquireInput,
   configureInput,
@@ -10,6 +10,7 @@ import {
   type InputLevel,
   type InputSnapshot,
 } from '../../audio/instrument/session';
+import { toneParams } from '../../audio/guitar/tone';
 import { updateGuitarSettings, useGuitarSettings } from '../store/settings';
 import { noiseKeyOf } from './inputView';
 
@@ -29,12 +30,13 @@ export function InputSession() {
   const [settings] = useGuitarSettings();
   const { deviceId, deviceLabel = '', channel, noiseDb, noiseKey, backend, bufferFrames = 128, outputDeviceId = null } = settings.input;
   const monitorGain = settings.monitoring.mode === 'tone' ? settings.mix.monitor : 0;
+  const tone = useMemo(() => toneParams(settings.tone), [settings.tone]);
   // Фон измерен на другом входе — порог по умолчанию.
   const noise = noiseKey === noiseKeyOf(deviceId, channel) && typeof noiseDb === 'number' ? noiseDb : NaN;
   // Порядок эффектов важен: настройки — до держателя, чтобы первое открытие шло уже на выбранное устройство.
   useEffect(
-    () => configureInput({ deviceId, deviceLabel, channel, monitorGain, noiseDb: noise, backend, bufferFrames, outputDeviceId }),
-    [deviceId, deviceLabel, channel, monitorGain, noise, backend, bufferFrames, outputDeviceId],
+    () => configureInput({ deviceId, deviceLabel, channel, monitorGain, noiseDb: noise, backend, bufferFrames, outputDeviceId, tone }),
+    [deviceId, deviceLabel, channel, monitorGain, noise, backend, bufferFrames, outputDeviceId, tone],
   );
   useEffect(() => acquireInput(), []);
   const snap = useInputSnapshot();

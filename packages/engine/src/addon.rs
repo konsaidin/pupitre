@@ -37,6 +37,8 @@ pub struct JsOpenOptions {
     pub monitor_gain: f64,
     pub mute: Option<bool>,
     pub loopback: Option<bool>,
+    /// Параметры процессора плоскими парами: номер, значение, номер, значение…
+    pub tone: Option<Vec<f64>>,
 }
 
 #[napi(object)]
@@ -59,6 +61,17 @@ pub struct JsSetOptions {
     pub channel: Option<i32>,
     pub monitor_gain: Option<f64>,
     pub mute: Option<bool>,
+    /// Изменённые параметры процессора плоскими парами: номер, значение…
+    pub tone: Option<Vec<f64>>,
+}
+
+/// Плоские пары «номер, значение» → пары; нечётный хвост и нечисла отбрасываются.
+fn tone_pairs(flat: Option<Vec<f64>>) -> Vec<(u32, f32)> {
+    flat.unwrap_or_default()
+        .chunks_exact(2)
+        .filter(|p| p[0].is_finite() && p[0] >= 0.0 && p[1].is_finite())
+        .map(|p| (p[0] as u32, p[1] as f32))
+        .collect()
 }
 
 #[napi(object)]
@@ -280,6 +293,7 @@ pub fn open(options: JsOpenOptions) -> AsyncTask<OpenTask> {
         monitor_gain: options.monitor_gain as f32,
         mute: options.mute.unwrap_or(false),
         loopback: options.loopback.unwrap_or(false),
+        tone: tone_pairs(options.tone),
     }))))
 }
 
@@ -290,7 +304,12 @@ pub fn close() -> AsyncTask<CloseTask> {
 
 #[napi]
 pub fn set(options: JsSetOptions) {
-    engine().set(SetOptions { channel: options.channel, monitor_gain: options.monitor_gain.map(|g| g as f32), mute: options.mute });
+    engine().set(SetOptions {
+        channel: options.channel,
+        monitor_gain: options.monitor_gain.map(|g| g as f32),
+        mute: options.mute,
+        tone: tone_pairs(options.tone),
+    });
 }
 
 #[napi(ts_return_type = "Promise<JsRtl>")]

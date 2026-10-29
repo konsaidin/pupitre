@@ -22,11 +22,16 @@ interface is available in English and Russian.
 
 **Guitar**
 - Import Guitar Pro (GP3–GP8, GPX) and MusicXML; a 3D note highway and a tablature view.
-- The backing track is synthesized from the score (MuseScore General soundfont); your part plays as a quiet guide.
+- The backing track is synthesized from the score: MuseScore General soundfont, the AVL Black Pearl drum kit, an amp
+  model for distorted guitars. Your own part can be muted, quiet or as loud as the rest.
 - Note and chord recognition with scoring: feedback on every hit, "early / late", "wrong note".
 - Learn mode: the song waits on every note until you play it.
 - "Input and sound" screen: interface and channel, level, monitoring. The Linux desktop app has a low-latency native
   engine (JACK/PipeWire, ≈ 7 ms round trip).
+- Tuner: chromatic or by string, tuning presets (Standard, Drop D, D Standard, E♭, Drop C, 7-string, 4- and 5-string
+  bass), adjustable A4; the measured tuning is saved.
+- "Tone": a processor for hearing yourself — amp (clean, crunch, high gain), tone stack, 4×12 cabinet, noise gate,
+  delay and room. One Rust core (`packages/dsp`) runs in the native engine and in the browser (WebAssembly).
 
 ## Download
 
