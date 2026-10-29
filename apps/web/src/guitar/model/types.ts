@@ -5,7 +5,7 @@ import type { MapNote, SongMap } from '../../lib/songMap';
 
 export const ARRANGEMENT_SCHEMA = 1 as const;
 /** Растёт при любой правке импорта → ленивый пере-разбор из оригинала (этап 9a). */
-export const CONVERTER_VERSION = 2; // 2 — направления слайдов и кривая рычага в TabNote
+export const CONVERTER_VERSION = 3; // 2 — направления слайдов и кривая рычага в TabNote; 3 — ударные с ID артикуляций GP7
 export const PPQ = 960 as const;
 
 /** 960 PPQ, ось исполнения по нотации; может быть дробным (свинг). */
@@ -181,7 +181,7 @@ export interface ToneTrack {
 }
 export type ImportWarningCode =
   | 'no-tuning' | 'tuning-guessed' | 'encoding-guess' | 'fingering-auto' | 'swing-corrected'
-  | 'unsupported-technique' | 'multitrack-midi' | 'empty-track' | 'grace-shift' | 'user-edits-unmatched';
+  | 'unsupported-technique' | 'multitrack-midi' | 'empty-track' | 'grace-shift' | 'user-edits-unmatched' | 'drum-ids';
 export interface ImportWarning {
   code: ImportWarningCode;
   detail: string;

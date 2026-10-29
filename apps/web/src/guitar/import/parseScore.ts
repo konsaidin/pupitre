@@ -1,8 +1,10 @@
 // Разбор партитуры alphaTab (ScoreLoader.loadScoreFromBytes). GP3–5 хранят строки в кодировке системы автора: без явной
 // кодировки пробуем UTF-8, а при «�» в названиях — windows-1251 и windows-1252 и берём вариант с меньшим числом «�»
 // (при равенстве — с меньшим числом слов смешанного письма) с предупреждением encoding-guess. Явная кодировка — ручной
-// выбор в окне импорта (этап 12b).
+// выбор в окне импорта (этап 12b). Ударные с ID артикуляций GP7 вместо индексов чинятся здесь же (drums.ts) —
+// предупреждение drum-ids.
 import * as alphaTab from '@coderline/alphatab';
+import { fixDrumArticulationIds } from './drums';
 import type { ImportWarning, ScoreFormat } from '../model/types';
 
 export const ENCODINGS = ['utf-8', 'windows-1251', 'windows-1252', 'koi8-r'] as const;
@@ -39,6 +41,13 @@ function load(bytes: Uint8Array, encoding: ScoreEncoding) {
 }
 
 export function parseScore(bytes: Uint8Array, format: ScoreFormat, opts: { encoding?: ScoreEncoding } = {}): ParsedScore {
+  const parsed = parseText(bytes, format, opts);
+  const drums = fixDrumArticulationIds(parsed.score);
+  if (drums) parsed.warnings.push({ code: 'drum-ids', detail: 'ноты ударных ссылались на ID артикуляций GP7, а не на индексы — переведены', count: drums });
+  return parsed;
+}
+
+function parseText(bytes: Uint8Array, format: ScoreFormat, opts: { encoding?: ScoreEncoding }): ParsedScore {
   if (opts.encoding) return { ...load(bytes, opts.encoding), encoding: opts.encoding, warnings: [] };
   const first = load(bytes, 'utf-8');
   const legacy = format === 'gp3' || format === 'gp4' || format === 'gp5';
