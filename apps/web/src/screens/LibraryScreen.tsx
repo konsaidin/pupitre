@@ -139,8 +139,8 @@ export function LibraryScreen() {
       >
         <GuitarIcon name={uploading ? 'loader-2' : 'cloud-upload'} size="lg" className={uploading ? 'vo-spin' : undefined} />
         <span className="vo-drop__copy">
-          <span className="rp-label">{t('Make it your next song')}</span>
-          <strong className="rp-h3">{uploading ? t('Uploading…') : t('Drop a track. Find your part.')}</strong>
+          <span className="rp-label">{t('New song')}</span>
+          <strong className="rp-h3">{uploading ? t('Uploading…') : t('Drop an audio file here')}</strong>
           <span className="rp-sm rp-muted">{t('We’ll find the vocal melody and turn it into notes you can sing along with.')}</span>
           <span className="rp-label rp-faint">MP3 · WAV · FLAC · M4A</span>
         </span>

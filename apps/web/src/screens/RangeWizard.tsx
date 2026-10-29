@@ -141,8 +141,8 @@ export function RangeWizard() {
           <RampaPoster seed="meet-your-instrument" glyph="♪" className="vo-invite__poster" />
           <div className="vo-invite__body">
             <span className="rp-label">{t('Before the first note')}</span>
-            <h2 className="rp-h2">{t('Meet your instrument.')}</h2>
-            <p className="rp-muted">{t('Three simple steps. Nothing to prove. Just sing comfortably.')}</p>
+            <h2 className="rp-h2">{t('Range measurement')}</h2>
+            <p className="rp-muted">{t('Three steps, about a minute.')}</p>
             <ul className="vo-tips">
               <li>
                 <GuitarIcon name="headphones" />

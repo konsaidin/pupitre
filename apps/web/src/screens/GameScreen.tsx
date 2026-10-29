@@ -406,11 +406,8 @@ export function GameScreen() {
           <div className="vo-overlay">
             <div className="vo-setup">
               <aside className="rp-card rp-card--pad vo-setup__intro">
-                <span className="rp-label">{t('The practice room')}</span>
-                <h2 className="rp-h2">
-                  {t('Listen.')} <span className="rp-muted">{t('Find your note.')}</span> {t('Make it yours.')}
-                </h2>
-                <p className="rp-sm rp-muted">{t('Follow the melody, see your voice, and enjoy getting closer with every take.')}</p>
+                <span className="rp-label">{t('Melody')}</span>
+                <p className="rp-sm rp-muted">{t('The line is the melody; your voice is drawn on top of it.')}</p>
                 <div className="vo-melody">
                   <MelodyPreview notes={songMap.notes} />
                   <div className="vo-melody__bar rp-xs rp-faint">
@@ -425,7 +422,7 @@ export function GameScreen() {
                 </div>
                 <span className="rp-xs rp-faint vo-setup__tip">
                   <GuitarIcon name="headphones" size="sm" />
-                  {t('Headphones on. Everything else can wait.')}
+                  {t('Sing in headphones')}
                 </span>
               </aside>
               <div className="rp-card rp-card--raised rp-card--pad vo-setup__panel">
@@ -634,7 +631,7 @@ export function GameScreen() {
       <div className="vo-game__foot rp-xs rp-faint">
         <span>
           <GuitarIcon name="headphones" size="sm" />
-          {t('Your voice. Your pace.')}
+          {t('Sing in headphones')}
         </span>
         <span className="vo-game__keys">
           <kbd className="rp-kbd">Space</kbd>

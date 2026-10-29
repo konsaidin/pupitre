@@ -51,8 +51,8 @@ export function HomeScreen() {
     <div className="screen home rp-page vo-page" data-ui="vocal-home">
       <header className="vo-head">
         <div>
-          <span className="rp-label">{t('Your personal voice studio')}</span>
-          <h1 className="rp-h1">{t('Find your flow.')}</h1>
+          <span className="rp-label">{t('Voice mode')}</span>
+          <h1 className="rp-h1">{t('Practice')}</h1>
         </div>
         <span className="rp-chip rp-chip--plain vo-date">
           <GuitarIcon name="clock" size="sm" />
@@ -65,11 +65,10 @@ export function HomeScreen() {
           <RampaPoster seed="pupitre-voice" glyph="♪" className="vo-continue__poster" />
           <div className="vo-continue__body">
             <div>
-              <span className="rp-label">{t('Made for your voice')}</span>
-              <h2 className="vo-continue__title">
-                {t('Your voice.')} <span className="rp-muted">{t('More possibility.')}</span>
-              </h2>
-              <p className="vo-continue__text">{t('Find your notes, feel the melody, and make a little progress every day.')}</p>
+              <h2 className="vo-continue__title">{r ? t('Continue practicing') : t('Measure your range')}</h2>
+              <p className="vo-continue__text">
+                {r ? t('Start with a warm-up, then exercises or a song.') : t('Exercises and songs are moved into your range.')}
+              </p>
             </div>
             <div className="vo-stats">
               <Stat value={String(scores.length)} label={t('sessions completed')} />
@@ -79,11 +78,9 @@ export function HomeScreen() {
             <div className="vo-continue__foot">
               <button className="rp-btn rp-btn--light rp-btn--lg" onClick={() => navigate(r ? '/exercises?cat=Warm-ups' : '/range')} data-ui="home-start">
                 <GuitarIcon name={r ? 'player-play-filled' : 'microphone'} />
-                {r ? t('Start a warm-up') : t('Discover my voice')}
+                {r ? t('Start a warm-up') : t('Measure my range')}
               </button>
-              <span className="rp-xs rp-faint">
-                {r ? t('Your range. Your pace. Your next step.') : t('One minute to find your starting point.')}
-              </span>
+              {!r && <span className="rp-xs rp-faint">{t('Takes about a minute.')}</span>}
             </div>
           </div>
         </section>
@@ -92,7 +89,6 @@ export function HomeScreen() {
 
       <div className="vo-section">
         <h2 className="rp-h3">{t('What shall we sing?')}</h2>
-        <span className="rp-sm rp-faint">{t('Small steps. A stronger voice.')}</span>
       </div>
       <div className="vo-tiles">
         <PracticeTile
@@ -100,7 +96,7 @@ export function HomeScreen() {
           glyph="01"
           icon="wave-sine"
           title={t('Warm-ups')}
-          desc={t('Ease into your voice. Long tones, gentle sirens, and a fresh start.')}
+          desc={t('Long tones and sirens before singing.')}
           foot={t('{n} exercises', { n: warmups })}
           onClick={() => navigate(r ? '/exercises?cat=Warm-ups' : '/range')}
         />
@@ -108,8 +104,8 @@ export function HomeScreen() {
           seed="skills"
           glyph="02"
           icon="target"
-          title={t('Build your skills')}
-          desc={t('Find the center of every note. Scales, intervals, and vocal technique.')}
+          title={t('Exercises')}
+          desc={t('Scales, intervals and vibrato.')}
           foot={t('{n} exercises', { n: EXERCISES.length - warmups })}
           onClick={() => navigate(r ? '/exercises' : '/range')}
         />
@@ -117,8 +113,8 @@ export function HomeScreen() {
           seed="songs-you-love"
           glyph="03"
           icon="music"
-          title={t('Sing what you love')}
-          desc={t('Turn your favorite songs into a practice session. Bring your own soundtrack.')}
+          title={t('My songs')}
+          desc={t('Upload a song: the app extracts the vocal melody from it.')}
           foot={songCount === null ? t('Open the library') : t('{n} songs ready', { n: songCount })}
           onClick={() => navigate('/songs')}
         />
@@ -131,7 +127,7 @@ export function HomeScreen() {
           <div className="rp-card__head">
             <h2 className="rp-section-title rp-h3">
               <GuitarIcon name="activity" />
-              {t('Your rhythm')}
+              {t('This week')}
             </h2>
             <span className="rp-chip">
               <GuitarIcon name="flame" size="sm" />
@@ -157,7 +153,7 @@ export function HomeScreen() {
             </h2>
             <button className="rp-btn rp-btn--ghost rp-btn--sm" onClick={() => navigate('/settings')}>
               <GuitarIcon name="adjustments-horizontal" size="sm" />
-              {t('Set up your studio')} · <span className="rp-num">{profile.latencyMs} {t('ms')}</span>
+              {t('Sound setup')} · <span className="rp-num">{profile.latencyMs} {t('ms')}</span>
             </button>
           </div>
           {scores.length > 0 ? (
@@ -238,12 +234,12 @@ function VoiceCard() {
   return (
     <section className="rp-card rp-card--pad vo-voice">
       <div className="rp-card__head">
-        <span className="rp-label">{t('Your instrument')}</span>
+        <span className="rp-label">{t('Range')}</span>
         <GuitarIcon name="microphone" size="sm" />
       </div>
       <div>
-        <div className="rp-h2">{r ? t(classifyRange(r.lowMidi, r.highMidi)) : t('One of a kind.')}</div>
-        <div className="rp-sm rp-muted">{r ? t('This is your vocal range') : t('Let’s get to know your voice')}</div>
+        <div className="rp-h2">{r ? t(classifyRange(r.lowMidi, r.highMidi)) : t('Voice type unknown')}</div>
+        <div className="rp-sm rp-muted">{r ? t('This is your vocal range') : t('Range not measured yet')}</div>
       </div>
       <div className="vo-voice__range rp-num">
         {r ? (

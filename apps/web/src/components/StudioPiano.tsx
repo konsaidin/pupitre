@@ -32,15 +32,14 @@ export function StudioPiano() {
       <div className="vo-piano__intro">
         <span className="rp-label rp-section-title">
           <GuitarIcon name="keyboard" size="sm" />
-          {t('A note to start with')}
+          {t('Piano')}
         </span>
-        <h2 className="rp-h3">{t('Hear it. Then sing it.')}</h2>
         <p className="rp-sm rp-muted">{t('Touch the keys and find a comfortable sound. No microphone needed.')}</p>
         <div className="vo-piano__display">
           <i className={preview.playing ? 'rp-led rp-led--on' : 'rp-led'} />
           <strong className="rp-num">{preview.midi === null ? '—' : name(preview.midi)}</strong>
           <span className="rp-xs rp-faint rp-num">
-            {preview.midi === null ? t('Ready when you are') : `${midiToHz(preview.midi).toFixed(1)} Hz`}
+            {preview.midi === null ? t('Press a key') : `${midiToHz(preview.midi).toFixed(1)} Hz`}
           </span>
         </div>
       </div>

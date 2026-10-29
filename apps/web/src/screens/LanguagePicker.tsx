@@ -17,23 +17,21 @@ export function LanguagePicker({ onPick }: { onPick: (lang: Lang) => void }) {
   return (
     <div className="rampa">
       <div className="screen lang-picker vo-lang" data-ui="vocal-language">
-        <RampaPoster seed="your-voice-your-way" glyph="P" className="vo-lang__poster">
-          <span className="rp-label vo-lang__motto">YOUR VOICE. YOUR OWN WAY.</span>
-        </RampaPoster>
+        <RampaPoster seed="your-voice-your-way" glyph="P" className="vo-lang__poster" />
         <div className="vo-lang__body">
           <span className="rp-brand">
             <span className="rp-brand__name">{APP_NAME}</span>
             <span className="rp-brand__mode">VOICE · GUITAR</span>
           </span>
           <h1 className="rp-display vo-lang__title">
-            Make room
+            Выбери язык
             <br />
-            for your voice.
+            Choose a language
           </h1>
           <p className="rp-muted">
-            Твой голос может больше.
+            Язык можно сменить в настройках.
             <br />
-            Начни с языка, на котором тебе удобно.
+            You can change it in Settings.
           </p>
           <div className="vo-lang__options">
             <button className="rp-btn rp-btn--light rp-btn--xl" onClick={() => pick('ru')}>

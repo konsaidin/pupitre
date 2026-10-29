@@ -21,10 +21,10 @@ const CATEGORY_ICON: Record<ExerciseDef['category'], GuitarIconName> = {
 };
 const name = (midi: number) => midiToName(midi).replace('#', '♯');
 const CATEGORY_DESC: Record<string, string> = {
-  'Warm-ups': 'Give your voice a gentle beginning.',
-  Scales: 'Make every step sound intentional.',
-  'Ear training': 'Hear it. Find it. Sing it.',
-  Techniques: 'Explore the character of your voice.',
+  'Warm-ups': 'Long tones and sirens before singing.',
+  Scales: 'Scales up and down.',
+  'Ear training': 'Hear a note and sing it back.',
+  Techniques: 'Vibrato.',
 };
 
 export function ExercisesScreen() {
@@ -48,7 +48,7 @@ export function ExercisesScreen() {
                 low: name(profile.range.lowMidi),
                 high: name(profile.range.highMidi),
               })
-            : t('Your voice sets the key. Let’s find it first.')
+            : t('Exercises are moved into your range — measure it first.')
         }
         action={<span className="rp-chip rp-chip--plain">{t('{n} exercises', { n: EXERCISES.length })}</span>}
       />

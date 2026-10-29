@@ -112,7 +112,6 @@
 /* выбор языка, плашка сервера */
 .rampa .vo-lang { display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr); min-height: 100vh; background: var(--rp-bg); }
 .rampa .vo-lang__poster { border-radius: 0; }
-.rampa .vo-lang__motto { position: absolute; left: 32px; bottom: 28px; color: var(--rp-fg-2); }
 .rampa .vo-lang__body { display: grid; align-content: center; justify-items: start; gap: 22px; padding: 48px clamp(32px, 6vw, 96px); }
 .rampa .vo-lang__title { font-size: clamp(40px, 5vw, 72px); }
 .rampa .vo-lang__options { display: grid; gap: 12px; width: min(100%, 380px); }
