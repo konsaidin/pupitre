@@ -2,8 +2,9 @@
 // (того же, что строит таймлайн, формат 0). Минус — все дорожки, кроме партии игрока (основной и вторичный MIDI-канал её
 // дорожки), гайд — она одна. Скорость — множитель темпа событий MidiFile. Саундфонт — MuseScore General от главного
 // потока, без него — SONiVOX из пакета alphaTab (встроен в чанк воркера: под file:// fetch не работает).
-// Перегруженные гитары (GM 29/30) рендерятся чистым тоном по одной и идут через модель усилителя (tone.ts), поверх
-// минуса и гайда — комната. Каждый проход рендера — копия MidiFile только со своими каналами: нота синтезируется один раз.
+// Перегруженные гитары (GM 29/30) рендерятся чистым тоном по одной и идут через модель усилителя (tone.ts). Ударные —
+// живым китом AVL Black Pearl (свой саундфонт, отдельный проход; чего в ките нет — киту саундфонта). Поверх минуса и
+// гайда — комната. Каждый проход рендера — копия MidiFile только со своими каналами: нота синтезируется один раз.
 import * as alphaTab from '@coderline/alphatab';
 import sonivox from '@coderline/alphatab/soundfont/sonivox.sf3?inline';
 import { ampSim, panInto, room, type AmpModel } from './tone';
@@ -26,6 +27,11 @@ let soundFont: Uint8Array | null = null;
 /** Свой саундфонт (MuseScore General — главный поток передаёт его воркеру); null — встроенный SONiVOX. */
 export function setSoundFont(bytes: Uint8Array | null): void {
   soundFont = bytes;
+}
+let drumKit: Uint8Array | null = null;
+/** Кит ударных AVL Black Pearl (главный поток передаёт его воркеру); null — ударные саундфонта. */
+export function setDrumKit(bytes: Uint8Array | null): void {
+  drumKit = bytes;
 }
 function soundFontBytes(): Uint8Array {
   if (!soundFont) {
@@ -57,6 +63,25 @@ const AMP_OF: Partial<Record<number, AmpModel>> = { 29: 'crunch', 30: 'high-gain
 /** Вход модели усилителя: Electric Guitar (clean). */
 const DI_PROGRAM = 27;
 const DRUM_CHANNEL = 9;
+/**
+ * Ноты GM-ударных → ноты кита AVL (раскладка не GM: 48 — хай-хэт «swish», 50 — заглушённый крэш). Томы GM — на два
+ * барабана кита (центр и край), китайская — на третий крэш. Нет в таблице — играет кит саундфонта.
+ */
+export const KIT_NOTES: Readonly<Partial<Record<number, number>>> = {
+  35: 36, 36: 36, 37: 37, 38: 38, 39: 39, 40: 40,
+  41: 41, 43: 43, 45: 45, 47: 45, 48: 47, 50: 47,
+  42: 42, 44: 44, 46: 46,
+  49: 49, 51: 51, 52: 60, 53: 53, 54: 54, 55: 55, 56: 56, 57: 57, 59: 59, 70: 61,
+};
+/** Канал кита в его проходе: кит — мелодический пресет 0 своего саундфонта. */
+const KIT_CHANNEL = 0;
+/**
+ * Громкость кита относительно ударных MuseScore General на той же дорожке (по K-взвешенной громкости BS.1770): баланс
+ * дорожек остаётся тем, что в файле.
+ */
+const KIT_GAIN = 1.3;
+/** Пик минуса и гайда вместе на полной громкости (транспорт складывает слои как есть): выше — оба тише поровну. */
+const HEADROOM = 0.9;
 /** Панорамы разведённых перегруженных гитар по порядку дорожек. */
 const SPREAD = [-0.7, 0.7, -0.35, 0.35];
 /**
@@ -67,6 +92,8 @@ const AMP_LEVEL = 0.018;
 
 export interface TrackVoice {
   channels: number[];
+  /** Ударные: при загруженном ките — его проход. */
+  drums: boolean;
   /** Через модель усилителя; null — сэмплы саундфонта как есть (громкость и панораму ставит синтезатор). */
   amp: AmpModel | null;
   /** Панорама −1…1 и громкость дорожки — для гитар через усилитель (их DI рендерится по центру). */
@@ -83,7 +110,7 @@ export function voicesOf(score: alphaTab.model.Score): TrackVoice[] {
   return score.tracks.map((t) => {
     const k = amped.indexOf(t);
     return {
-      channels: channelsOf(t), amp: ampOf(t),
+      channels: channelsOf(t), amp: ampOf(t), drums: t.staves.some((s) => s.isPercussion),
       pan: spread && k >= 0 ? SPREAD[k % SPREAD.length] : (t.playbackInfo.balance - 8) / 8,
       // громкость дорожки alphaSynth: куб доли CC7 (alphaTab ставит CC7 = 8 × громкость GP)
       gain: (Math.min(16, Math.max(0, t.playbackInfo.volume)) / 16) ** 3,
@@ -91,20 +118,30 @@ export function voicesOf(score: alphaTab.model.Score): TrackVoice[] {
   });
 }
 
-/**
- * Копия MidiFile для прохода рендера: общие события (темп, размер, конец дорожки — длина рендера та же) и события только
- * каналов keep. di — их программа заменяется чистой электрогитарой по центру: вход модели усилителя. Исходный MidiFile
- * не меняется — его держит кэш воркера.
- */
-export function midiPass(midiFile: alphaTab.midi.MidiFile, keep: ReadonlySet<number>, di = false): alphaTab.midi.MidiFile {
+/** Пустая копия MidiFile с теми же форматом, разрешением и сдвигом. */
+function emptyLike(midiFile: alphaTab.midi.MidiFile): alphaTab.midi.MidiFile {
   const out = new alphaTab.midi.MidiFile();
   out.format = midiFile.format;
   out.division = midiFile.division;
   out.tickShift = midiFile.tickShift;
+  return out;
+}
+const isKitNote = (e: alphaTab.midi.MidiEvent & { channel?: number; noteKey?: number }) =>
+  e.channel === DRUM_CHANNEL && e.noteKey !== undefined && KIT_NOTES[e.noteKey] !== undefined;
+
+/**
+ * Копия MidiFile для прохода рендера: общие события (темп, размер, конец дорожки — длина рендера та же) и события только
+ * каналов keep. di — их программа заменяется чистой электрогитарой по центру: вход модели усилителя. withoutKit — ноты
+ * ударных, которые играет кит (kitPass), не берутся. Исходный MidiFile не меняется — его держит кэш воркера.
+ */
+export function midiPass(
+  midiFile: alphaTab.midi.MidiFile, keep: ReadonlySet<number>, { di = false, withoutKit = false }: { di?: boolean; withoutKit?: boolean } = {},
+): alphaTab.midi.MidiFile {
+  const out = emptyLike(midiFile);
   const { ProgramChangeEvent, ControlChangeEvent, ControllerType } = alphaTab.midi;
   for (const e of midiFile.events as Array<alphaTab.midi.MidiEvent & { channel?: number }>) {
     if (e.channel === undefined) out.addEvent(e);
-    else if (!keep.has(e.channel)) continue;
+    else if (!keep.has(e.channel) || (withoutKit && isKitNote(e))) continue;
     else if (di && e instanceof ProgramChangeEvent) out.addEvent(new ProgramChangeEvent(e.track, e.tick, e.channel, DI_PROGRAM));
     else if (di && e instanceof ControlChangeEvent && e.controller === ControllerType.PanCoarse)
       out.addEvent(new ControlChangeEvent(e.track, e.tick, e.channel, e.controller, 64));
@@ -113,15 +150,47 @@ export function midiPass(midiFile: alphaTab.midi.MidiFile, keep: ReadonlySet<num
   return out;
 }
 
+/**
+ * Проход кита: ноты ударных из таблицы KIT_NOTES — его нотами на канале кита, туда же громкость, панорама и экспрессия
+ * дорожки ударных; смена банка и программы не переносится (кит — пресет 0 своего саундфонта).
+ */
+export function kitPass(midiFile: alphaTab.midi.MidiFile): alphaTab.midi.MidiFile {
+  const out = emptyLike(midiFile);
+  const { NoteOnEvent, NoteOffEvent, ControlChangeEvent, ControllerType, ProgramChangeEvent } = alphaTab.midi;
+  const carried: number[] = [ControllerType.VolumeCoarse, ControllerType.PanCoarse, ControllerType.ExpressionControllerCoarse];
+  out.addEvent(new ProgramChangeEvent(0, 0, KIT_CHANNEL, 0));
+  for (const e of midiFile.events as Array<alphaTab.midi.MidiEvent & { channel?: number }>) {
+    if (e.channel === undefined) out.addEvent(e);
+    else if (e.channel !== DRUM_CHANNEL) continue;
+    else if (e instanceof NoteOnEvent || e instanceof NoteOffEvent) {
+      const key = KIT_NOTES[e.noteKey];
+      if (key === undefined) continue;
+      const Note = e instanceof NoteOnEvent ? NoteOnEvent : NoteOffEvent;
+      out.addEvent(new Note(e.track, e.tick, KIT_CHANNEL, key, e.noteVelocity));
+    } else if (e instanceof ControlChangeEvent && carried.includes(e.controller))
+      out.addEvent(new ControlChangeEvent(e.track, e.tick, KIT_CHANNEL, e.controller, e.value));
+  }
+  return out;
+}
+
 /** Микс набора дорожек: сэмплы GM одним проходом, перегруженные гитары — по одной через усилитель; поверх — комната. */
 function renderVoices(midiFile: alphaTab.midi.MidiFile, voices: readonly TrackVoice[], sampleRate: number, speed: number): StereoPcm {
   const synth = synthFor(midiFile, sampleRate);
   const plain = new Set(voices.filter((v) => !v.amp).flatMap((v) => v.channels));
+  const kit = drumKit && voices.some((v) => v.drums) ? drumKit : null;
   // проход GM — всегда, даже пустой: он задаёт длину и тишину минуса у песни из одной партии
-  const out = renderMidi(midiPass(midiFile, plain), sampleRate, speed, {}, synth);
+  const out = renderMidi(midiPass(midiFile, plain, { withoutKit: !!kit }), sampleRate, speed, {}, synth);
+  if (kit) {
+    const drums = renderMidi(kitPass(midiFile), sampleRate, speed, {}, presetHost('kit', kit, new Set([0]), new Set(), sampleRate));
+    const n = Math.min(out.left.length, drums.left.length);
+    for (let i = 0; i < n; i++) {
+      out.left[i] += drums.left[i] * KIT_GAIN;
+      out.right[i] += drums.right[i] * KIT_GAIN;
+    }
+  }
   for (const v of voices) {
     if (!v.amp) continue;
-    const di = renderMidi(midiPass(midiFile, new Set(v.channels), true), sampleRate, speed, {}, synth);
+    const di = renderMidi(midiPass(midiFile, new Set(v.channels), { di: true }), sampleRate, speed, {}, synth);
     for (let i = 0; i < di.left.length; i++) di.left[i] = (di.left[i] + di.right[i]) * 0.5;
     panInto(out, ampSim(di.left, sampleRate, v.amp, AMP_LEVEL), v.pan, v.gain);
   }
@@ -129,30 +198,31 @@ function renderVoices(midiFile: alphaTab.midi.MidiFile, voices: readonly TrackVo
   return out;
 }
 
-/** Минус (все дорожки, кроме партии игрока) и гайд (она одна). */
+/** Минус (все дорожки, кроме партии игрока) и гайд (она одна) с общим запасом по пику HEADROOM. */
 export function renderSong(midiFile: alphaTab.midi.MidiFile, voices: readonly TrackVoice[], player: number, sampleRate: number, speed: number) {
-  return {
-    minus: renderVoices(midiFile, voices.filter((_, i) => i !== player), sampleRate, speed),
-    guide: renderVoices(midiFile, voices.filter((_, i) => i === player), sampleRate, speed),
-  };
+  const minus = renderVoices(midiFile, voices.filter((_, i) => i !== player), sampleRate, speed);
+  const guide = renderVoices(midiFile, voices.filter((_, i) => i === player), sampleRate, speed);
+  let peak = 0;
+  for (let i = 0; i < minus.left.length; i++)
+    peak = Math.max(peak, Math.abs(minus.left[i] + (guide.left[i] ?? 0)), Math.abs(minus.right[i] + (guide.right[i] ?? 0)));
+  if (peak > HEADROOM) {
+    const g = HEADROOM / peak;
+    for (const a of [minus.left, minus.right, guide.left, guide.right]) for (let i = 0; i < a.length; i++) a[i] *= g;
+  }
+  return { minus, guide };
 }
 
-// Синтезатор с загруженными пресетами: саундфонт разбирается и его сэмплы (в SF3 — Vorbis) декодируются один раз на
-// набор программ песни, а не на каждый проход рендера; экспортёры проходов берут готовые пресеты.
-let presetHost: { soundFont: Uint8Array; key: string; synth: alphaTab.synth.AlphaSynth } | null = null;
+// Синтезаторы с загруженными пресетами — песни (саундфонт) и кита ударных: саундфонт разбирается и его сэмплы (в SF3 —
+// Vorbis) декодируются один раз на набор программ песни, а не на каждый проход рендера; экспортёры проходов берут
+// готовые пресеты.
+const hosts = new Map<'song' | 'kit', { soundFont: Uint8Array; key: string; synth: alphaTab.synth.AlphaSynth }>();
 
-/** Синтезатор с пресетами всех программ и ударных песни и программы DI. */
-function synthFor(midiFile: alphaTab.midi.MidiFile, sampleRate: number): alphaTab.synth.AlphaSynth {
+function presetHost(role: 'song' | 'kit', sf: Uint8Array, programs: Set<number>, drums: Set<number>, sampleRate: number) {
   const { ProgramChangeEvent, NoteOnEvent, EndOfTrackEvent } = alphaTab.midi;
-  const programs = new Set([DI_PROGRAM]), drums = new Set<number>();
-  for (const e of midiFile.events) {
-    if (e instanceof ProgramChangeEvent && e.channel !== DRUM_CHANNEL) programs.add(e.program);
-    else if (e instanceof NoteOnEvent && e.channel === DRUM_CHANNEL) drums.add(e.noteKey);
-  }
-  const sf = soundFontBytes();
   const key = `${[...programs].sort((a, b) => a - b)}|${[...drums].sort((a, b) => a - b)}`;
-  if (presetHost?.soundFont === sf && presetHost.key === key) return presetHost.synth;
-  presetHost?.synth.destroy();
+  const hit = hosts.get(role);
+  if (hit?.soundFont === sf && hit.key === key) return hit.synth;
+  hit?.synth.destroy();
   // Набор программ alphaSynth берёт из загруженного MidiFile: хватает программ и нот ударных на нулевом тике.
   const union = new alphaTab.midi.MidiFile();
   for (const p of programs) union.addEvent(new ProgramChangeEvent(0, 0, 0, p));
@@ -162,8 +232,19 @@ function synthFor(midiFile: alphaTab.midi.MidiFile, sampleRate: number): alphaTa
   synth.isReady = true; // вывод-заглушка о готовности не сообщает, а без неё пресеты не грузятся
   synth.loadSoundFont(sf, false);
   synth.loadMidiFile(union);
-  presetHost = { soundFont: sf, key, synth };
+  hosts.set(role, { soundFont: sf, key, synth });
   return synth;
+}
+
+/** Синтезатор с пресетами всех программ и ударных песни и программы DI. */
+function synthFor(midiFile: alphaTab.midi.MidiFile, sampleRate: number): alphaTab.synth.AlphaSynth {
+  const { ProgramChangeEvent, NoteOnEvent } = alphaTab.midi;
+  const programs = new Set([DI_PROGRAM]), drums = new Set<number>();
+  for (const e of midiFile.events) {
+    if (e instanceof ProgramChangeEvent && e.channel !== DRUM_CHANNEL) programs.add(e.program);
+    else if (e instanceof NoteOnEvent && e.channel === DRUM_CHANNEL) drums.add(e.noteKey);
+  }
+  return presetHost('song', soundFontBytes(), programs, drums, sampleRate);
 }
 
 /**

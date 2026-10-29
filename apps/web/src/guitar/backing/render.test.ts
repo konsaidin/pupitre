@@ -6,7 +6,7 @@ import * as alphaTab from '@coderline/alphatab';
 import { describe, expect, it } from 'vitest';
 import { createConverter } from '../vendor/fretfall/fromScore.js';
 import { buildTimeline } from '../import/timeline';
-import { channelsOf, midiPass, renderMidi, renderSong, voicesOf } from './render';
+import { channelsOf, KIT_NOTES, kitPass, midiPass, renderMidi, renderSong, voicesOf } from './render';
 
 function prepared(tex: string) {
   const settings = new alphaTab.Settings();
@@ -72,10 +72,23 @@ describe('тон', () => {
     metal.score.tracks[0].playbackInfo.volume = 16;
   });
 
+  it('кит ударных: ноты GM — по таблице кита на его канал с громкостью дорожки; без кита — в общем проходе, с ним — нет', () => {
+    const drums = prepared(`\\tempo 120\n\\track "Drums"\n\\instrument percussion\n\\staff {score}\n\\articulation defaults\nKickHit.4 SnareHit.4 HiHatClosed.4 CrashHighHit.4\n`);
+    const gmKeys = (m: alphaTab.midi.MidiFile, ch: number) =>
+      m.events.filter((e): e is alphaTab.midi.NoteOnEvent => e instanceof alphaTab.midi.NoteOnEvent && e.channel === ch).map((e) => e.noteKey);
+    expect(gmKeys(drums.midiFile, 9)).toEqual([35, 38, 42, 49]);
+    const kit = kitPass(drums.midiFile);
+    expect(gmKeys(kit, 0)).toEqual([35, 38, 42, 49].map((k) => KIT_NOTES[k]));
+    expect(kit.events.some((e) => e instanceof alphaTab.midi.ControlChangeEvent && e.controller === alphaTab.midi.ControllerType.VolumeCoarse && e.channel === 0)).toBe(true);
+    expect(gmKeys(midiPass(drums.midiFile, new Set([9])), 9)).toHaveLength(4);
+    expect(gmKeys(midiPass(drums.midiFile, new Set([9]), { withoutKit: true }), 9)).toEqual([]);
+    expect(KIT_NOTES[48]).not.toBe(48); // у кита 48 — хай-хэт, тому GM там не место
+  });
+
   it('проход: ноты только своих каналов, темп и конец общие; DI — чистая гитара по центру; исходник не тронут', () => {
     const [a, b] = [channelsOf(metal.score.tracks[0]), channelsOf(metal.score.tracks[1])];
     const notes = (m: alphaTab.midi.MidiFile, chs: number[]) => m.events.filter((e) => e instanceof alphaTab.midi.NoteOnEvent && chs.includes(e.channel)).length;
-    const di = midiPass(metal.midiFile, new Set(a), true);
+    const di = midiPass(metal.midiFile, new Set(a), { di: true });
     expect(notes(di, a)).toBe(notes(metal.midiFile, a));
     expect(notes(di, b)).toBe(0);
     expect(di.events.some((e) => e instanceof alphaTab.midi.TempoChangeEvent)).toBe(true);
@@ -94,6 +107,11 @@ describe('тон', () => {
     expect(rms(r.minus.left)).toBeGreaterThan(1e-3);
     // гитара игрока разведена влево: в гайде левый канал громче правого
     expect(rms(r.guide.left)).toBeGreaterThan(rms(r.guide.right) * 1.5);
+
+    // запас по пику: минус и гайд вместе не выше −0,9 дБ
+    let peak = 0;
+    for (let i = 0; i < r.minus.left.length; i++) peak = Math.max(peak, Math.abs(r.minus.left[i] + r.guide.left[i]), Math.abs(r.minus.right[i] + r.guide.right[i]));
+    expect(peak).toBeLessThanOrEqual(0.9 + 1e-6);
 
     const lone = prepared(`\\tempo 120\n${track('Solo', '3.6.4 5.5.4 7.4.4 5.3.4 | 3.6.1', 30)}`);
     const solo = renderSong(lone.midiFile, voicesOf(lone.score), 0, 48000, 1);

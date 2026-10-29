@@ -3,7 +3,7 @@
 // → sniff → parseScore → convertScore. Ответ — только клонируемые данные: tickLookup/MidiFile (built) не отдаются.
 import * as alphaTab from '@coderline/alphatab';
 import { parseScore } from './parseScore';
-import { renderSong, setSoundFont, voicesOf, type TrackVoice } from '../backing/render';
+import { renderSong, setDrumKit, setSoundFont, voicesOf, type TrackVoice } from '../backing/render';
 import { createConverter } from '../vendor/fretfall/fromScore.js';
 import { ImportError, sha256Hex, type Bytes, type ParseRequest, type ParseResult, type RenderRequest, type RenderResult } from './protocol';
 import { buildTimeline } from './timeline';
@@ -54,12 +54,17 @@ export function handleRender(req: RenderRequest): RenderResult {
     setSoundFont(req.soundFont);
     soundFontSize = req.soundFont.byteLength;
   }
+  if (req.drumKit && req.drumKit.byteLength !== drumKitSize) {
+    setDrumKit(req.drumKit);
+    drumKitSize = req.drumKit.byteLength;
+  }
   if (!rendered.score.tracks[req.trackIndex]) throw new ImportError('parse-failed', `нет дорожки ${req.trackIndex}`);
   return { sampleRate: req.sampleRate, ...renderSong(rendered.midiFile, rendered.voices, req.trackIndex, req.sampleRate, req.speed) };
 }
 
-/** Размер переданного саундфонта: тот же — не перезагружаем. */
+/** Размеры переданных саундфонта и кита: те же — не перезагружаем. */
 let soundFontSize = 0;
+let drumKitSize = 0;
 
 export type WorkerOp = 'parse' | 'render';
 

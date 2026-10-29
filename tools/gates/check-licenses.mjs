@@ -123,7 +123,7 @@ export function judge(source, name, version, raw, context = {}) {
   const selected = selectExpression(license, base => {
     if (base === 'MPL-2.0' && (context.vendored || context.modified)) return false;
     if (base === 'OFL-1.1' && context.kind !== 'font') return false;
-    if (['CC-BY-4.0', 'CC-BY-SA-4.0'].includes(base) && source !== 'content') return false;
+    if (['CC-BY-4.0', 'CC-BY-SA-4.0', 'CC-BY-SA-3.0'].includes(base) && source !== 'content') return false;
     return true;
   });
   let verdict = selected ? 'OK' : 'DENY';

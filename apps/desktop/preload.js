@@ -21,9 +21,10 @@ contextBridge.exposeInMainWorld('desktop', {
   },
 });
 
-// Ресурсы страницы, которые под file:// не достать fetch: саундфонт синт-минуса гитары (lib/soundFont.ts)
+// Ресурсы страницы, которые под file:// не достать fetch: саундфонт синт-минуса гитары и кит ударных (lib/soundFont.ts)
 contextBridge.exposeInMainWorld('pupitreAssets', {
   soundFont: () => ipcRenderer.invoke('assets:soundfont'),
+  drumKit: () => ipcRenderer.invoke('assets:drumkit'),
 });
 
 // нативный захват (этап 4): мост появляется только когда main загрузил аддон;

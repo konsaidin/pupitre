@@ -68,6 +68,8 @@ export interface RenderRequest {
   speed: number;
   /** Саундфонт (MuseScore General); нет — встроенный SONiVOX. Копия, не передача: главный поток держит свою. */
   soundFont?: Uint8Array;
+  /** Кит ударных (AVL Black Pearl); нет — ударные саундфонта. Копия, как и саундфонт. */
+  drumKit?: Uint8Array;
 }
 export interface RenderResult {
   sampleRate: number;

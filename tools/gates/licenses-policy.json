@@ -65,6 +65,10 @@
       "why": "Только контент."
     },
     {
+      "spdx": "CC-BY-SA-3.0",
+      "why": "Только контент (кит ударных AVL: поставляется без изменений, атрибуция — в licenseText)."
+    },
+    {
       "spdx": "PSF-2.0",
       "why": "audioop-lts, typing_extensions и standard-* в окружении Python."
     },
