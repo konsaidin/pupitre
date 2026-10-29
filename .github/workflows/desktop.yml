@@ -1,4 +1,5 @@
-# Сборка десктопных пакетов (Windows + Linux).
+# Сборка десктопных пакетов (Windows + Linux + macOS: Apple Silicon и Intel с одного раннера).
+# В основном репозитории Actions выключены (релизы — tools/release.mjs); macOS собирается в форке или на маке.
 # По тегу v* — публикует файлы в GitHub Release; вручную (workflow_dispatch)
 # или по пушу в master — просто складывает артефакты сборки.
 
@@ -18,7 +19,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -63,6 +64,14 @@ jobs:
           # низколатентный движок гитары (JACK/PipeWire, грузит libjack при открытии)
           npm run build:engine
 
+      # CoreAudio через cpal; аддон под обе архитектуры — пакеты dmg для arm64 и x64 (подпись: build/sign-mac.cjs)
+      - name: Native audio module (macOS)
+        if: runner.os == 'macOS'
+        working-directory: apps/desktop
+        run: |
+          node ../../packages/native-audio/build.mjs --arch arm64
+          node ../../packages/native-audio/build.mjs --arch x64
+
       - name: Build desktop
         working-directory: apps/desktop
         # публикуем отдельным шагом ниже, поэтому electron-builder не публикует сам
@@ -77,6 +86,7 @@ jobs:
           path: |
             apps/desktop/release/*.AppImage
             apps/desktop/release/*.exe
+            apps/desktop/release/*.dmg
           if-no-files-found: error
 
       - name: Publish release
@@ -86,4 +96,5 @@ jobs:
           files: |
             apps/desktop/release/*.AppImage
             apps/desktop/release/*.exe
+            apps/desktop/release/*.dmg
           generate_release_notes: true

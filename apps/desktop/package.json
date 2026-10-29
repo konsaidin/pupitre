@@ -14,9 +14,11 @@
     "build:engine": "node ../../packages/engine/build.mjs",
     "dev": "npm run build:web && npm run copy-web && (npm run build:native || echo native-audio: сборка не удалась, будет worklet-путь) && (npm run build:engine || echo engine: сборка не удалась, будет захват браузера) && electron .",
     "pack": "npm run copy-web && npm run build:native && npm run build:engine && electron-builder --dir",
-    "dist": "npm run copy-web && npm run build:native && npm run build:engine && electron-builder"
+    "dist": "npm run copy-web && npm run build:native && npm run build:engine && electron-builder",
+    "dist:mac": "npm run build:web && npm run copy-web && node ../../packages/native-audio/build.mjs --arch arm64 && node ../../packages/native-audio/build.mjs --arch x64 && electron-builder --mac --publish never"
   },
   "devDependencies": {
+    "@electron/osx-sign": "1.3.1",
     "electron": "^33.2.1",
     "electron-builder": "^25.1.8"
   },
@@ -92,6 +94,36 @@
           "to": "engine",
           "filter": [
             "*.win32-x64.node"
+          ]
+        }
+      ]
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64",
+            "x64"
+          ]
+        }
+      ],
+      "category": "public.app-category.music",
+      "artifactName": "Pupitre-${version}-mac-${arch}.${ext}",
+      "minimumSystemVersion": "11.0",
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist",
+      "sign": "./build/sign-mac.cjs",
+      "extendInfo": {
+        "NSMicrophoneUsageDescription": "Pupitre listens to your voice and instrument to check your playing against the notes."
+      },
+      "extraResources": [
+        {
+          "from": "../../packages/native-audio",
+          "to": "native",
+          "filter": [
+            "*.darwin-${arch}.node"
           ]
         }
       ]

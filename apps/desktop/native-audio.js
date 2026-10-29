@@ -3,6 +3,7 @@
 // платформа) — мост не регистрируется, рендерер остаётся на AudioWorklet.
 
 const path = require('node:path');
+const { systemPreferences } = require('electron');
 
 /** Ищет и грузит .node-аддон; null, если не найден/не загрузился. */
 function loadAddon(isPackaged, resourcesPath) {
@@ -31,7 +32,11 @@ function initNativeAudio(ipcMain, isPackaged, resourcesPath) {
   let consumer = null; // webContents, получающий кадры (окно одно)
 
   ipcMain.handle('native-audio:list', () => addon.listDevices());
-  ipcMain.handle('native-audio:start', (e, opts) => {
+  ipcMain.handle('native-audio:start', async (e, opts) => {
+    // macOS: разрешение на микрофон (TCC) — до открытия входа CoreAudio, иначе вход молча отдаёт тишину. Отказ —
+    // ошибка: рендерер уходит на worklet-путь, а там браузер сообщит о запрете сам.
+    if (process.platform === 'darwin' && !(await systemPreferences.askForMediaAccess('microphone')))
+      throw new Error('нет доступа к микрофону: Системные настройки → Конфиденциальность и безопасность → Микрофон');
     consumer = e.sender;
     consumer.once('destroyed', () => {
       if (consumer === e.sender) {

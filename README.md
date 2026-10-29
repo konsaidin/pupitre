@@ -35,6 +35,10 @@ Ready-made builds for Linux (`.AppImage`) and Windows (installer and portable `.
 (checks, Linux and Windows packages, tag and GitHub Release); the GitHub Actions workflows in `.github/` are kept but
 disabled.
 
+macOS builds (`.dmg` for Apple Silicon and Intel) are made on a Mac with `npm run dist:mac` and attached to a release
+when available. They are not notarized by Apple: after copying Pupitre to Applications, run
+`xattr -cr /Applications/Pupitre.app` once, otherwise macOS says the app is damaged.
+
 Warm-ups, exercises and guitar work right away. The song processing server is set up by the app itself the first time
 you open "My songs": it downloads a Python environment, dependencies (≈ 2.5 GB, once) and ffmpeg. You can also point it
 to an external server in Settings → Song processing server.
@@ -78,7 +82,10 @@ cd apps/desktop
 npm install
 npm run dev     # builds the web app and native modules (Linux), then starts Electron
 npm run dist    # packages in apps/desktop/release/
+npm run dist:mac  # on a Mac: .dmg for Apple Silicon and Intel (Xcode Command Line Tools, rustup)
 ```
+
+`dist:mac` signs with a Developer ID certificate if one is in the keychain (or `CSC_LINK`), otherwise ad-hoc.
 
 ### Self-hosting the browser version
 

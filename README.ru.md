@@ -33,6 +33,10 @@
 [Releases](../../releases). Их собирает и выкладывает локально `node tools/release.mjs X.Y.Z` (проверки, пакеты Linux и
 Windows, тег и GitHub Release); workflow GitHub Actions в `.github/` сохранены, но отключены.
 
+Сборки для macOS (`.dmg` для Apple Silicon и Intel) делаются на маке командой `npm run dist:mac` и прикладываются к
+релизу, когда есть. Apple их не нотаризует: после копирования Pupitre в «Программы» один раз выполни
+`xattr -cr /Applications/Pupitre.app`, иначе macOS скажет, что приложение повреждено.
+
 Распевки, упражнения и гитара работают сразу. Сервер обработки песен приложение разворачивает само при первом
 открытии «Моих песен»: скачивает Python-окружение, зависимости (≈ 2,5 ГБ, один раз) и ffmpeg. Можно указать и
 внешний сервер: «Настройки → Сервер обработки песен».
@@ -76,7 +80,10 @@ cd apps/desktop
 npm install
 npm run dev     # собирает веб, нативные модули (Linux) и запускает Electron
 npm run dist    # пакеты в apps/desktop/release/
+npm run dist:mac  # на маке: .dmg для Apple Silicon и Intel (Xcode Command Line Tools, rustup)
 ```
+
+`dist:mac` подписывает сертификатом Developer ID, если он есть в связке ключей (или `CSC_LINK`), иначе — ad-hoc.
 
 ### Браузерная версия на своём сервере
 
