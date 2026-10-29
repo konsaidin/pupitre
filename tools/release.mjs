@@ -1,9 +1,12 @@
 // Релиз без GitHub Actions: проверки, сборка Linux (AppImage) и Windows (установщик и portable .exe) на этой машине,
-// тег и GitHub Release через gh (обычный API, не Actions). Windows собирается из Linux через electron-builder (wine не
-// нужен: подпись и правка exe выключены в apps/desktop/package.json).
+// тег и GitHub Release через gh (обычный API, не Actions). Windows собирается из Linux через electron-builder: подпись и
+// правка exe выключены в apps/desktop/package.json, но установщик NSIS он запускает под wine (извлекает деинсталлятор) —
+// в своём префиксе ~/.cache/pupitre/wine: старый ~/.wine после обновления wine (10.x, режим WoW64) 32-битный установщик
+// не запускает.
 // Запуск: node tools/release.mjs 0.3.0 [--skip-checks] [--draft]
 import { execSync } from 'node:child_process';
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -49,7 +52,8 @@ try {
   sh('npm run build:native', { cwd: desktop });
   sh('npm run build:engine', { cwd: desktop });
   sh('npx electron-builder --linux --publish never', { cwd: desktop });
-  sh('npx electron-builder --win --x64 --publish never', { cwd: desktop });
+  const wine = { WINEPREFIX: process.env.WINEPREFIX ?? join(homedir(), '.cache/pupitre/wine'), WINEDEBUG: process.env.WINEDEBUG ?? '-all' };
+  sh('npx electron-builder --win --x64 --publish never', { cwd: desktop, env: { ...process.env, ...wine } });
 } catch (e) {
   writeFileSync(pkgPath, pkg); // версию не оставляем при неудаче
   throw e;
