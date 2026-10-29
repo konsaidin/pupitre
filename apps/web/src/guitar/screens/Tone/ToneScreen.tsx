@@ -10,6 +10,7 @@ import { useInputSnapshot } from '../../input/useInput';
 import { updateGuitarSettings, useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
 import { Knob } from './Knob';
+import { Tubes } from './Tubes';
 import './tone.css';
 
 const MODEL_UI: Record<AmpModelName, { label: string }> = {
@@ -179,7 +180,7 @@ export function ToneScreen() {
               </div>
             </div>
             </div>
-            <i className="amp-head__vent" aria-hidden="true" />
+            <Tubes hot={tone.on} />
           </section>
 
           <section className="amp-cab" aria-label={t('Cabinet 4×12')} data-ui="tone-cab" data-off={!tone.cab || undefined}>
@@ -188,7 +189,7 @@ export function ToneScreen() {
               {[0, 1, 2, 3].map((i) => (
                 <i key={i} className="amp-cab__cone" aria-hidden="true" />
               ))}
-              <span className="amp-cab__badge">Pupitre · 4×12</span>
+              <span className="amp-cab__badge">Pupitre</span>
               {!tone.cab && <span className="amp-cab__bypass">{t('No cabinet')}</span>}
             </div>
             <div className="amp-cab__plate">
