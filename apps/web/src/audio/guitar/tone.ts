@@ -23,6 +23,8 @@ export interface ToneShape {
   model: AmpModelName;
   /** Порог гейта, дБ полной шкалы; ниже −96 — выключен. */
   gateDb: number;
+  /** Кнопка гейта: выключает его, не трогая порог. */
+  gateOn: boolean;
   gain: number;
   bass: number;
   mid: number;
@@ -31,8 +33,11 @@ export interface ToneShape {
   /** Громкость выхода, дБ. */
   levelDb: number;
   cab: boolean;
-  delay: { mix: number; ms: number; feedback: number };
+  /** Дилей; on — кнопка: выключает его, не трогая ручки. */
+  delay: { on: boolean; mix: number; ms: number; feedback: number };
   room: number;
+  /** Кнопка комнаты: выключает её, не трогая микс. */
+  roomOn: boolean;
   /** Овердрайв в духе TS808: ручки 0…1, уровень 0.5 — 0 дБ. */
   screamer: { on: boolean; drive: number; tone: number; level: number };
   /** Фузз: ручки 0…1; тон 0 — низ, 1 — верх; уровень 0.5 — −15 дБ. */
@@ -43,15 +48,42 @@ export interface ToneShape {
   board: { order: PedalId[]; loop: number };
 }
 
-/** Как в DEFAULTS ядра: хай-гейн с кабинетом, гейт −60 дБ, педали выключены, без дилея, лёгкая комната. */
+/** Как в DEFAULTS ядра: хай-гейн с кабинетом, гейт −60 дБ, педали выключены, без дилея, лёгкая комната. Кнопки гейта,
+ *  дилея и комнаты включены: молчат они ручкой в нуле — так их выключали настройки до кнопок (флаг при чтении таких
+ *  настроек берётся отсюда). */
 export const DEFAULT_TONE: ToneShape = {
-  on: true, model: 'high-gain', gateDb: -60, gain: 0.5, bass: 0.5, mid: 0.5, treble: 0.5, presence: 0.5, levelDb: 0, cab: true,
-  delay: { mix: 0, ms: 350, feedback: 0.3 }, room: 0.15,
+  on: true, model: 'high-gain', gateDb: -60, gateOn: true, gain: 0.5, bass: 0.5, mid: 0.5, treble: 0.5, presence: 0.5, levelDb: 0, cab: true,
+  delay: { on: true, mix: 0, ms: 350, feedback: 0.3 }, room: 0.15, roomOn: true,
   screamer: { on: false, drive: 0.4, tone: 0.5, level: 0.6 },
   fuzz: { on: false, gain: 0.6, tone: 0.5, level: 0.5 },
   boost: { on: false, levels: [0.5, 0.5, 0.5, 0.5] },
   board: { order: ['fuzz', 'screamer', 'boost', 'gate', 'delay', 'room'], loop: 4 },
 };
+
+/** Порог, которым гейт выключен в ядре (ниже −96 дБ). */
+export const GATE_OFF_DB = -120;
+const GATE_CLOSED_DB = -96;
+/** Микс, с которым дилей включается, если ручка стояла в нуле. */
+export const DELAY_MIX_ON = 0.3;
+
+type Utility = 'gate' | 'delay' | 'room';
+
+/** Включены ли гейт, дилей и комната: кнопкой и ручкой не в нуле. */
+export function utilitiesOn(tone: ToneShape): Record<Utility, boolean> {
+  return {
+    gate: tone.gateOn !== false && tone.gateDb > GATE_CLOSED_DB,
+    delay: tone.delay.on !== false && tone.delay.mix > 0,
+    room: tone.roomOn !== false && tone.room > 0,
+  };
+}
+
+/** Кнопка гейта, дилея или комнаты: выключение ручку не трогает; включение с ручкой в нуле ставит её по умолчанию. */
+export function toggleUtility(tone: ToneShape, pedal: Utility): Partial<ToneShape> {
+  const on = !utilitiesOn(tone)[pedal];
+  if (pedal === 'gate') return { gateOn: on, ...(on && tone.gateDb <= GATE_CLOSED_DB && { gateDb: DEFAULT_TONE.gateDb }) };
+  if (pedal === 'delay') return { delay: { ...tone.delay, on, ...(on && tone.delay.mix <= 0 && { mix: DELAY_MIX_ON }) } };
+  return { roomOn: on, ...(on && tone.room <= 0 && { room: DEFAULT_TONE.room }) };
+}
 
 /** Педалборд из настроек — с проверкой. Запись без педалей, появившихся позже, дополняется ими в начале цепочки (они
  *  выключены — звук не меняется); повторы, чужие названия и прочий мусор — порядок по умолчанию. */
@@ -71,7 +103,8 @@ export function toneParams(t: ToneShape | null): number[] {
   const tone = t ?? { ...DEFAULT_TONE, on: false };
   p[TONE_PARAM.bypass] = tone.on ? 0 : 1;
   p[TONE_PARAM.model] = Math.max(0, AMP_MODELS.indexOf(tone.model));
-  p[TONE_PARAM.gate] = tone.gateDb;
+  const on = utilitiesOn(tone);
+  p[TONE_PARAM.gate] = on.gate ? tone.gateDb : GATE_OFF_DB;
   p[TONE_PARAM.gain] = tone.gain;
   p[TONE_PARAM.bass] = tone.bass;
   p[TONE_PARAM.mid] = tone.mid;
@@ -79,10 +112,10 @@ export function toneParams(t: ToneShape | null): number[] {
   p[TONE_PARAM.presence] = tone.presence;
   p[TONE_PARAM.level] = tone.levelDb;
   p[TONE_PARAM.cab] = tone.cab ? 1 : 0;
-  p[TONE_PARAM.delayMix] = tone.delay.mix;
+  p[TONE_PARAM.delayMix] = on.delay ? tone.delay.mix : 0;
   p[TONE_PARAM.delayMs] = tone.delay.ms;
   p[TONE_PARAM.delayFeedback] = tone.delay.feedback;
-  p[TONE_PARAM.roomMix] = tone.room;
+  p[TONE_PARAM.roomMix] = on.room ? tone.room : 0;
   const screamer = tone.screamer ?? DEFAULT_TONE.screamer;
   p[TONE_PARAM.screamerOn] = screamer.on ? 1 : 0;
   p[TONE_PARAM.screamerDrive] = screamer.drive;

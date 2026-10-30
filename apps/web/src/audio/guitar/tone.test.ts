@@ -2,7 +2,9 @@
 // почти линеен, хай-гейн — гармоники); изменения уходят парами только для изменившихся параметров.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { boardOf, changedToneParams, DEFAULT_TONE, TONE_PARAM, TONE_PARAM_COUNT, toneParams, type ToneShape } from './tone';
+import {
+  boardOf, changedToneParams, DEFAULT_TONE, DELAY_MIX_ON, GATE_OFF_DB, toggleUtility, TONE_PARAM, TONE_PARAM_COUNT, toneParams, utilitiesOn, type ToneShape,
+} from './tone';
 
 interface ToneDsp {
   memory: WebAssembly.Memory;
@@ -68,6 +70,24 @@ describe('процессор на tone.wasm', () => {
       order: ['fuzz', 'boost', 'room', 'delay', 'screamer', 'gate'], loop: 6,
     });
     expect(boardOf({ board: { order: ['gate', 'screamer', 'delay', 'room'], loop: 2 } }).loop).toBe(4);
+  });
+
+  it('кнопки гейта, дилея и комнаты: выключают в ядре, ручки остаются; записи до кнопок выключены ручкой в нуле', () => {
+    const tuned: ToneShape = { ...DEFAULT_TONE, gateDb: -45, delay: { on: true, mix: 0.5, ms: 500, feedback: 0.6 }, room: 0.4 };
+    let tone = tuned;
+    for (const pedal of ['gate', 'delay', 'room'] as const) tone = { ...tone, ...toggleUtility(tone, pedal) };
+    expect(utilitiesOn(tone)).toEqual({ gate: false, delay: false, room: false });
+    expect([tone.gateDb, tone.delay, tone.room]).toEqual([-45, { on: false, mix: 0.5, ms: 500, feedback: 0.6 }, 0.4]);
+    const p = toneParams(tone);
+    expect([p[TONE_PARAM.gate], p[TONE_PARAM.delayMix], p[TONE_PARAM.roomMix]]).toEqual([GATE_OFF_DB, 0, 0]);
+    expect([p[TONE_PARAM.delayMs], p[TONE_PARAM.delayFeedback]]).toEqual([500, 0.6]);
+    for (const pedal of ['gate', 'delay', 'room'] as const) tone = { ...tone, ...toggleUtility(tone, pedal) };
+    expect(tone).toEqual(tuned);
+    // до кнопок педали выключались ручкой: флаг из умолчаний, включение возвращает ручку по умолчанию
+    let old: ToneShape = { ...DEFAULT_TONE, gateDb: GATE_OFF_DB, room: 0 };
+    expect(utilitiesOn(old)).toEqual({ gate: false, delay: false, room: false });
+    for (const pedal of ['gate', 'delay', 'room'] as const) old = { ...old, ...toggleUtility(old, pedal) };
+    expect([old.gateDb, old.delay.mix, old.room]).toEqual([DEFAULT_TONE.gateDb, DELAY_MIX_ON, DEFAULT_TONE.room]);
   });
 
   it('фузз и буст на tone.wasm: фузз — почти меандр, четыре LEVEL буста складываются', async () => {

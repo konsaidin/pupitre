@@ -5,7 +5,7 @@
 // кабинета. Педали и коробку переставляют за шильдик — мышью или стрелками; порядок уходит в ядро (settings.tone.board →
 // PARAM_SLOT_*). Кабели — SVG поверх деки по offset-координатам джеков: zoom установки их не искажает.
 import { useId, useLayoutEffect, useRef, useState, type DragEvent, type KeyboardEvent, type ReactNode } from 'react';
-import { boardOf, DEFAULT_TONE, type PedalId, type ToneShape } from '../../../audio/guitar/tone';
+import { boardOf, DEFAULT_TONE, DELAY_MIX_ON, toggleUtility, utilitiesOn, type PedalId, type ToneShape } from '../../../audio/guitar/tone';
 import { t } from '../../../lib/i18n';
 import { Knob } from './Knob';
 import { AutisticScreamerLogo, HerachiloLogo, KiborgLogo } from './PedalLogos';
@@ -14,8 +14,7 @@ type Item = PedalId | 'loop';
 /** Правка тона от его актуального состояния: события ручек и клавиш приходят быстрее перерисовки. */
 type UpdateTone = (patch: (tone: ToneShape) => Partial<ToneShape>) => void;
 
-/** Ниже — гейт выключен (порог ядра −96 дБ); педаль включается на пороге по умолчанию. */
-const GATE_OFF_DB = -120;
+/** Нижний край ручки порога; ниже стоит только порог из настроек до кнопки гейта — выключенный. */
 const GATE_MIN_DB = -90;
 const db = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(v % 1 ? 1 : 0)} ${t('dB')}`;
 const pct = (v: number) => `${Math.round(v * 100)} %`;
@@ -327,7 +326,7 @@ export function Pedalboard({ tone, update }: { tone: ToneShape; update: UpdateTo
     end();
   };
 
-  const gateOn = tone.gateDb > -96;
+  const on = utilitiesOn(tone);
   const screamer = tone.screamer ?? DEFAULT_TONE.screamer;
   const fuzz = tone.fuzz ?? DEFAULT_TONE.fuzz;
   const boost = tone.boost ?? DEFAULT_TONE.boost;
@@ -390,17 +389,17 @@ export function Pedalboard({ tone, update }: { tone: ToneShape; update: UpdateTo
         );
       case 'gate':
         return (
-          <Pedal key={id} id={id} handle={h} on={gateOn} onToggle={() => setTone({ gateDb: gateOn ? GATE_OFF_DB : DEFAULT_TONE.gateDb })}
+          <Pedal key={id} id={id} handle={h} on={on.gate} onToggle={() => update((now) => toggleUtility(now, 'gate'))}
             plate={<span className="pedal__name pedal__name--gov"><small>GOV. CENSORSHIP</small>NOISEGATE</span>}>
             <Knob ui="tone-gate-threshold" label="Threshold" name={t('Threshold')} value={Math.max(GATE_MIN_DB, tone.gateDb)} min={GATE_MIN_DB} max={-30} step={1}
-              initial={DEFAULT_TONE.gateDb} shown={gateOn ? db(tone.gateDb) : t('off')} size={54} cap="yellow" onChange={(gateDb) => setTone({ gateDb })} />
+              initial={DEFAULT_TONE.gateDb} shown={tone.gateDb >= GATE_MIN_DB ? db(tone.gateDb) : t('off')} size={54} cap="yellow" onChange={(gateDb) => setTone({ gateDb })} />
           </Pedal>
         );
       case 'delay':
         return (
-          <Pedal key={id} id={id} handle={h} on={tone.delay.mix > 0} onToggle={() => setDelay({ mix: tone.delay.mix > 0 ? 0 : 0.3 })}
+          <Pedal key={id} id={id} handle={h} on={on.delay} onToggle={() => update((now) => toggleUtility(now, 'delay'))}
             plate={<><span className="pedal__name pedal__name--forgor"><Skull />forgor?…</span><span className="pedal__kind">DELAY</span></>}>
-            <Knob ui="tone-delay-mix" label="Mix" name={t('Mix')} value={tone.delay.mix} min={0} max={1} step={0.01} initial={0.3} shown={pct(tone.delay.mix)}
+            <Knob ui="tone-delay-mix" label="Mix" name={t('Mix')} value={tone.delay.mix} min={0} max={1} step={0.01} initial={DELAY_MIX_ON} shown={pct(tone.delay.mix)}
               {...knob} onChange={(mix) => setDelay({ mix })} />
             <Knob ui="tone-delay-ms" label="Time" name={t('Time')} value={tone.delay.ms} min={20} max={1500} step={10} initial={DEFAULT_TONE.delay.ms}
               shown={`${tone.delay.ms} ${t('ms')}`} {...knob} onChange={(ms) => setDelay({ ms })} />
@@ -410,7 +409,7 @@ export function Pedalboard({ tone, update }: { tone: ToneShape; update: UpdateTo
         );
       default:
         return (
-          <Pedal key={id} id={id} handle={h} on={tone.room > 0} onToggle={() => setTone({ room: tone.room > 0 ? 0 : DEFAULT_TONE.room })}
+          <Pedal key={id} id={id} handle={h} on={on.room} onToggle={() => update((now) => toggleUtility(now, 'room'))}
             plate={<><span className="pedal__name pedal__name--surf">Серфинг</span><Wave /><span className="pedal__kind">REVERB</span></>}>
             <Knob ui="tone-room-mix" label="Mix" name={t('Mix')} value={tone.room} min={0} max={1} step={0.01} initial={DEFAULT_TONE.room} shown={pct(tone.room)}
               size={54} cap="chrome" onChange={(room) => setTone({ room })} />
