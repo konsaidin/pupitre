@@ -2,14 +2,16 @@
 // громкость, каналы чистый · кранч · хай-гейн со светодиодами, тумблер питания с лампой), кабинет 4×12 (сетка, уголки,
 // шильдик; выключатель — «без кабинета») и педали гейта, дилея и комнаты (футсвич, светодиод, свои крутилки). Сверху —
 // как слышать себя. Всё пишет settings.tone и применяется на лету (InputSession → JACK-движок или ворклет браузера).
-import type { CSSProperties, ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { AMP_MODELS, DEFAULT_TONE, type AmpModelName, type ToneShape } from '../../../audio/guitar/tone';
 import { t } from '../../../lib/i18n';
 import { HashLink } from '../../HashLink';
 import { useInputSnapshot } from '../../input/useInput';
 import { updateGuitarSettings, useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
+import { CarryHandle, Jewel, ToggleSwitch } from './Hardware';
 import { Knob } from './Knob';
+import { Pedalboard } from './Pedalboard';
 import { Tubes } from './Tubes';
 import './tone.css';
 
@@ -18,12 +20,8 @@ const MODEL_UI: Record<AmpModelName, { label: string }> = {
   crunch: { label: 'Crunch' },
   'high-gain': { label: 'High gain' },
 };
-/** Ниже — гейт выключен (порог ядра −96 дБ); педаль включается на пороге по умолчанию. */
-const GATE_OFF_DB = -120;
-const GATE_MIN_DB = -90;
-
 const setTone = (patch: Partial<ToneShape>) => updateGuitarSettings((s) => ({ ...s, tone: { ...s.tone, ...patch } }));
-const setDelay = (patch: Partial<ToneShape['delay']>) => updateGuitarSettings((s) => ({ ...s, tone: { ...s.tone, delay: { ...s.tone.delay, ...patch } } }));
+const updateTone = (patch: (tone: ToneShape) => Partial<ToneShape>) => updateGuitarSettings((s) => ({ ...s, tone: { ...s.tone, ...patch(s.tone) } }));
 
 /** Ручка 0…1 как на усилителе: 0–10. */
 const dial = (v: number) => (v * 10).toFixed(1).replace('.', ',');
@@ -46,37 +44,39 @@ const Corners = ({ small }: { small?: boolean }) => (
   </>
 );
 
-/** Педаль: литой корпус в металлической краске, джеки по бокам и питание сверху, винты, светодиод, крутилки, название,
- *  футсвич на шестигранной гайке. */
-function Pedal(props: { name: string; color: string; on: boolean; onToggle: () => void; disabled?: boolean; ui: string; children: ReactNode }) {
-  return (
-    <div className="pedal" style={{ '--pedal': props.color } as CSSProperties} data-ui={props.ui} data-on={props.on || undefined}>
-      <i className="pedal__jack pedal__jack--in" aria-hidden="true" />
-      <i className="pedal__jack pedal__jack--out" aria-hidden="true" />
-      <i className="pedal__dc" aria-hidden="true" />
-      <Screws />
-      <span className="pedal__led" aria-hidden="true" />
-      <div className="pedal__knobs">{props.children}</div>
-      <span className="pedal__name">{props.name}</span>
-      <span className="pedal__nut">
-        <button type="button" className="pedal__switch" role="switch" aria-checked={props.on} aria-label={props.name} disabled={props.disabled}
-          onClick={props.onToggle} data-ui={`${props.ui}-switch`} />
-      </span>
-      <span className="pedal__brand" aria-hidden="true">Pupitre</span>
-    </div>
-  );
+/**
+ * Установка рисуется в расчётной ширине (DESIGN_W — ширина головы и кабинета) и масштабируется zoom до ширины страницы,
+ * как карточка «Слышать себя». zoom участвует в раскладке — под установкой не остаётся пустоты, как от transform; на узких
+ * экранах не мельче MIN_ZOOM, чтобы ручки оставались крутибельными.
+ */
+const DESIGN_W = 880;
+const MIN_ZOOM = 0.55;
+const MAX_ZOOM = 1.3;
+function useFitZoom() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [zoom, setZoom] = useState(1);
+  useLayoutEffect(() => {
+    const box = ref.current?.parentElement;
+    if (!box) return;
+    const fit = () => setZoom(Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, box.clientWidth / DESIGN_W)));
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, zoom] as const;
 }
 
 export function ToneScreen() {
   const [settings] = useGuitarSettings();
   const snap = useInputSnapshot();
   const tone = settings.tone;
+  const [rigRef, zoom] = useFitZoom();
   const through = settings.monitoring.mode === 'tone';
-  const knob = (id: 'gain' | 'bass' | 'mid' | 'treble' | 'presence', label: string) => (
-    <Knob ui={`tone-${id}`} label={label} value={tone[id]} min={0} max={1} step={0.01} initial={DEFAULT_TONE[id]} shown={dial(tone[id])} numbers
+  const knob = (id: 'gain' | 'bass' | 'mid' | 'treble' | 'presence', label: string, name: string) => (
+    <Knob ui={`tone-${id}`} label={label} name={name} value={tone[id]} min={0} max={1} step={0.01} initial={DEFAULT_TONE[id]} shown={dial(tone[id])} numbers
       onChange={(v) => setTone({ [id]: v })} />
   );
-  const gateOn = tone.gateDb > -96;
 
   return (
     <div className="rp-page tone-page" data-ui="tone-screen" data-backend={snap.backend}>
@@ -132,18 +132,15 @@ export function ToneScreen() {
         </span>
       </section>
 
-      <div className="rig">
+      <div className="rig" ref={rigRef} style={{ zoom }}>
         <div className="amp" data-on={tone.on || undefined}>
           <section className="amp-head" aria-label={t('Amp')} data-ui="tone-amp">
-            <span className="amp-head__handle" aria-hidden="true">
-              <i className="amp-head__strap" />
-            </span>
+            <CarryHandle />
             <Corners small />
             <div className="amp-head__bezel">
             <div className="amp-head__panel">
               <Screws />
               <div className="amp-head__jacks" aria-hidden="true">
-                <span className="jack" />
                 <span className="jack" />
                 <span className="amp-head__engrave">Input</span>
               </div>
@@ -151,36 +148,36 @@ export function ToneScreen() {
                 <span className="amp-head__badge">
                   <span className="amp-head__logo">Pupitre</span>
                 </span>
-                <span className="amp-head__model">{t(MODEL_UI[tone.model].label)}</span>
+                <span className="amp-head__model" aria-hidden="true">CUSTOM • 100</span>
               </div>
               <div className="amp-head__channels" role="radiogroup" aria-label={t('Amp')} data-ui="tone-model">
                 {AMP_MODELS.map((model) => (
                   <button key={model} type="button" className="amp-btn" role="radio" aria-checked={tone.model === model} onClick={() => setTone({ model })}>
                     <i className="amp-btn__led" aria-hidden="true" />
-                    {t(MODEL_UI[model].label)}
+                    <span className="amp-btn__label">{t(MODEL_UI[model].label)}</span>
                   </button>
                 ))}
               </div>
               <div className="amp-head__knobs">
-                {knob('gain', t('Gain'))}
-                {knob('bass', t('Bass'))}
-                {knob('mid', t('Middle'))}
-                {knob('treble', t('Treble'))}
-                {knob('presence', t('Presence'))}
-                <Knob ui="tone-level" label={t('Volume')} value={tone.levelDb} min={-24} max={12} step={0.5} initial={0} shown={db(tone.levelDb)}
+                {knob('gain', 'Gain', t('Gain'))}
+                {knob('bass', 'Bass', t('Bass'))}
+                {knob('mid', 'Middle', t('Middle'))}
+                {knob('treble', 'Treble', t('Treble'))}
+                {knob('presence', 'Presence', t('Presence'))}
+                <Knob ui="tone-level" label="Volume" name={t('Volume')} value={tone.levelDb} min={-24} max={12} step={0.5} initial={0} shown={db(tone.levelDb)}
                   onChange={(levelDb) => setTone({ levelDb })} />
               </div>
               <div className="amp-head__power">
-                <span className="amp-jewel" aria-hidden="true" />
-                <button type="button" className="amp-toggle" role="switch" aria-checked={tone.on} aria-label={t('Processor')} onClick={() => setTone({ on: !tone.on })}
-                  data-ui="tone-on">
-                  <i className="amp-toggle__bat" aria-hidden="true" />
-                </button>
-                <span className="amp-head__state">{tone.on ? t('Processor on') : t('Clean signal')}</span>
+                <Jewel on={tone.on} />
+                <ToggleSwitch checked={tone.on} onToggle={() => setTone({ on: !tone.on })} label={t('Processor')}
+                  title={tone.on ? t('Processor on') : t('Clean signal')} ui="tone-on" />
+                <span className="amp-head__state" aria-hidden="true">POWER</span>
               </div>
             </div>
             </div>
             <Tubes hot={tone.on} />
+            <i className="amp-head__foot amp-head__foot--l" aria-hidden="true" />
+            <i className="amp-head__foot amp-head__foot--r" aria-hidden="true" />
           </section>
 
           <section className="amp-cab" aria-label={t('Cabinet 4×12')} data-ui="tone-cab" data-off={!tone.cab || undefined}>
@@ -190,39 +187,19 @@ export function ToneScreen() {
                 <i key={i} className="amp-cab__cone" aria-hidden="true" />
               ))}
               <span className="amp-cab__badge">Pupitre</span>
-              {!tone.cab && <span className="amp-cab__bypass">{t('No cabinet')}</span>}
             </div>
             <div className="amp-cab__plate">
-              <span className="amp-head__engrave">On</span>
-              <button type="button" className="amp-toggle" role="switch" aria-checked={tone.cab} aria-label={t('Cabinet 4×12')}
-                onClick={() => setTone({ cab: !tone.cab })} data-ui="tone-cab-switch">
-                <i className="amp-toggle__bat" aria-hidden="true" />
-              </button>
-              <span className="amp-head__engrave">Off</span>
+              <span className="amp-cab__spec" aria-hidden="true">PUPITRE<br />4 × 12</span>
+              <span className="amp-head__engrave" aria-hidden="true">CAB · ON</span>
+              <ToggleSwitch checked={tone.cab} onToggle={() => setTone({ cab: !tone.cab })} label={t('Cabinet 4×12')}
+                title={tone.cab ? t('Cabinet 4×12') : t('No cabinet')} ui="tone-cab-switch" />
+              <span className="amp-head__engrave" aria-hidden="true">BYPASS</span>
             </div>
             <i className="amp-cab__foot amp-cab__foot--l" aria-hidden="true" />
             <i className="amp-cab__foot amp-cab__foot--r" aria-hidden="true" />
           </section>
         </div>
-        <div className="pedalboard" data-ui="tone-fx">
-          <Pedal ui="tone-gate" name={t('Noise gate')} color="#2f8f5b" on={gateOn} onToggle={() => setTone({ gateDb: gateOn ? GATE_OFF_DB : DEFAULT_TONE.gateDb })}>
-            <Knob ui="tone-gate-threshold" label={t('Threshold')} value={Math.max(GATE_MIN_DB, tone.gateDb)} min={GATE_MIN_DB} max={-30} step={1}
-              initial={DEFAULT_TONE.gateDb} shown={gateOn ? db(tone.gateDb) : t('off')} size={54} cap="chrome" onChange={(gateDb) => setTone({ gateDb })} />
-          </Pedal>
-          <Pedal ui="tone-delay" name={t('Delay')} color="#2d6fb3" on={tone.delay.mix > 0} onToggle={() => setDelay({ mix: tone.delay.mix > 0 ? 0 : 0.3 })}>
-            <Knob ui="tone-delay-mix" label={t('Mix')} value={tone.delay.mix} min={0} max={1} step={0.01} initial={0.3} shown={pct(tone.delay.mix)}
-              size={54} cap="chrome" onChange={(mix) => setDelay({ mix })} />
-            <Knob ui="tone-delay-ms" label={t('Time')} value={tone.delay.ms} min={20} max={1500} step={10} initial={DEFAULT_TONE.delay.ms}
-              shown={`${tone.delay.ms} ${t('ms')}`} size={54} cap="chrome" onChange={(ms) => setDelay({ ms })} />
-            <Knob ui="tone-delay-feedback" label={t('Repeats')} value={tone.delay.feedback} min={0} max={0.9} step={0.01}
-              initial={DEFAULT_TONE.delay.feedback} shown={pct(tone.delay.feedback)} size={54} cap="chrome" onChange={(feedback) => setDelay({ feedback })} />
-          </Pedal>
-          <Pedal ui="tone-room" name={t('Room')} color="#7a4fb0" on={tone.room > 0} onToggle={() => setTone({ room: tone.room > 0 ? 0 : DEFAULT_TONE.room })}>
-            <Knob ui="tone-room-mix" label={t('Mix')} value={tone.room} min={0} max={1} step={0.01} initial={DEFAULT_TONE.room} shown={pct(tone.room)}
-              size={54} cap="chrome" onChange={(room) => setTone({ room })} />
-          </Pedal>
-        </div>
-
+        <Pedalboard tone={tone} update={updateTone} />
       </div>
     </div>
   );

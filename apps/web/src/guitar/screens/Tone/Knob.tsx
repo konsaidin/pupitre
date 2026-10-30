@@ -1,9 +1,9 @@
 // Крутилка как на усилителе (SVG): тень на панели, юбка со шкалой, рифлёный корпус, металлический колпачок с бликом,
 // указатель. Управление: тянуть вверх-вниз (с Shift — точнее), колесо, стрелки и PgUp/PgDn, Home/End; двойной клик —
-// значение по умолчанию. Для экранного диктора — ползунок (role="slider").
+// значение по умолчанию. Точное значение — при наведении и фокусе. Для экранного диктора — ползунок (role="slider").
 import { useEffect, useId, useRef, type KeyboardEvent, type PointerEvent } from 'react';
 
-export type KnobCap = 'chrome' | 'black' | 'cream';
+export type KnobCap = 'chrome' | 'black' | 'cream' | 'yellow';
 
 const SWEEP = 270;
 const START = -135;
@@ -11,7 +11,10 @@ const START = -135;
 const DRAG_PX = 220;
 
 interface Props {
+  /** Маркировка на корпусе — по-английски, как на железе, без перевода. */
   label: string;
+  /** Имя для экранного диктора — переводом (и с номером, если маркировка ручки не различает). */
+  name: string;
   value: number;
   min: number;
   max: number;
@@ -32,6 +35,7 @@ const CAPS: Record<KnobCap, [string, string, string]> = {
   chrome: ['#fbfbfb', '#b7b9bd', '#6f7277'],
   black: ['#55585e', '#25272b', '#0c0d0f'],
   cream: ['#fff6df', '#e3d3ad', '#a8946a'],
+  yellow: ['#fff3a6', '#f2c400', '#9a7400'],
 };
 
 export function Knob(props: Props) {
@@ -107,7 +111,7 @@ export function Knob(props: Props) {
         className="knob__dial"
         role="slider"
         tabIndex={disabled ? -1 : 0}
-        aria-label={props.label}
+        aria-label={props.name}
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuenow={value}
@@ -139,7 +143,7 @@ export function Knob(props: Props) {
               <stop offset="1" stopColor={mid} />
             </linearGradient>
             <radialGradient id={`${id}-shine`} cx="0.35" cy="0.25" r="0.45">
-              <stop offset="0" stopColor="#fff" stopOpacity="0.8" />
+              <stop offset="0" stopColor="#fff" stopOpacity={props.cap === 'black' ? 0.16 : 0.55} />
               <stop offset="1" stopColor="#fff" stopOpacity="0" />
             </radialGradient>
           </defs>
@@ -171,7 +175,7 @@ export function Knob(props: Props) {
         </svg>
       </div>
       <span className="knob__label">{props.label}</span>
-      <span className="knob__value rp-num">{props.shown}</span>
+      <span className="knob__value rp-num" aria-hidden="true">{props.shown}</span>
     </div>
   );
 }

@@ -14,7 +14,7 @@ const web = join(ROOT, 'apps/web');
 // Модули ядра packages/dsp (npm run build:dsp): анализ и гитарный процессор; пересборка должна дать те же байты.
 const WASM = {
   'dsp.wasm': '075376c0928172da203ea1e27436baec210a7537ca873c06ba0adefe906d478b',
-  'tone.wasm': 'b47d5cdf30a98935050094c418e76d30903194fe1f2833da885c0abbec1c5816',
+  'tone.wasm': '50ad459050dc75ef39ee3054849eeeefc1a57acf8e103493c03d81d824d5240e',
 };
 const wasmPath = (name) => join(web, 'src/assets', name);
 const hash = b => createHash('sha256').update(b).digest('hex');

@@ -2,7 +2,7 @@
 // почти линеен, хай-гейн — гармоники); изменения уходят парами только для изменившихся параметров.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { changedToneParams, DEFAULT_TONE, TONE_PARAM, TONE_PARAM_COUNT, toneParams, type ToneShape } from './tone';
+import { boardOf, changedToneParams, DEFAULT_TONE, TONE_PARAM, TONE_PARAM_COUNT, toneParams, type ToneShape } from './tone';
 
 interface ToneDsp {
   memory: WebAssembly.Memory;
@@ -54,6 +54,40 @@ describe('процессор на tone.wasm', () => {
     const hot = (await run({ ...DEFAULT_TONE, room: 0 }, sine(110, 1, 0.1))).subarray(12000, 36000);
     expect(hot.some(Number.isNaN)).toBe(false);
     expect(bin(hot, 330) / bin(hot, 110)).toBeGreaterThan(0.05);
+  });
+
+  it('педалборд: порядок — номерами педалей в слотах, граница петли; битый порядок — по умолчанию', () => {
+    const p = toneParams({ ...DEFAULT_TONE, board: { order: ['delay', 'screamer', 'gate', 'boost', 'fuzz', 'room'], loop: 3 } });
+    expect(p.slice(TONE_PARAM.slot0, TONE_PARAM.slot0 + 6)).toEqual([2, 1, 0, 5, 4, 3]);
+    expect(p[TONE_PARAM.loop]).toBe(3);
+    expect(TONE_PARAM.loop).toBe(TONE_PARAM.slot0 + 6);
+    expect(boardOf({ board: { order: ['gate', 'gate', 'delay', 'room'], loop: 9 } as never })).toEqual(DEFAULT_TONE.board);
+    expect(boardOf({ board: { order: ['wah'], loop: 0 } as never })).toEqual(DEFAULT_TONE.board);
+    // запись до фузза и буста: они встают в начало цепочки, граница петли сдвигается вместе с ней
+    expect(boardOf({ board: { order: ['room', 'delay', 'screamer', 'gate'], loop: 9 } })).toEqual({
+      order: ['fuzz', 'boost', 'room', 'delay', 'screamer', 'gate'], loop: 6,
+    });
+    expect(boardOf({ board: { order: ['gate', 'screamer', 'delay', 'room'], loop: 2 } }).loop).toBe(4);
+  });
+
+  it('фузз и буст на tone.wasm: фузз — почти меандр, четыре LEVEL буста складываются', async () => {
+    const quiet: ToneShape = { ...DEFAULT_TONE, model: 'clean', gain: 0, cab: false, room: 0, gateDb: -120 };
+    const fuzz = (await run({ ...quiet, fuzz: { on: true, gain: 1, tone: 1, level: 0.5 } }, sine(220, 0.5, 0.05))).subarray(12000);
+    expect(bin(fuzz, 660) / bin(fuzz, 220)).toBeGreaterThan(0.15);
+    const x = sine(440, 0.5, 0.001);
+    const level = async (levels: number[]) => bin((await run({ ...quiet, boost: { on: true, levels } }, x)).subarray(12000), 440);
+    const base = bin((await run(quiet, x)).subarray(12000), 440);
+    const db = (v: number) => 20 * Math.log10(v / base);
+    expect(db(await level([0.5, 0.5, 0.5, 0.5]))).toBeCloseTo(0, 0);
+    expect(db(await level([1, 1, 1, 1]))).toBeGreaterThan(25);
+  });
+
+  it('скример на tone.wasm: включённый с драйвом даёт гармоники на чистом усилителе', async () => {
+    const quiet: ToneShape = { ...DEFAULT_TONE, model: 'clean', gain: 0, cab: false, room: 0, gateDb: -120 };
+    const off = (await run(quiet, sine(440, 0.5, 0.05))).subarray(6000, 18000);
+    const on = (await run({ ...quiet, screamer: { on: true, drive: 1, tone: 1, level: 0.5 } }, sine(440, 0.5, 0.05))).subarray(6000, 18000);
+    expect(bin(off, 1320) / bin(off, 440)).toBeLessThan(0.01);
+    expect(bin(on, 1320) / bin(on, 440)).toBeGreaterThan(0.03);
   });
 
   it('параметры по номерам; изменения — только изменившиеся пары', () => {
