@@ -60,10 +60,12 @@ try {
 }
 
 const release = join(desktop, 'release');
-const files = readdirSync(release)
-  .filter((f) => f.includes(`-${version}`) && /\.(AppImage|exe)$/.test(f))
-  .map((f) => join(release, f));
-if (files.length < 3) throw new Error(`ожидалось 3 файла сборки, есть: ${files.join(', ')}`);
+// точные имена: по подстроке «-0.4.1» в релиз попадали и сборки 0.4.1-dev
+const names = [`Pupitre-${version}-linux-x86_64.AppImage`, `Pupitre-Setup-${version}.exe`, `Pupitre-${version}-win-x64.exe`];
+const built = new Set(readdirSync(release));
+const missing = names.filter((f) => !built.has(f));
+if (missing.length) throw new Error(`нет файлов сборки: ${missing.join(', ')}`);
+const files = names.map((f) => join(release, f));
 
 step('коммит версии и тег');
 sh('git add apps/desktop/package.json');
