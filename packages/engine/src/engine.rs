@@ -78,12 +78,24 @@ pub struct FramesOut {
     pub frames: Vec<FrameOut>,
 }
 
+/// Кусок сухого сигнала для записи дубля (канал или смесь после DC-блока, как у анализа).
+#[derive(Debug, Clone, PartialEq)]
+pub struct AudioOut {
+    pub sample_rate: u32,
+    pub samples: Vec<f32>,
+}
+
 /// Куда движок отдаёт метры, события и кадры анализа (N-API — потокобезопасные функции JS).
 pub trait Sink: Send + Sync + 'static {
     fn meters(&self, meters: MeterOut);
     fn event(&self, event: EventOut);
     fn frames(&self, frames: FramesOut);
+    /// Сухой сигнал для записи — только пока она включена (SetOptions::record).
+    fn audio(&self, _audio: AudioOut) {}
 }
+
+/// Кусок записи наружу — не реже, сэмплов на секунду частоты (≈ 100 мс).
+const RECORD_CHUNK_DIV: usize = 10;
 
 #[derive(Debug, Clone, Default, PartialEq)]
 pub struct SetOptions {
@@ -92,6 +104,8 @@ pub struct SetOptions {
     pub mute: Option<bool>,
     /// Изменённые параметры процессора: (номер, значение).
     pub tone: Vec<(u32, f32)>,
+    /// Запись дубля: сухой сигнал (тот же отвод, что у анализа) уходит наружу кусками ≈ 100 мс (Sink::audio).
+    pub record: Option<bool>,
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -288,6 +302,9 @@ struct Actor {
     latency: (u32, u32),
     latency_at: Instant,
     analysis: Option<Analysis>,
+    /// Запись дубля: включена ли и накопленный кусок (выделение — в потоке управления, не в аудиопотоке).
+    recording: bool,
+    recorded: Vec<f32>,
 }
 
 impl Actor {
@@ -310,7 +327,21 @@ impl Actor {
             latency: (0, 0),
             latency_at: Instant::now(),
             analysis: None,
+            recording: false,
+            recorded: Vec::new(),
         }
+    }
+
+    /// Накопленный кусок записи — наружу (частота — его сессии; без сессии частоты нет — кусок теряется).
+    fn flush_recorded(&mut self, sample_rate: u32) {
+        if self.recorded.is_empty() {
+            return;
+        }
+        if sample_rate == 0 {
+            self.recorded.clear();
+            return;
+        }
+        self.sink.audio(AudioOut { sample_rate, samples: std::mem::take(&mut self.recorded) });
     }
 
     fn run(mut self, rx: Receiver<Msg>) {
@@ -358,7 +389,9 @@ impl Actor {
                 let _ = reply.send(lists.map(|(c, p)| DeviceList { capture: c.iter().map(info).collect(), playback: p.iter().map(info).collect() }));
             }
             Msg::Open(options, reply) => {
+                // хвост записи прошлой сессии — наружу; новая открывается без записи (рендерер включит её сам)
                 self.close_session();
+                self.recording = false;
                 self.xruns_base = 0;
                 self.mute = options.mute;
                 let result = self.open_session(options);
@@ -366,6 +399,7 @@ impl Actor {
             }
             Msg::Close(reply) => {
                 self.close_session();
+                self.recording = false;
                 self.options = None;
                 let _ = reply.0.send(Ok(()));
             }
@@ -378,6 +412,14 @@ impl Actor {
                         options.monitor_gain = g;
                     }
                     merge_tone(&mut options.tone, &set.tone);
+                }
+                if let Some(on) = set.record {
+                    // остановка — хвост наружу сразу; запись переживает переоткрытие (флаг у потока управления)
+                    if !on {
+                        let rate = self.session.as_ref().map_or(0, |s| s.sample_rate);
+                        self.flush_recorded(rate);
+                    }
+                    self.recording = on;
                 }
                 if let Some(m) = set.mute {
                     self.mute = m;
@@ -460,6 +502,8 @@ impl Actor {
 
     fn close_session(&mut self) {
         self.analysis = None;
+        let rate = self.session.as_ref().map_or(0, |s| s.sample_rate);
+        self.flush_recorded(rate);
         if let Some(s) = self.session.take() {
             s.close();
         }
@@ -506,8 +550,11 @@ impl Actor {
         if let Some(reason) = shutdown {
             // клиента не закрывать: после конца сервера jack_client_close в pipewire-jack падает (Session::forget)
             if let Some(dead) = self.session.take() {
+                let rate = dead.sample_rate;
                 dead.forget();
+                self.flush_recorded(rate);
             }
+            self.recording = false;
             self.analysis = None;
             if let Some((reply, _)) = self.rtl.take() {
                 let _ = reply.send(Err(EngineError::Failed("сервер остановился".into())));
@@ -558,6 +605,10 @@ impl Actor {
                     let mut frames = Vec::new();
                     a.process(first, &mut frames);
                     a.process(second, &mut frames);
+                    if self.recording {
+                        self.recorded.extend_from_slice(first);
+                        self.recorded.extend_from_slice(second);
+                    }
                     chunk.commit_all();
                     if !frames.is_empty() {
                         let now_us = s.client_ref().time() as f64;
@@ -565,6 +616,9 @@ impl Actor {
                     }
                 }
             }
+        }
+        if self.recorded.len() >= (s.sample_rate as usize / RECORD_CHUNK_DIV).max(1) {
+            self.sink.audio(AudioOut { sample_rate: s.sample_rate, samples: std::mem::take(&mut self.recorded) });
         }
         let xruns = s.xruns.load(std::sync::atomic::Ordering::Relaxed);
         if self.agg.n > 0 && self.sent_at.elapsed() >= METER_PERIOD {

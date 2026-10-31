@@ -79,6 +79,12 @@ export interface EngineFrames {
   frames: Float64Array;
 }
 
+/** Кусок сухого сигнала записи дубля (канал или смесь после DC-блока). */
+export interface EngineAudio {
+  sampleRate: number;
+  samples: Float32Array;
+}
+
 export interface EngineRtl {
   /** Задержки щелчков выход → вход, кадры; пропущенные щелчки не входят. */
   delaysFrames: number[];
@@ -92,13 +98,18 @@ export interface EngineApi {
   listDevices(): Promise<EngineDevices>;
   open(options: EngineOpenOptions): Promise<EngineOpenInfo>;
   close(): Promise<void>;
-  set(options: { channel?: number; monitorGain?: number; mute?: boolean; tone?: number[] }): void;
+  /** record — запись дубля: сухой сигнал кусками ≈ 100 мс в onAudio. */
+  set(options: { channel?: number; monitorGain?: number; mute?: boolean; tone?: number[]; record?: boolean }): void;
   measureRtl(clicks: number): Promise<EngineRtl>;
   /** Открыт ли движок, квант и устройство (диагностика, e2e). */
   status(): Promise<{ open: boolean; bufferFrames: number; captureId: string }>;
   onMeters(fn: (meters: EngineMeters) => void): () => void;
   onEvent(fn: (event: EngineEvent) => void): () => void;
   onFrames(fn: (frames: EngineFrames) => void): () => void;
+  /** Нет у десктопа старой сборки — запись на движке недоступна. */
+  onAudio?(fn: (audio: EngineAudio) => void): () => void;
+  /** Что умеет загруженный аддон (record — отвод записи); нет у десктопа старой сборки. */
+  capabilities?(): Promise<{ record: boolean }>;
 }
 
 /** Движок десктопа или null (веб, аддон не загрузился). */

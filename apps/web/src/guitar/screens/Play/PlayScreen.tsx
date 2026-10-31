@@ -2,7 +2,9 @@
 // («СЕКЦИЯ · ТАКТ n / N · м:сс»; с выбранным входом — точность, серия, очки, множитель; без него — «Без оценки»), снизу
 // слева — пилюля входа, отсчёт крупной цифрой, пауза, итоги. Клавиши: Space — старт/пауза/дальше, Esc — пауза, на паузе
 // — выход; ←/→ — ±5 с; PgUp/PgDn — секции; L — луп секции; F — во весь экран; T — 3D/табулатура; M — своя партия в
-// аккомпанементе (не слышно → тихо → громко).
+// аккомпанементе (не слышно → тихо → громко); O — тон, U — тюнер.
+// Тон и тюнер открываются панелью поверх игры (кнопки HUD, пауза, O/U): песня встаёт на паузу на том же месте — со
+// счётом и серией, — панель закрывается (Esc) обратно к ней. Дорожка под панелью не рисуется.
 // HUD обновляется опросом ~8 Гц (как GameScreen), не из кадра дорожки.
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -16,12 +18,22 @@ import { GameInputPill } from '../../input/InputPill';
 import { backingLayers, partLevelOf, synthBuffers } from '../../backing/synthBacking';
 import { GuitarHighway } from '../../highway/GuitarHighway';
 import type { GuitarSong, TabMap } from '../../model/types';
+import { InGameSheet } from '../../play/inGame';
 import { createPlaySession, type PlaySession } from '../../play/session';
 import { guitarLibrary, renderBacking } from '../../store/library';
 import { loadGuitarSettings, updateGuitarSettings, useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
 import { cyclePartLevel, PART_LEVEL_UI, PartLevelSeg } from '../../ui/PartLevel';
+import { ToneScreen } from '../Tone/ToneScreen';
+import { TunerScreen } from '../Tuner/TunerScreen';
 import './play.css';
+
+/** Панель поверх игры. */
+type Sheet = 'tone' | 'tuner' | null;
+const SHEETS: Array<{ id: Exclude<Sheet, null>; label: string; key: string; icon: 'c-amp' | 'c-fork' }> = [
+  { id: 'tone', label: 'Tone', key: 'O', icon: 'c-amp' },
+  { id: 'tuner', label: 'Tuner', key: 'U', icon: 'c-fork' },
+];
 
 /** /guitar/play/:songId/:arrId → [songId, arrId] (разбор пути сам: useParams утяжелил бы входной чанк). */
 export function playIds(pathname: string): [string, string] | null {
@@ -102,6 +114,15 @@ export function PlayScreen() {
   // «Сыграть ещё» — новая сессия тем же эффектом
   const [round, setRound] = useState(0);
   const sessionRef = useRef<PlaySession | null>(null);
+  const [sheet, setSheet] = useState<Sheet>(null);
+  const sheetRef = useRef<Sheet>(null);
+  sheetRef.current = sheet;
+  /** Открыть тон или тюнер поверх игры: идущая песня встаёт на паузу на том же месте. */
+  const openSheet = (next: Sheet) => {
+    const engine = sessionRef.current?.engine;
+    if (next && engine && (engine.phase === 'playing' || engine.phase === 'countdown' || engine.phase === 'waiting')) engine.pause();
+    setSheet(next);
+  };
 
   // Сессия: контекст, минус, движок — создаются и освобождаются в одном эффекте (StrictMode).
   useEffect(() => {
@@ -181,8 +202,19 @@ export function PlayScreen() {
   // Клавиши — через ref на сессию (как GameScreen: обработчик не пересоздаётся на каждый кадр HUD).
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      // открыта панель тона или тюнера: клавиши — её (ручки, поля), Esc — назад к песне; Esc поля, списка или меню
+      // панели (отмена ввода, закрытие меню) — их собственный
+      if (sheetRef.current) {
+        const field = e.target instanceof HTMLElement && e.target.closest('input, select, textarea');
+        if (e.code === 'Escape' && !e.defaultPrevented && !field) {
+          e.preventDefault();
+          setSheet(null);
+        }
+        return;
+      }
       const s = sessionRef.current;
-      if (!s || e.repeat) return;
+      // сочетания с Ctrl, Alt и Cmd — браузера и системы (Ctrl+F, Ctrl+L…), не игры
+      if (!s || e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
       const { engine, map } = s;
       const ms = engine.songMs();
       switch (e.code) {
@@ -237,6 +269,13 @@ export function PlayScreen() {
         case 'KeyM':
           cyclePartLevel();
           break;
+        case 'KeyO':
+        case 'KeyU': {
+          const playing = engine.phase === 'playing' || engine.phase === 'countdown' || engine.phase === 'waiting';
+          if (playing) engine.pause();
+          setSheet(e.code === 'KeyO' ? 'tone' : 'tuner');
+          break;
+        }
       }
     };
     window.addEventListener('keydown', onKey);
@@ -266,12 +305,14 @@ export function PlayScreen() {
     return phase === 'playing' || phase === 'countdown' ? s.transport.heardSongMs() : s.engine.songMs();
   };
   const total = ready?.map.durationMs ?? 0;
+  // под открытой панелью игра недоступна: ни фокуса, ни кликов (Space на кнопке паузы под панелью продолжил бы песню)
+  const behind = (sheet ? { inert: '' } : {}) as Record<string, string>;
 
   return (
     <div className={`game${view.mode === 'tab' ? ' game--tab' : ''}`} data-ui="play">
-      {ready && <GuitarHighway adapted={ready.adapted} songMs={songMs} visualOffsetMs={settings.visualOffsetMs} view={view} />}
+      {ready && !sheet && <GuitarHighway adapted={ready.adapted} songMs={songMs} visualOffsetMs={settings.visualOffsetMs} view={view} />}
       <div className="game__scrim" />
-      <header className="hud-top">
+      <header className="hud-top" {...behind}>
         <div className="hud-left">
           <button type="button" className="hud-btn" data-ui="play-pause"
             aria-label={hud?.phase === 'playing' || hud?.phase === 'countdown' || hud?.phase === 'waiting' ? t('Pause (Esc)') : t('Play')}
@@ -284,6 +325,12 @@ export function PlayScreen() {
             }}>
             <GuitarIcon name={hud?.phase === 'playing' || hud?.phase === 'countdown' || hud?.phase === 'waiting' ? 'player-pause-filled' : 'player-play-filled'} />
           </button>
+          {SHEETS.map((item) => (
+            <button key={item.id} type="button" className="hud-btn hud-btn--sm" aria-label={`${t(item.label)} (${item.key})`} title={`${t(item.label)} · ${item.key}`}
+              onClick={() => openSheet(item.id)} data-ui={`play-open-${item.id}`}>
+              <GuitarIcon name={item.icon} />
+            </button>
+          ))}
           <div className="hud-song">
             <b>{song?.title ?? ''}</b>
             <span>{load.phase !== 'loading' ? load.arrName : ''} · 100 %</span>
@@ -343,7 +390,7 @@ export function PlayScreen() {
         </div>
       </header>
       {(hud?.loop || ready?.scoring) && (
-        <footer className="hud-bottom">
+        <footer className="hud-bottom" {...behind}>
           <div className="hud-pills">{ready?.scoring && <GameInputPill />}</div>
           <div className="hud-pills">
             {hud?.loop && (
@@ -360,7 +407,7 @@ export function PlayScreen() {
       {hud?.phase === 'countdown' && hud.countdownSec > 0.3 && <div className="game__count" data-ui="play-countdown">{hud.countdown}</div>}
       {ready && hud?.phase === 'waiting' && hud.waitingFor >= 0 && <WaitingChip event={ready.map.notes[hud.waitingFor]} />}
       {load.phase !== 'ready' && (
-        <div className="game__overlay" data-ui="play-preparing">
+        <div className="game__overlay" data-ui="play-preparing" {...behind}>
           <span className="rp-chip rp-chip--spin rp-chip--light">
             <GuitarIcon name="loader-2" size="sm" />
             {t('Preparing the backing track…')}
@@ -368,7 +415,7 @@ export function PlayScreen() {
         </div>
       )}
       {ready && hud?.phase === 'idle' && (
-        <div className="game__overlay" data-ui="play-start">
+        <div className="game__overlay" data-ui="play-start" {...behind}>
           <h1 className="rp-h1">{song?.title}</h1>
           <p>
             {ready.scoring
@@ -409,7 +456,7 @@ export function PlayScreen() {
         </div>
       )}
       {ready && hud?.phase === 'paused' && (
-        <div className="game__overlay" data-ui="play-paused">
+        <div className="game__overlay" data-ui="play-paused" {...behind}>
           <div className="game__pause" role="dialog" aria-label={t('Pause')}>
             <span className="rp-label">{t('Pause')}</span>
             <div className="pause__time">
@@ -435,6 +482,13 @@ export function PlayScreen() {
               {t('Your part')}: {t(PART_LEVEL_UI[partLevelOf(settings.mix.guide)].label).toLowerCase()}
               <span className="rp-kbd">M</span>
             </button>
+            {SHEETS.map((item) => (
+              <button key={item.id} type="button" className="pause__item" onClick={() => openSheet(item.id)} data-ui={`play-pause-${item.id}`}>
+                <GuitarIcon name={item.icon} />
+                {t(item.label)}
+                <span className="rp-kbd">{item.key}</span>
+              </button>
+            ))}
             <div className="pause__sep" />
             <button type="button" className="pause__item pause__item--danger" onClick={() => navigate(-1)}>
               <GuitarIcon name="x" />
@@ -444,8 +498,33 @@ export function PlayScreen() {
           </div>
         </div>
       )}
+      {sheet && (
+        <div className="game__sheet" role="dialog" aria-modal="true" aria-label={t(sheet === 'tone' ? 'Tone' : 'Tuner')} data-ui={`play-sheet-${sheet}`}>
+          <div className="game__sheet-bar">
+            <button type="button" className="rp-btn rp-btn--light rp-btn--sm" onClick={() => setSheet(null)} data-ui="play-sheet-back" autoFocus>
+              <GuitarIcon name="arrow-left" size="sm" />
+              {t('Back to the song')}
+              <span className="rp-kbd">Esc</span>
+            </button>
+            <span className="game__sheet-where rp-sm">
+              {song?.title} · {t('Pause')} · <span className="rp-num">{clock(hud?.songMs ?? 0)}</span>
+            </span>
+            <div className="rp-seg rp-seg--sm" role="radiogroup" aria-label={t('Sections')}>
+              {SHEETS.map((item) => (
+                <button key={item.id} type="button" className="rp-seg__item" role="radio" aria-checked={sheet === item.id} onClick={() => setSheet(item.id)}>
+                  <GuitarIcon name={item.icon} size="sm" />
+                  {t(item.label)}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="game__sheet-body">
+            <InGameSheet.Provider value>{sheet === 'tone' ? <ToneScreen /> : <TunerScreen />}</InGameSheet.Provider>
+          </div>
+        </div>
+      )}
       {summary && song && (
-        <div className="game__overlay" data-ui="play-results">
+        <div className="game__overlay" data-ui="play-results" {...behind}>
           <div className="game__pause" role="dialog" aria-label={t('Results')}>
             <span className="rp-label">{t('Results')}</span>
             <div className="pause__time" data-ui="results-accuracy">

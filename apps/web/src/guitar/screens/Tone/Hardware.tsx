@@ -3,7 +3,7 @@
 // тумблер — шайба, шестигранная гайка с фасками, резьбовая втулка и хромированный рычаг-«бита» с шариком. Свет на панель
 // падает сверху-слева: блики там, тени — вниз-вправо (тень рычага считается отдельно от рычага и при перевороте не
 // переворачивается). Включённая лампа светит изнутри граней и бросает красный отсвет на панель.
-import { useId } from 'react';
+import { useId, type CSSProperties } from 'react';
 
 const C = 20; // центр в координатах viewBox 0…40
 const polar = (r: number, deg: number) => [C + r * Math.cos((deg * Math.PI) / 180), C + r * Math.sin((deg * Math.PI) / 180)];
@@ -218,3 +218,21 @@ export function CarryHandle() {
     </span>
   );
 }
+
+/** Винты по углам (позиции — классами: соседние элементы не сбивают раскладку). */
+export const Screws = () => (
+  <>
+    {(['tl', 'tr', 'bl', 'br'] as const).map((at, i) => (
+      <i key={at} className={`screw screw--${at}`} style={{ '--turn': `${[18, 72, 131, 47][i]}deg` } as CSSProperties} aria-hidden="true" />
+    ))}
+  </>
+);
+
+/** Хромированные уголки корпуса. */
+export const Corners = ({ small }: { small?: boolean }) => (
+  <>
+    {(['tl', 'tr', 'bl', 'br'] as const).map((at) => (
+      <i key={at} className={`amp-corner amp-corner--${at}${small ? ' amp-corner--sm' : ''}`} aria-hidden="true" />
+    ))}
+  </>
+);

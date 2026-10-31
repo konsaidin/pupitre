@@ -59,6 +59,7 @@ if (process.argv.includes('--pupitre-engine')) {
     set: (options) => ipcRenderer.send('engine:set', options),
     measureRtl: (clicks) => invoke('engine:rtl', clicks),
     status: () => invoke('engine:status'),
+    capabilities: () => invoke('engine:capabilities'),
     onMeters(cb) {
       const listener = (_e, meters) => cb(meters);
       ipcRenderer.on('engine:meters', listener);
@@ -73,6 +74,11 @@ if (process.argv.includes('--pupitre-engine')) {
       const listener = (_e, frames) => cb(frames);
       ipcRenderer.on('engine:frames', listener);
       return () => ipcRenderer.removeListener('engine:frames', listener);
+    },
+    onAudio(cb) {
+      const listener = (_e, audio) => cb(audio);
+      ipcRenderer.on('engine:audio', listener);
+      return () => ipcRenderer.removeListener('engine:audio', listener);
     },
   });
 }

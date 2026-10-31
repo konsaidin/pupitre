@@ -116,3 +116,16 @@
 .rampa .game__waiting .rp-chip { animation: rp-rise var(--rp-dur-3) var(--rp-ease-out); height: 34px; padding: 0 14px; font-size: 13.5px; gap: 8px; box-shadow: 0 0 24px -6px var(--rp-beam); }
 .rampa .game__waiting b { color: var(--rp-fg-1); }
 .rampa .game__part { display: grid; justify-items: center; gap: 6px; }
+
+/* Тон и тюнер поверх игры: панель на весь экран, сверху — назад к песне (она на паузе) и переключатель */
+.rampa .hud-btn--sm { width: 36px; height: 36px; }
+.rampa .game__sheet {
+  position: fixed; inset: 0; z-index: 60; display: grid; grid-template-rows: auto minmax(0, 1fr); background: var(--rp-bg);
+}
+.rampa .game__sheet-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px var(--rp-gutter);
+  border-bottom: 1px solid var(--rp-line-1); background: var(--rp-surface-1);
+}
+.rampa .game__sheet-where { flex: 1 1 200px; min-width: 0; color: var(--rp-fg-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rampa .game__sheet-body { overflow: auto; padding: 22px var(--rp-gutter) 48px; }
+.rampa .game__sheet-body > .rp-page { margin-inline: auto; }

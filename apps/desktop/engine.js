@@ -2,7 +2,7 @@
 // IPC-мост в рендерер. Аддона нет (не собран, чужая платформа) — мост не регистрируется, рендерер остаётся на захвате
 // браузера. Процесс движка поднимается при первом вызове и заново после выхода (падение pipewire-jack, остановка
 // PipeWire): рендерер получает событие shutdown, сессия входа делает пробу — открытие поднимает процесс снова.
-// Метры, события и кадры уходят окну, открывшему движок; окно закрылось, рендерер упал или страница сменила документ
+// Метры, события, кадры и куски записи дублей уходят окну, открывшему движок; окно закрылось, рендерер упал или страница сменила документ
 // (перезагрузка) — движок закрывается (мониторинг себя не должен звучать без интерфейса, 01-architecture §8.9).
 
 const path = require('node:path');
@@ -50,6 +50,7 @@ function initEngine(ipcMain, isPackaged, resourcesPath) {
       if (msg?.kind === 'meters') send('engine:meters', msg.value);
       else if (msg?.kind === 'event') send('engine:event', msg.value);
       else if (msg?.kind === 'frames') send('engine:frames', msg.value);
+      else if (msg?.kind === 'audio') send('engine:audio', msg.value);
       else if (msg?.id !== undefined) {
         const call = pending.get(msg.id);
         pending.delete(msg.id);
@@ -95,9 +96,10 @@ function initEngine(ipcMain, isPackaged, resourcesPath) {
     });
   };
 
-  // параметры процессора — плоские пары «номер, значение» (packages/dsp/src/tone.rs), не больше 32 пар
+  // параметры процессора — плоские пары «номер, значение» (packages/dsp/src/tone.rs), не больше 256 пар: при открытии
+  // уходят все (их больше 32 с педалборда — прежний предел молча терял тон открытия)
   const toneOf = (t) =>
-    Array.isArray(t) && t.length % 2 === 0 && t.length <= 64 && t.every((v) => typeof v === 'number' && Number.isFinite(v)) ? t : undefined;
+    Array.isArray(t) && t.length % 2 === 0 && t.length <= 512 && t.every((v) => typeof v === 'number' && Number.isFinite(v)) ? t : undefined;
 
   ipcMain.handle('engine:available', () => call('available'));
   ipcMain.handle('engine:list', () => call('listDevices'));
@@ -123,10 +125,12 @@ function initEngine(ipcMain, isPackaged, resourcesPath) {
       monitorGain: o.monitorGain === undefined ? undefined : finite(o.monitorGain, 0, 1, 0),
       mute: typeof o.mute === 'boolean' ? o.mute : undefined,
       tone: toneOf(o.tone),
+      record: typeof o.record === 'boolean' ? o.record : undefined,
     }).catch(() => {});
   });
   ipcMain.handle('engine:rtl', (_e, clicks) => call('measureRtl', finite(clicks, 1, 32, 8)));
   ipcMain.handle('engine:status', () => (child ? call('status') : { open: false, bufferFrames: 0, captureId: '' }));
+  ipcMain.handle('engine:capabilities', () => call('capabilities'));
   return {
     close: () => close().then(() => child?.kill()),
     /** Убить процесс движка (проверка изоляции падений в e2e). */

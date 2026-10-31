@@ -1,0 +1,151 @@
+/* Басовый комплект (BassRig.tsx). Свет — сверху-слева, как у гитарного: блики на верхних гранях, тени вниз-вправо.
+   Винил корпуса — общий с гитарным (tone.css). Панель — шлифованный алюминий (поперечные риски, мягкий блик), под
+   подписями ручек — синяя полоса; кабинет — чёрная перфорированная сталь поверх динамиков. */
+
+.rampa .amp--bass { margin-bottom: 26px; }
+.rampa .amp--bass::after { bottom: -60px; }
+
+/* ——— голова ——— */
+.rampa .bass-head { margin: 34px 10px 0; padding: 16px 18px 16px; border-radius: 9px 9px 5px 5px; z-index: 1; }
+.rampa .bass-head__bar { position: absolute; top: -38px; width: 120px; height: 44px; z-index: 1; overflow: visible; pointer-events: none; }
+.rampa .bass-head__bar--l { left: 16%; }
+.rampa .bass-head__bar--r { right: 16%; }
+
+/* Жалюзи: вертикальные пластины с кромкой и тенью, сквозь щели — тёплый отсвет изнутри (прогрев — как у ламп). */
+.rampa .bass-head__vents {
+  --warm: 16s; --cool: 7s;
+  position: relative; height: 34px; margin: 2px 10px 12px; border-radius: 4px; overflow: hidden; background: #050506;
+  box-shadow: 0 0 0 1px #050506, 0 1px 0 2px #2e2e31, inset 0 3px 5px #000;
+}
+.rampa .bass-head__glow {
+  position: absolute; inset: 0; opacity: 0; transition: opacity var(--cool) linear;
+  background:
+    radial-gradient(34% 140% at 24% 110%, rgb(255 138 62 / 0.75), rgb(255 96 30 / 0.22) 55%, transparent 75%),
+    radial-gradient(34% 140% at 76% 110%, rgb(255 128 56 / 0.7), rgb(255 90 30 / 0.2) 55%, transparent 75%);
+}
+.rampa .bass-head__vents[data-hot] .bass-head__glow { opacity: 1; transition-duration: var(--warm); }
+.rampa .bass-head__louvers {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.07), transparent 35%, rgb(0 0 0 / 0.45)),
+    repeating-linear-gradient(90deg, #36373b 0 1px, #1f2023 1px 5px, #111113 5px 8px, #050506 8px 9px, transparent 9px 13px);
+}
+@media (prefers-reduced-motion: no-preference) {
+  html .rampa .bass-head__vents .bass-head__glow { transition-duration: var(--cool) !important; }
+  html .rampa .bass-head__vents[data-hot] .bass-head__glow { transition-duration: var(--warm) !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rampa .bass-head__glow { transition: none; }
+}
+
+.rampa .bass-head__panel {
+  position: relative; display: grid; grid-template-columns: auto auto 1fr auto auto;
+  grid-template-areas: 'jacks brand voices meter power' 'knobs knobs knobs knobs knobs';
+  align-items: center; gap: 12px 14px; padding: 16px 22px 0; border-radius: 2px; overflow: hidden; color: #1c1d20;
+  background:
+    repeating-linear-gradient(0deg, rgb(255 255 255 / 0.06) 0 1px, rgb(0 0 0 / 0.04) 1px 2px, transparent 2px 3px),
+    linear-gradient(100deg, transparent 22%, rgb(255 255 255 / 0.3) 40%, transparent 58%),
+    linear-gradient(180deg, #e6e8eb, #c5c9ce 45%, #b0b4ba 72%, #cdd0d4);
+  box-shadow: inset 0 1px 2px #0005, inset 0 -1px 0 #fff4;
+}
+.rampa .bass-head__engrave {
+  font: 800 8px Arial, sans-serif; letter-spacing: 0.16em; text-transform: uppercase; white-space: nowrap; color: #24262a;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 0.65);
+}
+.rampa .bass-head__jacks { grid-area: jacks; display: flex; gap: 12px; }
+.rampa .bass-head__jack { display: grid; justify-items: center; gap: 6px; }
+.rampa .bass-head__brand { grid-area: brand; display: grid; gap: 6px; justify-items: start; }
+.rampa .bass-head__model { font: 700 10px Arial, sans-serif; letter-spacing: 0.3em; color: #3b3e44; text-shadow: 0 1px 0 rgb(255 255 255 / 0.6); }
+.rampa .bass-head__voices { grid-area: voices; display: flex; justify-content: center; gap: 6px; }
+.rampa .bass-head__voices .amp-btn { min-width: 58px; }
+/* кнопки голосов — гитарные, утоплены в алюминий: кольцо светлее */
+.rampa .bass-head .amp-btn { color: #1f2125; }
+.rampa .bass-head .amp-btn::before { box-shadow: 0 0 0 2px #5d6066, 0 0 0 3px #eef0f2, inset 0 1px 0 #ffffff35, 0 3px 2px #0009; }
+.rampa .bass-head .amp-btn[aria-checked='true']::before { box-shadow: 0 0 0 2px #5d6066, 0 0 0 3px #eef0f2, inset 0 2px 3px #000b; }
+.rampa .bass-head__power .amp-head__state { color: #1f2125; }
+
+/* Синяя полоса — под подписями ручек, во всю ширину панели. */
+.rampa .bass-head__knobs {
+  grid-area: knobs; position: relative; display: flex; justify-content: space-between; align-items: flex-end; gap: 4px;
+  margin: 2px -22px 0; padding: 4px 34px 26px;
+}
+/* полоса — над нижними винтами панели */
+.rampa .bass-head__knobs::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 20px; height: 25px;
+  background: linear-gradient(180deg, #2459a3, #1a4482 60%, #143569);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), inset 0 -1px 0 rgb(0 0 0 / 0.45), 0 -1px 0 rgb(0 0 0 / 0.25);
+}
+.rampa .bass-head__knobs .knob { color: #1f2125; }
+.rampa .bass-head__knobs .knob__label, .rampa .bass-head__ultra .bass-head__engrave {
+  position: relative; color: #f3f6fb; font-size: 9.5px; letter-spacing: 0.12em; text-shadow: 0 1px 0 rgb(0 0 0 / 0.55);
+}
+.rampa .bass-head__ultra { position: relative; display: grid; justify-items: center; align-content: end; gap: 14px; padding-bottom: 1px; }
+
+/* VU: хромированная рамка, кремовая шкала с подсветкой, стрелка */
+.rampa .vu { grid-area: meter; display: block; width: 132px; height: 79px; filter: drop-shadow(1px 3px 3px rgb(0 0 0 / 0.45)); }
+.rampa .vu svg { display: block; width: 100%; height: 100%; }
+.rampa .vu__lit { opacity: 0; transition: opacity 0.3s; }
+.rampa .vu[data-on] .vu__lit { opacity: 1; }
+.rampa .vu[data-on] { filter: drop-shadow(1px 3px 3px rgb(0 0 0 / 0.45)) drop-shadow(0 0 7px rgb(255 190 90 / 0.4)); }
+.rampa .vu__num { font: 700 7px var(--rp-font-mono, monospace); }
+.rampa .vu__name { font: 800 10px Arial, sans-serif; letter-spacing: 0.24em; fill: #2b2117; }
+.rampa .vu__brand { font: 800 5.5px Arial, sans-serif; letter-spacing: 0.22em; fill: #6d5a3d; }
+
+/* галетный переключатель частоты середины */
+.rampa .rotary .knob__dial { cursor: ns-resize; }
+.rampa .rotary__label { font: 700 7.5px var(--rp-font-mono, monospace); fill: #2a2c31; cursor: pointer; }
+.rampa .rotary__dot { fill: #2a2c31; opacity: 0.55; }
+.rampa .rotary__pos[data-on] .rotary__label { fill: #173f7c; }
+.rampa .rotary__pos[data-on] .rotary__dot { fill: #173f7c; opacity: 1; }
+
+/* ——— кабинет 4×10 ——— */
+.rampa .bass-cab {
+  width: 100%; min-width: 0; margin-top: 14px; aspect-ratio: 1.04;
+  padding: 30px 30px 76px; border-radius: 7px 7px 10px 10px;
+}
+.rampa .bass-cab__baffle {
+  position: absolute; inset: 30px 30px 76px; border-radius: 5px; overflow: hidden; background: #0d0d0f;
+  box-shadow: 0 0 0 2px #050505, 0 0 0 4px rgb(214 216 220 / 0.55), 0 0 0 5px #050505;
+}
+.rampa .bass-cab__drivers { position: absolute; inset: 0; display: block; width: 100%; height: 100%; transition: filter 0.3s; }
+.rampa .bass-cab[data-off] .bass-cab__drivers { filter: brightness(0.5) saturate(0.4); }
+.rampa .bass-cab__cap { transform: scale(calc(1 + var(--throw, 0) * 0.07)); }
+/* Перфорированная сталь: отверстия шахматкой (шаг 3 × 2,6), свет сверху, у рамки — тень завальцованного края. */
+.rampa .bass-cab__grille {
+  position: absolute; inset: 0;
+  background:
+    linear-gradient(112deg, transparent 18%, rgb(255 255 255 / 0.07) 30%, transparent 44%),
+    linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 26%, transparent 70%, rgb(0 0 0 / 0.35)),
+    linear-gradient(115deg, #34363b, #1b1c1f 45%, #26282c);
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='8.66'><path fill-rule='evenodd' d='M0 0H10V8.66H0ZM0.8 2.165a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM5.8 2.165a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM-1.7 6.495a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM3.3 6.495a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM8.3 6.495a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0Z'/></svg>") 0 0 / 6px 5.2px;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='8.66'><path fill-rule='evenodd' d='M0 0H10V8.66H0ZM0.8 2.165a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM5.8 2.165a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM-1.7 6.495a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM3.3 6.495a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0ZM8.3 6.495a1.7 1.7 0 1 0 3.4 0a1.7 1.7 0 1 0 -3.4 0Z'/></svg>") 0 0 / 6px 5.2px;
+}
+.rampa .bass-cab__baffle::after {
+  content: ''; position: absolute; inset: 0; border-radius: 5px; pointer-events: none;
+  box-shadow: inset 0 10px 14px -6px rgb(0 0 0 / 0.8), inset 0 -10px 14px -6px rgb(0 0 0 / 0.6),
+    inset 10px 0 14px -8px rgb(0 0 0 / 0.6), inset -10px 0 14px -8px rgb(0 0 0 / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.14);
+}
+.rampa .bass-cab__badge {
+  /* хромированный логотип на стали (PupitreLogo chrome): тень на сетку — в самом знаке */
+  position: absolute; top: 16px; left: 24px; z-index: 1; display: block; height: 40px; width: auto; overflow: visible;
+}
+.rampa .bass-cab__plate {
+  position: absolute; left: 36px; right: 36px; bottom: 14px; height: 48px; z-index: 2; display: flex; align-items: center; gap: 22px;
+  padding: 0 16px; border: 1px solid #484943; border-radius: 3px; background: linear-gradient(105deg, #242523, #111210);
+  box-shadow: 0 1px 0 #ffffff15, inset 0 1px 3px #000;
+}
+.rampa .bass-cab__spec { margin-right: auto; color: #b9b6a7; font: 700 9px/1.5 monospace; letter-spacing: 0.15em; }
+.rampa .bass-cab__switch { display: flex; align-items: center; gap: 10px; }
+.rampa .bass-cab__switch .amp-toggle { width: 34px; height: 34px; }
+.rampa .bass-cab__engrave { color: #b9b6a7; font: 800 8.5px Arial, sans-serif; letter-spacing: 0.16em; }
+.rampa .bass-cab__caster { position: absolute; bottom: -36px; width: 64px; height: 44px; overflow: visible; }
+.rampa .bass-cab__caster--l { left: 64px; }
+.rampa .bass-cab__caster--r { right: 64px; }
+
+@media (max-width: 760px) {
+  .rampa .bass-head__panel { grid-template-columns: auto 1fr auto; grid-template-areas: 'jacks brand power' 'voices voices meter' 'knobs knobs knobs'; }
+  .rampa .bass-head__knobs { flex-wrap: wrap; justify-content: center; gap: 10px 8px; padding-top: 12px; }
+  .rampa .bass-head__knobs::before { top: 0; height: auto; }
+  .rampa .bass-head__knobs .knob { color: #f3f6fb; }
+  .rampa .bass-head__knobs .rotary__label, .rampa .bass-head__knobs .rotary__dot { fill: #f3f6fb; }
+}

@@ -7,17 +7,18 @@
 // одном коммите, и захват не переоткрывается (инв. 21). Уровень сессия опрашивает сама (таймер), шкалы читают его из
 // кадров анимации — состояние входа идёт и там, где шкал нет (игра). Кадры анализа (атаки и высота, время звука на часах
 // страницы) — onInputFrames: у движка — его поток анализа, у браузера — ворклеты на сухом сигнале (вокальное ядро
-// высоты и детектор атак того же алгоритма, что в движке).
+// высоты и детектор атак того же алгоритма, что в движке). Сухой сигнал кусками для записи дублей — onInputAudio: у
+// движка — тот же отвод, что у анализа (record), у браузера — ворклет-отвод.
 import { decodeFrame, FRAME_FLOATS } from '../AudioInput';
 import { stopMic } from '../audioSession';
 import { engineBridge, type EngineApi, type EngineEvent, type EngineMeters, type EngineOpenInfo } from '../engine/EngineBridge';
 import { changedToneParams, toneParams } from '../guitar/tone';
-import { TONE_PROCESSOR_SOURCE } from '../guitar/toneProcessorSource';
+import { addToneWorklet } from '../guitar/toneModule';
 import { PITCH_PROCESSOR_SOURCE } from '../pitchProcessorSource';
 // data-URI, а не ?url: под file:// в Electron fetch ассетов не работает (как WorkletAudioInput)
 import dspWasmDataUri from '../../assets/dsp.wasm?inline';
-import toneWasmDataUri from '../../assets/tone.wasm?inline';
 import { ONSET_PROCESSOR_SOURCE } from './onsetProcessorSource';
+import { TAP_PROCESSOR_SOURCE } from './tapProcessorSource';
 
 /**
  * off — вход не выбран или раздел закрыт; no-signal — дольше 5 с тише порога (и сразу после открытия, пока сигнала не
@@ -201,9 +202,13 @@ interface Capture {
   readonly requestedFrames: number;
   bufferFrames: number;
   xruns: number;
+  /** Умеет ли отдавать сухой сигнал для записи (движок старой сборки — нет). */
+  readonly recordable: boolean;
   /** false — данных ещё нет. */
   measure(raw: Raw): boolean;
   apply(config: InputConfig): void;
+  /** Отдавать ли сухой сигнал в onInputAudio. */
+  record(on: boolean): void;
   latency(): InputLatency;
   close(): void;
 }
@@ -246,9 +251,14 @@ function markEngineDown(reason: string) {
 const listeners = new Set<() => void>();
 const deviceListeners = new Set<() => void>();
 const frameListeners = new Set<(frame: InputFrame) => void>();
+const audioListeners = new Set<(samples: Float32Array, sampleRate: number) => void>();
 
 function emitFrame(frame: InputFrame) {
   for (const fn of frameListeners) fn(frame);
+}
+
+function emitAudio(samples: Float32Array, sampleRate: number) {
+  for (const fn of audioListeners) fn(samples, sampleRate);
 }
 
 /** Кадры анализа открытого входа (подписка переживает переоткрытие и смену бэкенда). */
@@ -256,6 +266,21 @@ export function onInputFrames(fn: (frame: InputFrame) => void): () => void {
   frameListeners.add(fn);
   return () => void frameListeners.delete(fn);
 }
+
+/**
+ * Сухой сигнал открытого входа кусками (запись дублей): моно после выбора канала, до процессора. Пока есть подписка,
+ * бэкенд его отдаёт; подписка переживает переоткрытие (с разрывом на время переоткрытия).
+ */
+export function onInputAudio(fn: (samples: Float32Array, sampleRate: number) => void): () => void {
+  audioListeners.add(fn);
+  if (audioListeners.size === 1) capture?.record(true);
+  return () => {
+    if (audioListeners.delete(fn) && !audioListeners.size) capture?.record(false);
+  };
+}
+
+/** Можно ли записывать с открытого входа. */
+export const inputRecordable = (): boolean => capture?.recordable ?? false;
 
 const level: InputLevel = {
   rmsDb: -Infinity, peakDb: -Infinity, barDb: -Infinity, holdDb: -Infinity, playDb: -Infinity, clipping: false,
@@ -413,9 +438,10 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
     };
     const stopAnalysis = webAnalysis(ctx, pick, inputLatencyMs);
     const tone = webTone(ctx, pick, monitor);
+    const tap = webTap(ctx, pick);
     return {
       backend: 'web', deviceId: settings.deviceId || requestedId || '', label: track.label, outputLabel: '', channels,
-      sampleRate: settings.sampleRate || ctx.sampleRate, requestedFrames: 0, bufferFrames: 0, xruns: 0,
+      sampleRate: settings.sampleRate || ctx.sampleRate, requestedFrames: 0, bufferFrames: 0, xruns: 0, recordable: !!ctx.audioWorklet,
       measure(out) {
         dry.getFloatTimeDomainData(buf);
         let sum = 0;
@@ -444,6 +470,7 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
         monitor.gain.setTargetAtTime(Math.max(0, next.monitorGain), ctx.currentTime, 0.02);
         tone.apply(next.tone);
       },
+      record: tap.record,
       latency() {
         const s = track.getSettings() as { latency?: unknown };
         const out = (ctx.baseLatency || 0) + (ctx.outputLatency || 0);
@@ -453,6 +480,7 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
         unwake();
         stopAnalysis();
         tone.stop();
+        tap.stop();
         for (const t of stream.getTracks()) {
           t.onended = null;
           t.stop();
@@ -473,19 +501,6 @@ function webCapture(stream: MediaStream, track: MediaStreamTrack, requestedId: s
  * Ворклет тона между выбранным каналом и мониторингом. Пока он грузится (или без AudioWorklet — тесты), мониторинг
  * сухой: pick → monitor; готов — pick → тон → monitor, параметры — изменившимися парами.
  */
-let toneModulePromise: Promise<WebAssembly.Module> | null = null;
-
-/** WASM гитарного процессора (tone.wasm из того же ядра; только гитарный чанк); компилируется один раз на страницу. */
-function toneModule(): Promise<WebAssembly.Module> {
-  if (!toneModulePromise) {
-    const bin = atob(toneWasmDataUri.slice(toneWasmDataUri.indexOf(',') + 1));
-    const bytes = new Uint8Array(bin.length);
-    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-    toneModulePromise = WebAssembly.compile(bytes);
-  }
-  return toneModulePromise;
-}
-
 function webTone(ctx: AudioContext, pick: AudioNode, monitor: AudioNode): { apply(params: readonly number[]): void; stop(): void } {
   pick.connect(monitor);
   let node: AudioWorkletNode | null = null;
@@ -500,13 +515,7 @@ function webTone(ctx: AudioContext, pick: AudioNode, monitor: AudioNode): { appl
   };
   if (ctx.audioWorklet)
     void (async () => {
-      const module = await toneModule();
-      const url = URL.createObjectURL(new Blob([TONE_PROCESSOR_SOURCE], { type: 'application/javascript' }));
-      try {
-        await ctx.audioWorklet.addModule(url);
-      } finally {
-        URL.revokeObjectURL(url);
-      }
+      const module = await addToneWorklet(ctx);
       if (stopped) return;
       sent = wanted ?? toneParams(null);
       node = new AudioWorkletNode(ctx, 'pupitre-tone', {
@@ -527,6 +536,59 @@ function webTone(ctx: AudioContext, pick: AudioNode, monitor: AudioNode): { appl
       stopped = true;
       node?.port.close();
       node?.disconnect();
+    },
+  };
+}
+
+// ——— браузер: отвод сухого сигнала для записи ———
+
+/** Ворклет-отвод на выбранном канале: модуль грузится при первой записи, узел подключён, пока запись идёт. */
+function webTap(ctx: AudioContext, pick: AudioNode): { record(on: boolean): void; stop(): void } {
+  let node: AudioWorkletNode | null = null;
+  let loading: Promise<void> | null = null;
+  let wanted = false;
+  let connected = false;
+  let stopped = false;
+  const sync = () => {
+    if (!node || stopped) return;
+    if (wanted && !connected) {
+      node.port.postMessage('reset');
+      pick.connect(node);
+    }
+    if (!wanted && connected) pick.disconnect(node);
+    connected = wanted;
+  };
+  const load = () => {
+    loading ??= (async () => {
+      const url = URL.createObjectURL(new Blob([TAP_PROCESSOR_SOURCE], { type: 'application/javascript' }));
+      try {
+        await ctx.audioWorklet.addModule(url);
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+      if (stopped) return;
+      node = new AudioWorkletNode(ctx, 'pupitre-tap', { numberOfInputs: 1, numberOfOutputs: 0 });
+      node.port.onmessage = (e) => {
+        if (connected && e.data instanceof Float32Array) emitAudio(e.data, ctx.sampleRate);
+      };
+      sync();
+    })().catch(() => {
+      // отвод не завёлся — запись молчит
+    });
+  };
+  return {
+    record(on) {
+      wanted = on;
+      if (on && ctx.audioWorklet) load();
+      sync();
+    },
+    stop() {
+      stopped = true;
+      if (node) {
+        if (connected) pick.disconnect(node);
+        node.port.close();
+      }
+      connected = false;
     },
   };
 }
@@ -676,6 +738,9 @@ async function engineCapture(api: EngineApi, deviceId: string | null, label: str
       emitFrame({ atMs: f[i] / 1000 + clockMs, midi: f[i + 1], clarity: f[i + 2], levelDb: f[i + 3], onset: f[i + 4] === 1 });
     }
   });
+  const offAudio = api.onAudio?.((chunk) => {
+    if (cap && capture === cap && chunk.samples instanceof Float32Array && chunk.sampleRate > 0) emitAudio(chunk.samples, chunk.sampleRate);
+  });
   // процессор движка: при открытии — все параметры, потом — изменившиеся
   let toneSent: readonly number[] | null = null;
   const options = (id: string | null) => {
@@ -703,15 +768,18 @@ async function engineCapture(api: EngineApi, deviceId: string | null, label: str
     offMeters();
     offEvents();
     offFrames();
+    offAudio?.();
     // «не ответил» — движок мог открыться позже: закрыть, чтобы не звучал мониторинг без сессии
     if (/не ответил/.test(errorText(e))) void api.close().catch(() => {});
     throw e;
   });
+  // запись умеет только аддон новой сборки: preload отдаёт onAudio всегда, знает процесс движка
+  const canRecord = !!offAudio && (await api.capabilities?.().catch(() => null))?.record === true;
   const ms = (frames: number) => (frames / info.sampleRate) * 1000;
   const opened: Capture = {
     backend: 'engine', deviceId: info.captureId, label: info.captureLabel, outputLabel: info.playbackLabel, channels: info.captureChannels,
     sampleRate: info.sampleRate,
-    requestedFrames: info.requestedFrames, bufferFrames: info.bufferFrames, xruns: 0,
+    requestedFrames: info.requestedFrames, bufferFrames: info.bufferFrames, xruns: 0, recordable: canRecord,
     measure(out) {
       // сторож: метры движка молчат — его закрыли помимо сессии (главный процесс) — поток кончился
       if (platform.now() - metersAt > ENGINE_SILENT_MS) {
@@ -742,6 +810,9 @@ async function engineCapture(api: EngineApi, deviceId: string | null, label: str
       toneSent = next.tone;
       api.set({ channel: next.channel, monitorGain: next.monitorGain, ...(tone.length ? { tone } : {}) });
     },
+    record(on) {
+      if (canRecord) api.set({ record: on });
+    },
     latency() {
       // свежий отчёт драйвера из метров; до первого пакета — значения открытия
       const m = last as EngineMeters | null;
@@ -753,6 +824,7 @@ async function engineCapture(api: EngineApi, deviceId: string | null, label: str
       offMeters();
       offEvents();
       offFrames();
+      offAudio?.();
       void api.close().catch(() => {});
     },
   };
@@ -824,6 +896,7 @@ async function open(deviceId: string | null, label: string): Promise<void> {
   capture = cap;
   if (cap.backend === 'engine') engineDown = '';
   cap.apply(config);
+  if (audioListeners.size) cap.record(true);
   resetLevel();
   stopTicks = platform.every(TICK_MS, () => tick(platform.now()));
   publish({
@@ -993,6 +1066,7 @@ export function setInputPlatform(next: InputPlatform | null): void {
   listeners.clear();
   deviceListeners.clear();
   frameListeners.clear();
+  audioListeners.clear();
   platform = next ?? browser;
   snapshot = { ...CLOSED, backend: inputBackend() };
 }

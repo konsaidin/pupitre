@@ -1,17 +1,22 @@
 // Тон (гитарный процессор мониторинга) в виде железа: голова усилителя (металлическая панель, крутилки гейна и тонстека,
 // громкость, каналы чистый · кранч · хай-гейн со светодиодами, тумблер питания с лампой), кабинет 4×12 (сетка, уголки,
-// шильдик; выключатель — «без кабинета») и педали гейта, дилея и комнаты (футсвич, светодиод, свои крутилки). Сверху —
-// как слышать себя. Всё пишет settings.tone и применяется на лету (InputSession → JACK-движок или ворклет браузера).
+// шильдик; выключатель — «без кабинета») — или басовый комплект (BassRig.tsx: голова на 4×10) — и педалборд. Сверху —
+// как слышать себя и комплект. Всё пишет settings.tone и применяется на лету (InputSession → JACK-движок или ворклет браузера).
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { AMP_MODELS, DEFAULT_TONE, type AmpModelName, type ToneShape } from '../../../audio/guitar/tone';
 import { t } from '../../../lib/i18n';
 import { HashLink } from '../../HashLink';
 import { useInputSnapshot } from '../../input/useInput';
+import { useInGameSheet } from '../../play/inGame';
 import { updateGuitarSettings, useGuitarSettings } from '../../store/settings';
 import { GuitarIcon } from '../../ui/GuitarIcon';
-import { CarryHandle, Jewel, ToggleSwitch } from './Hardware';
+import { BassRig } from './BassRig';
+import { CarryHandle, Corners, Jewel, Screws, ToggleSwitch } from './Hardware';
 import { Knob } from './Knob';
 import { Pedalboard } from './Pedalboard';
+import { PresetBar } from './PresetBar';
+import { PupitreLogo } from './PupitreLogo';
+import { Recorder, TakeList } from './Recorder';
 import { Tubes } from './Tubes';
 import './tone.css';
 
@@ -20,6 +25,7 @@ const MODEL_UI: Record<AmpModelName, { label: string }> = {
   crunch: { label: 'Crunch' },
   'high-gain': { label: 'High gain' },
 };
+
 const setTone = (patch: Partial<ToneShape>) => updateGuitarSettings((s) => ({ ...s, tone: { ...s.tone, ...patch } }));
 const updateTone = (patch: (tone: ToneShape) => Partial<ToneShape>) => updateGuitarSettings((s) => ({ ...s, tone: { ...s.tone, ...patch(s.tone) } }));
 
@@ -27,22 +33,6 @@ const updateTone = (patch: (tone: ToneShape) => Partial<ToneShape>) => updateGui
 const dial = (v: number) => (v * 10).toFixed(1).replace('.', ',');
 const db = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Math.abs(v).toFixed(v % 1 ? 1 : 0)} ${t('dB')}`;
 const pct = (v: number) => `${Math.round(v * 100)} %`;
-
-/** Винты по углам (позиции — классами: соседние элементы не сбивают раскладку). */
-const Screws = () => (
-  <>
-    {(['tl', 'tr', 'bl', 'br'] as const).map((at, i) => (
-      <i key={at} className={`screw screw--${at}`} style={{ '--turn': `${[18, 72, 131, 47][i]}deg` } as CSSProperties} aria-hidden="true" />
-    ))}
-  </>
-);
-const Corners = ({ small }: { small?: boolean }) => (
-  <>
-    {(['tl', 'tr', 'bl', 'br'] as const).map((at) => (
-      <i key={at} className={`amp-corner amp-corner--${at}${small ? ' amp-corner--sm' : ''}`} aria-hidden="true" />
-    ))}
-  </>
-);
 
 /**
  * Установка рисуется в расчётной ширине (DESIGN_W — ширина головы и кабинета) и масштабируется zoom до ширины страницы,
@@ -72,6 +62,7 @@ export function ToneScreen() {
   const snap = useInputSnapshot();
   const tone = settings.tone;
   const [rigRef, zoom] = useFitZoom();
+  const inGame = useInGameSheet();
   const through = settings.monitoring.mode === 'tone';
   const knob = (id: 'gain' | 'bass' | 'mid' | 'treble' | 'presence', label: string, name: string) => (
     <Knob ui={`tone-${id}`} label={label} name={name} value={tone[id]} min={0} max={1} step={0.01} initial={DEFAULT_TONE[id]} shown={dial(tone[id])} numbers
@@ -85,7 +76,8 @@ export function ToneScreen() {
           <span className="rp-label">{t('Guitar mode')}</span>
           <h1 className="rp-h1">{t('Tone')}</h1>
         </div>
-        <button type="button" className="rp-btn rp-btn--ghost" onClick={() => setTone({ ...DEFAULT_TONE, on: tone.on })} data-ui="tone-reset">
+        <button type="button" className="rp-btn rp-btn--ghost" data-ui="tone-reset"
+          onClick={() => updateGuitarSettings((s) => ({ ...s, tone: { ...DEFAULT_TONE, on: s.tone.on, rig: s.tone.rig }, monitoring: { ...s.monitoring, toneId: undefined } }))}>
           <GuitarIcon name="refresh" size="sm" />
           {t('Reset the sound')}
         </button>
@@ -95,7 +87,7 @@ export function ToneScreen() {
         <p className="tone-note" data-ui="tone-no-input">
           <GuitarIcon name="plug-x" size="sm" />
           {t('No input is chosen — the processor has nothing to process.')}{' '}
-          <HashLink to="/guitar/input">{t('Choose an input')}</HashLink>
+          {inGame ? t('It is chosen in Input and sound.') : <HashLink to="/guitar/input">{t('Choose an input')}</HashLink>}
         </p>
       )}
 
@@ -132,7 +124,10 @@ export function ToneScreen() {
         </span>
       </section>
 
+      <PresetBar tone={tone} toneId={settings.monitoring.toneId} />
+
       <div className="rig" ref={rigRef} style={{ zoom }}>
+        {tone.rig === 'bass' ? <BassRig tone={tone} update={updateTone} /> : (
         <div className="amp" data-on={tone.on || undefined}>
           <section className="amp-head" aria-label={t('Amp')} data-ui="tone-amp">
             <CarryHandle />
@@ -146,7 +141,7 @@ export function ToneScreen() {
               </div>
               <div className="amp-head__brand">
                 <span className="amp-head__badge">
-                  <span className="amp-head__logo">Pupitre</span>
+                  <PupitreLogo finish="chrome" className="amp-head__logo" />
                 </span>
                 <span className="amp-head__model" aria-hidden="true">CUSTOM • 100</span>
               </div>
@@ -186,7 +181,7 @@ export function ToneScreen() {
               {[0, 1, 2, 3].map((i) => (
                 <i key={i} className="amp-cab__cone" aria-hidden="true" />
               ))}
-              <span className="amp-cab__badge">Pupitre</span>
+              <PupitreLogo finish="cream" className="amp-cab__badge" />
             </div>
             <div className="amp-cab__plate">
               <span className="amp-cab__spec" aria-hidden="true">PUPITRE<br />4 × 12</span>
@@ -199,8 +194,11 @@ export function ToneScreen() {
             <i className="amp-cab__foot amp-cab__foot--r" aria-hidden="true" />
           </section>
         </div>
+        )}
         <Pedalboard tone={tone} update={updateTone} />
+        <Recorder inputChosen={settings.input.deviceId !== null} />
       </div>
+      <TakeList />
     </div>
   );
 }

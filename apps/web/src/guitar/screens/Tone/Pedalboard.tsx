@@ -9,6 +9,7 @@ import { boardOf, DEFAULT_TONE, DELAY_MIX_ON, toggleUtility, utilitiesOn, type P
 import { t } from '../../../lib/i18n';
 import { Knob } from './Knob';
 import { AutisticScreamerLogo, HerachiloLogo, KiborgLogo } from './PedalLogos';
+import { PupitreLogo } from './PupitreLogo';
 
 type Item = PedalId | 'loop';
 /** Правка тона от его актуального состояния: события ручек и клавиш приходят быстрее перерисовки. */
@@ -70,7 +71,7 @@ function Pedal(props: { id: PedalId; on: boolean; onToggle: () => void; handle: 
         <button type="button" className="pedal__switch" role="switch" aria-checked={props.on} aria-label={label} onClick={props.onToggle}
           data-ui={`tone-${props.id}-switch`} />
       </span>
-      {props.foot ?? <span className="pedal__brand" aria-hidden="true">Pupitre</span>}
+      {props.foot ?? <PupitreLogo finish="ink" className="pedal__brand" />}
     </div>
   );
 }
@@ -424,7 +425,10 @@ export function Pedalboard({ tone, update }: { tone: ToneShape; update: UpdateTo
         {shown.map((item) => (item === 'loop' ? <LoopBox key="loop" handle={handle('loop')} /> : pedal(item)))}
         <Cables {...wires} />
       </div>
-      <span className="pedalboard__plate" aria-hidden="true">PUPITRE · PEDAL BOARD</span>
+      <span className="pedalboard__plate" aria-hidden="true">
+        <PupitreLogo finish="engraved" className="pedalboard__logo" />
+        <span>PEDAL BOARD</span>
+      </span>
       <p className="pedalboard__hint">
         {t('Pedals move by the nameplate, with the mouse or the arrow keys. The signal runs right to left; pedals past FX LOOP play after the amp.')}
       </p>

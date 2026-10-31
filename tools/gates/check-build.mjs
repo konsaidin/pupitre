@@ -11,10 +11,18 @@ import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const web = join(ROOT, 'apps/web');
-// Модули ядра packages/dsp (npm run build:dsp): анализ и гитарный процессор; пересборка должна дать те же байты.
+// Модули ядра packages/dsp (npm run build:dsp): анализ и гитарный процессор; пересборка должна дать те же байты. Байты
+// зависят от сборки компилятора, не только от версии: 1.95.0 из rustup (официальная) и из пакета дистрибутива (собрана
+// из исходников, другой LLVM) дают разный wasm из одного кода — допустимы известные сборки каждого модуля; в дереве
+// лежит первая (её проверяют и голдены вокала). Новая машина или тулчейн — хэш из сообщения гейта, с пометкой откуда.
 const WASM = {
-  'dsp.wasm': '075376c0928172da203ea1e27436baec210a7537ca873c06ba0adefe906d478b',
-  'tone.wasm': '50ad459050dc75ef39ee3054849eeeefc1a57acf8e103493c03d81d824d5240e',
+  'dsp.wasm': [
+    '075376c0928172da203ea1e27436baec210a7537ca873c06ba0adefe906d478b', // rustup 1.95.0
+    '625cd45ecf17187ced89633b229ee41efe97ebb1ec9419a8fe93962aaedd8671', // rust 1.95.0 openSUSE
+  ],
+  'tone.wasm': [
+    '2a470b38fefc0804d8e88e38b64364aedcbe5502f41368b497c2c9eef616b7f6', // rust 1.95.0 openSUSE
+  ],
 };
 const wasmPath = (name) => join(web, 'src/assets', name);
 const hash = b => createHash('sha256').update(b).digest('hex');
@@ -89,14 +97,14 @@ if (!failure) {
   let backedUp = false;
   try {
     const before = Object.fromEntries(Object.keys(WASM).map((n) => [n, existsSync(wasmPath(n)) ? hash(readFileSync(wasmPath(n))) : 'нет файла']));
-    for (const [name, expected] of Object.entries(WASM))
-      if (before[name] !== expected) throw Error(`${name}: ожидается ${expected}, до сборки ${before[name]}`);
+    for (const [name, known] of Object.entries(WASM))
+      if (!known.includes(before[name])) throw Error(`${name}: ожидается одна из ${known.join(', ')}, до сборки ${before[name]}`);
     backup();
     backedUp = true;
     await run('npm', ['run', 'build:dsp'], web);
-    for (const [name, expected] of Object.entries(WASM)) {
+    for (const [name, known] of Object.entries(WASM)) {
       const actual = hash(readFileSync(wasmPath(name)));
-      if (actual !== expected) throw Error(`${name}: до ${before[name]}, после ${actual}, ожидается ${expected}`);
+      if (!known.includes(actual)) throw Error(`${name}: до ${before[name]}, после ${actual}, ожидается одна из ${known.join(', ')}`);
     }
     await run('npx', ['tsc', '-b'], web);
     await run('npx', ['vite', 'build'], web, { ...process.env, VITE_PUPITRE_GUITAR: '1' });
@@ -106,9 +114,12 @@ if (!failure) {
     if (backedUp) {
       try {
         const changed = restore();
-        // Не оставляем повреждённый вокальный WASM даже после неудачной сборки.
+        // Не оставляем повреждённый вокальный WASM даже после неудачной сборки. Пересборка другим тулчейном в известные
+        // байты того же кода (WASM) — не порча: в дереве снова байты из git, это не провал.
         const wasmChanged = changed.find(line => line.startsWith('dsp.wasm'));
-        if (wasmChanged) failure = `${failure ?? 'Изменён dsp.wasm'}; восстановлен ${wasmChanged}`;
+        const knownBuild = wasmChanged && WASM['dsp.wasm'].some((h) => wasmChanged.startsWith(`dsp.wasm: ${h} ->`));
+        if (wasmChanged && !knownBuild) failure = `${failure ?? 'Изменён dsp.wasm'}; восстановлен ${wasmChanged}`;
+        else if (wasmChanged) console.log(`[check-build] dsp.wasm пересобран известной сборкой другого тулчейна; восстановлен ${wasmChanged}`);
       } catch (e) { failure = `${failure ?? ''}; восстановление: ${e.message} (копия оставлена в ${BACKUP})`; }
     }
   }

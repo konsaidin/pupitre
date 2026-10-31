@@ -1,7 +1,9 @@
 // Гитарный процессор: моно-вход инструмента → педали перед усилителем → усилитель (пред-EQ, два каскада клиппинга с
 // двукратным оверсемплингом, тонстек) → кабинет 4×12 → педали в петле эффектов → громкость. Педали — гейт, скример
 // (овердрайв в духе TS808), фузз, буст, дилей, комната; их порядок и граница петли — параметры (PARAM_SLOT_*,
-// PARAM_LOOP). Одно ядро на JACK-движок (нативно, по сэмплу:
+// PARAM_LOOP). Комплект (PARAM_RIG) — гитара или бас: у баса свои голоса усилителя на тех же каскадах, компрессор одной
+// ручкой до них, Blend с чистым DI, тонстек с выбором частоты середины и Ultra Lo/Hi, кабинет 4×10 с рупором; ручки
+// GAIN/BASS/MID/TREBLE/LEVEL/CAB — общие номера (UI хранит их для каждого комплекта и отдаёт активный). Одно ядро на JACK-движок (нативно, по сэмплу:
 // tick) и AudioWorklet (wasm, блоком: process). Реальное время: все буферы выделяются в new(), tick не аллоцирует;
 // гейны и подмешивания сглаживаются, коэффициенты фильтров пересчитываются в set() (несколько cos/sin — дёшево).
 // Номера параметров (PARAM_*) — контракт с apps/web/src/audio/guitar/tone.ts: меняются только синхронно.
@@ -49,7 +51,23 @@ pub const PARAM_SLOT_0: u32 = 27;
 const PARAM_SLOT_LAST: u32 = PARAM_SLOT_0 + PEDALS as u32 - 1;
 /// Первый слот петли эффектов (0…PEDALS): слоты до него — перед усилителем, с него — после усилителя и кабинета.
 pub const PARAM_LOOP: u32 = 33;
-pub const PARAM_COUNT: u32 = 34;
+/// Комплект: 0 — гитара, 1 — бас. PARAM_MODEL у баса — номер басового голоса (BASS_VOICINGS).
+pub const PARAM_RIG: u32 = 34;
+/// Бас: частота середины — положение переключателя (MID_FREQS: 220 · 450 · 800 · 1 600 · 3 000 Гц).
+pub const PARAM_MID_FREQ: u32 = 35;
+/// Бас: Ultra Lo (подъём 40 Гц и вырез 500 Гц) и Ultra Hi (подъём 8 кГц) — 0/1.
+pub const PARAM_ULTRA_LO: u32 = 36;
+pub const PARAM_ULTRA_HI: u32 = 37;
+/// Бас: доля усилителя против чистого DI (0 — только DI, 1 — только усилитель).
+pub const PARAM_BLEND: u32 = 38;
+/// Бас: компрессор одной ручкой (0 — выключен: порог и степень растут вместе).
+pub const PARAM_COMP: u32 = 39;
+/// Бас: рупор кабинета 4×10 (0/1).
+pub const PARAM_HORN: u32 = 40;
+pub const PARAM_COUNT: u32 = 41;
+
+pub const RIG_GUITAR: u32 = 0;
+pub const RIG_BASS: u32 = 1;
 
 pub const PEDAL_GATE: u32 = 0;
 pub const PEDAL_SCREAMER: u32 = 1;
@@ -168,6 +186,17 @@ impl Smooth {
         self.value = flush(self.target + k * (self.value - self.target));
         self.value
     }
+
+    /// Подмешивание педали (вкл/выкл): у цели — ровно в неё. Простое сглаживание с flush застревает у нуля (≈ 2.5e−23:
+    /// шаг меньше половины кванта flush) — выключенная педаль после включения никогда не уходила в обход.
+    #[inline]
+    fn tick_snap(&mut self, k: f32) -> f32 {
+        let v = self.tick(k);
+        if (v - self.target).abs() < 1e-6 {
+            self.value = self.target;
+        }
+        self.value
+    }
 }
 
 struct Voicing {
@@ -191,6 +220,29 @@ const VOICINGS: [Voicing; 3] = [
     Voicing { tight: 70.0, push: (700.0, 3.0), fizz: 8000.0, gain_db: (12.0, 30.0), stage2: (1.5, 3.0), bias: (0.02, 0.02), scoop: -2.0, makeup_by_gain: false, makeup: 0.35 },
     Voicing { tight: 110.0, push: (800.0, 6.0), fizz: 6500.0, gain_db: (24.0, 42.0), stage2: (4.0, 8.0), bias: (0.01, 0.005), scoop: -5.0, makeup_by_gain: false, makeup: 0.3 },
 ];
+
+/// Басовый голос усилителя: те же каскады, что у гитары, своя настройка. Выход — makeup / g1^makeup_exp (1 — громкость
+/// не зависит от ручки в линейной зоне, 0 — постоянная).
+struct BassVoicing {
+    tight: f32,
+    push: (f32, f32),
+    fizz: f32,
+    gain_db: (f32, f32),
+    stage2: (f32, f32),
+    bias: (f32, f32),
+    makeup: f32,
+    makeup_exp: f32,
+}
+
+/// vintage — ламповый: тёплый, перегрузка с середины ручки; modern — чистый транзисторный, широкая полоса; grit —
+/// перегруз верхней середины (низ держит Blend).
+const BASS_VOICINGS: [BassVoicing; 3] = [
+    BassVoicing { tight: 28.0, push: (500.0, 2.0), fizz: 7000.0, gain_db: (0.0, 26.0), stage2: (1.0, 2.0), bias: (0.04, 0.01), makeup: 1.0, makeup_exp: 0.6 },
+    BassVoicing { tight: 32.0, push: (1200.0, 1.0), fizz: 12000.0, gain_db: (-6.0, 12.0), stage2: (1.0, 1.0), bias: (0.0, 0.0), makeup: 1.0, makeup_exp: 1.0 },
+    BassVoicing { tight: 120.0, push: (900.0, 5.0), fizz: 5500.0, gain_db: (14.0, 36.0), stage2: (2.0, 5.0), bias: (0.01, 0.005), makeup: 0.35, makeup_exp: 0.0 },
+];
+/// Положения переключателя частоты середины баса, Гц.
+pub const MID_FREQS: [f32; 5] = [220.0, 450.0, 800.0, 1600.0, 3000.0];
 
 /// Комната: FDN из 8 линий с матрицей Адамара; длины — взаимно простые 23–65 мс на 44.1 кГц.
 const FDN_LENGTHS: [usize; 8] = [1031, 1327, 1523, 1801, 2063, 2333, 2593, 2879];
@@ -261,6 +313,24 @@ pub struct Tone {
     cab: [Biquad; 5],
     cab_on: bool,
     makeup: Smooth,
+    // бас: комплект, тонстек (бас, середина, верх, Ultra Lo — полка и вырез, Ultra Hi), кабинет 4×10, Blend, постоянная
+    rig: u32,
+    bass_stack: [Biquad; 6],
+    ultra_lo: bool,
+    ultra_hi: bool,
+    bass_cab: [Biquad; 6],
+    bass_dc: Biquad,
+    blend: Smooth,
+    // компрессор баса: огибающая, гейн, порог, наклон (1 − 1/степень), подъём; подмешивание — включение без щелчка
+    comp_env: f32,
+    comp_gain: f32,
+    comp_thr: f32,
+    comp_slope: f32,
+    comp_makeup: f32,
+    comp_mix: Smooth,
+    k_comp_atk: f32,
+    k_comp_rel: f32,
+    k_comp_gain: f32,
     // дилей
     delay: Vec<f32>,
     delay_pos: usize,
@@ -348,6 +418,22 @@ impl Tone {
             ],
             cab_on: true,
             makeup: Smooth::default(),
+            rig: RIG_GUITAR,
+            bass_stack: [Biquad::default(); 6],
+            ultra_lo: false,
+            ultra_hi: false,
+            bass_cab: [Biquad::default(); 6],
+            bass_dc: Biquad::new(Kind::HighPass, 15.0, fs, 0.707, 0.0),
+            blend: Smooth::default(),
+            comp_env: 0.0,
+            comp_gain: 1.0,
+            comp_thr: 1.0,
+            comp_slope: 0.0,
+            comp_makeup: 1.0,
+            comp_mix: Smooth::default(),
+            k_comp_atk: k(0.005),
+            k_comp_rel: k(0.12),
+            k_comp_gain: k(0.002),
             delay: vec![0.0; (DELAY_MAX_S * fs) as usize + 4],
             delay_pos: 0,
             delay_len: 0.0,
@@ -370,7 +456,7 @@ impl Tone {
         // стартовые значения — сразу в цели, без разгона от нуля
         for s in [&mut tone.g1, &mut tone.g2, &mut tone.makeup, &mut tone.delay_mix, &mut tone.room_mix, &mut tone.level,
             &mut tone.scr_gain, &mut tone.scr_level, &mut tone.scr_mix, &mut tone.fz_gain, &mut tone.fz_level, &mut tone.fz_mix,
-            &mut tone.bst_gain, &mut tone.bst_mix] {
+            &mut tone.bst_gain, &mut tone.bst_mix, &mut tone.blend, &mut tone.comp_mix] {
             s.value = s.target;
         }
         tone.delay_len = tone.delay_target;
@@ -387,7 +473,11 @@ impl Tone {
             return;
         }
         let value = match id {
-            PARAM_BYPASS | PARAM_CAB | PARAM_SCREAMER_ON | PARAM_FUZZ_ON | PARAM_BOOST_ON => if value >= 0.5 { 1.0 } else { 0.0 },
+            PARAM_BYPASS | PARAM_CAB | PARAM_SCREAMER_ON | PARAM_FUZZ_ON | PARAM_BOOST_ON | PARAM_ULTRA_LO | PARAM_ULTRA_HI | PARAM_HORN => {
+                if value >= 0.5 { 1.0 } else { 0.0 }
+            }
+            PARAM_RIG => value.round().clamp(0.0, 1.0),
+            PARAM_MID_FREQ => value.round().clamp(0.0, (MID_FREQS.len() - 1) as f32),
             PARAM_SLOT_0..=PARAM_SLOT_LAST => value.round().clamp(0.0, (PEDALS - 1) as f32),
             PARAM_LOOP => value.round().clamp(0.0, PEDALS as f32),
             PARAM_MODEL => value.round().clamp(0.0, (VOICINGS.len() - 1) as f32),
@@ -426,6 +516,16 @@ impl Tone {
             }
             PARAM_SLOT_0..=PARAM_SLOT_LAST => self.reorder(),
             PARAM_LOOP => self.loop_at = value as usize,
+            PARAM_BLEND => self.blend.target = value,
+            PARAM_COMP => {
+                // порог −8…−38 дБ, степень 1.5…8, подъём — половина снятого на пороге
+                let thr_db = -8.0 - 30.0 * value;
+                let ratio = 1.5 + 6.5 * value;
+                self.comp_thr = 10f32.powf(thr_db / 20.0);
+                self.comp_slope = 1.0 - 1.0 / ratio;
+                self.comp_makeup = 10f32.powf(-thr_db * self.comp_slope * 0.5 / 20.0);
+                self.comp_mix.target = if value > 0.0 { 1.0 } else { 0.0 };
+            }
             _ => self.voice(),
         }
     }
@@ -445,9 +545,14 @@ impl Tone {
         self.order = next;
     }
 
-    /// Пересчёт усилителя и тонстека по модели и ручкам.
+    /// Пересчёт усилителя и тонстека по комплекту, модели и ручкам.
     fn voice(&mut self) {
         self.model = self.params[PARAM_MODEL as usize] as usize;
+        self.rig = self.params[PARAM_RIG as usize] as u32;
+        if self.rig == RIG_BASS {
+            self.voice_bass();
+            return;
+        }
         let v = &VOICINGS[self.model];
         let fs = self.fs;
         let params = self.params;
@@ -467,6 +572,100 @@ impl Tone {
         self.stack[1].design(Kind::Peaking, 700.0, fs, 0.7, v.scoop + knob(PARAM_MID, 12.0));
         self.stack[2].design(Kind::HighShelf, 3200.0, fs, 0.707, knob(PARAM_TREBLE, 12.0));
         self.stack[3].design(Kind::Peaking, 3500.0, fs, 0.8, knob(PARAM_PRESENCE, 8.0));
+    }
+
+    /// Басовый усилитель: голос, тонстек и кабинет 4×10 (с рупором — шире вверх, без — срез 4.2 кГц круче).
+    fn voice_bass(&mut self) {
+        let v = &BASS_VOICINGS[self.model];
+        let fs = self.fs;
+        let params = self.params;
+        let p = |id: u32| params[id as usize];
+        let gain = p(PARAM_GAIN);
+        self.pre[0].design(Kind::HighPass, v.tight, fs, 0.707, 0.0);
+        self.pre[1].design(Kind::Peaking, v.push.0, fs, 0.8, v.push.1);
+        self.pre[2].design(Kind::LowPass, v.fizz, fs, 0.707, 0.0);
+        let g1 = 10f32.powf((v.gain_db.0 + (v.gain_db.1 - v.gain_db.0) * gain) / 20.0);
+        self.g1.target = g1;
+        self.g2.target = v.stage2.0 + (v.stage2.1 - v.stage2.0) * gain;
+        self.b1 = v.bias.0;
+        self.b2 = v.bias.1;
+        self.makeup.target = v.makeup / g1.powf(v.makeup_exp);
+        let knob = |id: u32, range: f32| (p(id) - 0.5) * 2.0 * range;
+        let mid = MID_FREQS[p(PARAM_MID_FREQ) as usize];
+        self.ultra_lo = p(PARAM_ULTRA_LO) >= 0.5;
+        self.ultra_hi = p(PARAM_ULTRA_HI) >= 0.5;
+        self.bass_stack[0].design(Kind::LowShelf, 40.0, fs, 0.707, knob(PARAM_BASS, 15.0));
+        self.bass_stack[1].design(Kind::Peaking, mid, fs, 0.9, knob(PARAM_MID, 12.0));
+        self.bass_stack[2].design(Kind::HighShelf, 4500.0, fs, 0.707, knob(PARAM_TREBLE, 15.0));
+        self.bass_stack[3].design(Kind::LowShelf, 40.0, fs, 0.707, 2.0);
+        self.bass_stack[4].design(Kind::Peaking, 500.0, fs, 0.7, -10.0);
+        self.bass_stack[5].design(Kind::HighShelf, 8000.0, fs, 0.707, 9.0);
+        let horn = p(PARAM_HORN) >= 0.5;
+        self.bass_cab[0].design(Kind::HighPass, 38.0, fs, 0.8, 0.0);
+        self.bass_cab[1].design(Kind::Peaking, 90.0, fs, 1.1, 3.0);
+        self.bass_cab[2].design(Kind::Peaking, 400.0, fs, 1.0, -2.5);
+        self.bass_cab[3].design(Kind::Peaking, 2200.0, fs, 1.4, 2.0);
+        if horn {
+            // рупор: верх до 12 кГц, его зона чуть приглушена (аттенюатор рупора)
+            self.bass_cab[4].design(Kind::LowPass, 12000.0, fs, 0.7, 0.0);
+            self.bass_cab[5].design(Kind::Peaking, 6500.0, fs, 0.8, -3.0);
+        } else {
+            self.bass_cab[4].design(Kind::LowPass, 4200.0, fs, 0.75, 0.0);
+            self.bass_cab[5].design(Kind::LowPass, 5500.0, fs, 0.6, 0.0);
+        }
+    }
+
+    /// Компрессор баса: пиковая огибающая (атака 5 мс, спад 120 мс), гейн выше порога — (порог / огибающая)^наклон,
+    /// сглаженный; включение и выключение — подмешиванием. Выключенный забывает огибающую: включение после громкого
+    /// места не давит первую ноту.
+    #[inline]
+    fn comp(&mut self, x: f32) -> f32 {
+        let mix = self.comp_mix.tick_snap(self.k_smooth);
+        if mix <= 0.0 && self.comp_mix.target <= 0.0 {
+            self.comp_env = 0.0;
+            self.comp_gain = 1.0;
+            return x;
+        }
+        let a = x.abs();
+        let k = if a > self.comp_env { self.k_comp_atk } else { self.k_comp_rel };
+        self.comp_env = flush(a + k * (self.comp_env - a));
+        let target = if self.comp_env > self.comp_thr { (self.comp_slope * (self.comp_thr / self.comp_env).ln()).exp() } else { 1.0 };
+        self.comp_gain = flush(target + self.k_comp_gain * (self.comp_gain - target));
+        let y = x * self.comp_gain * self.comp_makeup;
+        x + mix * (y - x)
+    }
+
+    /// Басовый усилитель: компрессор → (пред-EQ, каскады на удвоенной частоте) с Blend чистого DI → тонстек → кабинет.
+    #[inline]
+    fn bass_amp(&mut self, x: f32, k: f32) -> f32 {
+        let clean = self.comp(x);
+        let mut s = clean;
+        for f in &mut self.pre {
+            s = f.tick(s);
+        }
+        let (g1, g2) = (self.g1.tick(k), self.g2.tick(k));
+        let mid = 0.5 * (self.prev + s);
+        self.prev = s;
+        self.stages(mid, g1, g2);
+        let amp = self.stages(s, g1, g2) * self.makeup.tick(k);
+        let blend = self.blend.tick(k);
+        let mut y = self.bass_dc.tick(clean + blend * (amp - clean));
+        for f in &mut self.bass_stack[..3] {
+            y = f.tick(y);
+        }
+        if self.ultra_lo {
+            y = self.bass_stack[3].tick(y);
+            y = self.bass_stack[4].tick(y);
+        }
+        if self.ultra_hi {
+            y = self.bass_stack[5].tick(y);
+        }
+        if self.cab_on {
+            for f in &mut self.bass_cab {
+                y = f.tick(y);
+            }
+        }
+        y
     }
 
     /// Нелинейная часть на удвоенной частоте для одного сэмпла x2.
@@ -508,7 +707,7 @@ impl Tone {
     #[inline]
     fn screamer(&mut self, x: f32) -> f32 {
         let k = self.k_smooth;
-        let mix = self.scr_mix.tick(k);
+        let mix = self.scr_mix.tick_snap(k);
         let (g, level) = (self.scr_gain.tick(k), self.scr_level.tick(k));
         if mix <= 0.0 && self.scr_mix.target <= 0.0 {
             return x;
@@ -538,7 +737,7 @@ impl Tone {
     #[inline]
     fn fuzz(&mut self, x: f32) -> f32 {
         let k = self.k_smooth;
-        let mix = self.fz_mix.tick(k);
+        let mix = self.fz_mix.tick_snap(k);
         let (g, level) = (self.fz_gain.tick(k), self.fz_level.tick(k));
         if mix <= 0.0 && self.fz_mix.target <= 0.0 {
             return x;
@@ -557,7 +756,7 @@ impl Tone {
     #[inline]
     fn boost(&mut self, x: f32) -> f32 {
         let k = self.k_smooth;
-        let mix = self.bst_mix.tick(k);
+        let mix = self.bst_mix.tick_snap(k);
         let g = self.bst_gain.tick(k);
         if mix <= 0.0 && self.bst_mix.target <= 0.0 {
             return x;
@@ -590,7 +789,7 @@ impl Tone {
         for &id in &order[..self.loop_at] {
             s = self.pedal(id, s);
         }
-        s = self.amp(s, k);
+        s = if self.rig == RIG_BASS { self.bass_amp(s, k) } else { self.amp(s, k) };
         for &id in &order[self.loop_at..] {
             s = self.pedal(id, s);
         }
@@ -683,8 +882,9 @@ impl Tone {
     }
 }
 
-/// Звук по умолчанию: хай-гейн с кабинетом, гейт −60 дБ, скример, фузз и буст выключены, без дилея, лёгкая комната;
-/// фузз, скример, буст и гейт — перед усилителем, дилей и комната — в петле.
+/// Звук по умолчанию: гитара, хай-гейн с кабинетом, гейт −60 дБ, скример, фузз и буст выключены, без дилея, лёгкая
+/// комната; фузз, скример, буст и гейт — перед усилителем, дилей и комната — в петле. Бас (когда выбран): середина
+/// 800 Гц, без Ultra, только усилитель (Blend 1), без компрессора, с рупором.
 pub const DEFAULTS: [(u32, f32); PARAM_COUNT as usize] = [
     (PARAM_BYPASS, 0.0),
     (PARAM_MODEL, 2.0),
@@ -720,6 +920,13 @@ pub const DEFAULTS: [(u32, f32); PARAM_COUNT as usize] = [
     (PARAM_SLOT_0 + 4, PEDAL_DELAY as f32),
     (PARAM_SLOT_0 + 5, PEDAL_ROOM as f32),
     (PARAM_LOOP, 4.0),
+    (PARAM_RIG, RIG_GUITAR as f32),
+    (PARAM_MID_FREQ, 2.0),
+    (PARAM_ULTRA_LO, 0.0),
+    (PARAM_ULTRA_HI, 0.0),
+    (PARAM_BLEND, 1.0),
+    (PARAM_COMP, 0.0),
+    (PARAM_HORN, 1.0),
 ];
 
 #[cfg(test)]
@@ -958,6 +1165,134 @@ mod tests {
         a.process(&mut x);
         b.process(&mut y);
         assert_eq!(x, y);
+    }
+
+    /// Бас-комплект с чистым голосом, без комнаты и гейта; extra — поверх.
+    fn bass_rig(extra: &[(u32, f32)]) -> Tone {
+        let mut t = Tone::new(FS);
+        for &(id, v) in [(PARAM_RIG, 1.0), (PARAM_MODEL, 1.0), (PARAM_GAIN, 0.3), (PARAM_ROOM_MIX, 0.0), (PARAM_GATE, -120.0)].iter().chain(extra) {
+            t.set(id, v);
+        }
+        t
+    }
+    fn level(t: &mut Tone, hz: f32, amp: f32) -> f32 {
+        let mut y = sine(hz, 0.6, amp);
+        t.process(&mut y);
+        bin(&y[14400..], hz)
+    }
+
+    #[test]
+    fn bass_rig_keeps_the_low_end_the_guitar_rig_cuts() {
+        // нижнее E баса (41 Гц): гитарный кабинет и пред-EQ его режут, басовые — пропускают
+        let mut guitar = Tone::new(FS);
+        for (id, v) in [(PARAM_MODEL, 0.0), (PARAM_GAIN, 0.3), (PARAM_ROOM_MIX, 0.0), (PARAM_GATE, -120.0)] {
+            guitar.set(id, v);
+        }
+        let (g, b) = (level(&mut guitar, 41.2, 0.05), level(&mut bass_rig(&[]), 41.2, 0.05));
+        assert!(b > 2.5 * g, "бас на 41 Гц: {b} против гитары {g}");
+    }
+
+    #[test]
+    fn mid_frequency_switch_moves_the_mid_peak() {
+        let at = |pos: f32, hz: f32| level(&mut bass_rig(&[(PARAM_MID, 1.0), (PARAM_MID_FREQ, pos), (PARAM_CAB, 0.0)]), hz, 0.01);
+        assert!(at(0.0, 220.0) > 2.0 * at(4.0, 220.0), "220 Гц: {} против {}", at(0.0, 220.0), at(4.0, 220.0));
+        assert!(at(4.0, 3000.0) > 2.0 * at(0.0, 3000.0), "3 кГц: {} против {}", at(4.0, 3000.0), at(0.0, 3000.0));
+    }
+
+    #[test]
+    fn bass_compressor_evens_out_loud_and_quiet() {
+        let spread = |comp: f32| {
+            let loud = level(&mut bass_rig(&[(PARAM_COMP, comp), (PARAM_GAIN, 0.0)]), 110.0, 0.5);
+            let quiet = level(&mut bass_rig(&[(PARAM_COMP, comp), (PARAM_GAIN, 0.0)]), 110.0, 0.05);
+            20.0 * (loud / quiet).log10()
+        };
+        let (off, on) = (spread(0.0), spread(1.0));
+        assert!((off - 20.0).abs() < 2.0, "без компрессора — те же 20 дБ: {off}");
+        assert!(on < 12.0, "с компрессором разница меньше: {on}");
+    }
+
+    #[test]
+    fn compressor_switched_off_while_playing_loud_forgets_it() {
+        // выключили посреди громкой игры, через полсекунды тишины включили — тихая нота как у компрессора, который до
+        // этого не включался (оба прогреты одинаково: параметры усилителя доехали до басовых)
+        let run = |on_at_start: bool| {
+            let mut t = bass_rig(&[(PARAM_GAIN, 0.0), (PARAM_COMP, if on_at_start { 1.0 } else { 0.0 })]);
+            let mut loud = sine(110.0, 0.3, 0.8);
+            t.process(&mut loud);
+            t.set(PARAM_COMP, 0.0);
+            let mut still_loud = sine(110.0, 1.2, 0.8);
+            t.process(&mut still_loud);
+            let mut gap = vec![0.0; 24000];
+            t.process(&mut gap);
+            t.set(PARAM_COMP, 1.0);
+            let mut first = sine(110.0, 0.2, 0.05);
+            t.process(&mut first);
+            rms(&first[1200..4800])
+        };
+        let (a, b) = (run(true), run(false));
+        assert!((a / b - 1.0).abs() < 0.05, "первая нота после включения: {a} против {b}");
+    }
+
+    #[test]
+    fn pedals_switched_off_go_back_to_bypass() {
+        let mut t = clean_rig(&[(PARAM_SCREAMER_ON, 1.0), (PARAM_FUZZ_ON, 1.0), (PARAM_BOOST_ON, 1.0), (PARAM_RIG, 1.0), (PARAM_COMP, 0.5)]);
+        let mut y = sine(220.0, 0.2, 0.1);
+        t.process(&mut y);
+        for id in [PARAM_SCREAMER_ON, PARAM_FUZZ_ON, PARAM_BOOST_ON, PARAM_COMP] {
+            t.set(id, 0.0);
+        }
+        let mut z = sine(220.0, 0.3, 0.1);
+        t.process(&mut z);
+        assert_eq!([t.scr_mix.value, t.fz_mix.value, t.bst_mix.value, t.comp_mix.value], [0.0; 4]);
+        assert_eq!([t.comp_env, t.comp_gain], [0.0, 1.0]);
+    }
+
+    #[test]
+    fn blend_zero_keeps_the_grit_voice_clean() {
+        let thd = |blend: f32| {
+            let mut t = bass_rig(&[(PARAM_MODEL, 2.0), (PARAM_GAIN, 1.0), (PARAM_BLEND, blend), (PARAM_CAB, 0.0)]);
+            let mut y = sine(110.0, 0.6, 0.2);
+            t.process(&mut y);
+            let body = &y[14400..];
+            bin(body, 330.0) / bin(body, 110.0)
+        };
+        assert!(thd(0.0) < 0.02, "только DI — чисто: {}", thd(0.0));
+        assert!(thd(1.0) > 0.1, "только усилитель — перегруз: {}", thd(1.0));
+    }
+
+    #[test]
+    fn horn_adds_the_top_end() {
+        let at = |horn: f32| level(&mut bass_rig(&[(PARAM_HORN, horn)]), 8000.0, 0.01);
+        assert!(at(1.0) > 3.0 * at(0.0), "8 кГц с рупором: {} без: {}", at(1.0), at(0.0));
+    }
+
+    #[test]
+    fn guitar_rig_ignores_bass_only_params_bit_exact() {
+        let mut a = Tone::new(FS);
+        let mut b = Tone::new(FS);
+        for (id, v) in [(PARAM_MID_FREQ, 0.0), (PARAM_ULTRA_LO, 1.0), (PARAM_ULTRA_HI, 1.0), (PARAM_BLEND, 0.2), (PARAM_COMP, 0.8), (PARAM_HORN, 0.0)] {
+            b.set(id, v);
+        }
+        let (mut x, mut y) = (sine(196.0, 0.2, 0.2), sine(196.0, 0.2, 0.2));
+        a.process(&mut x);
+        b.process(&mut y);
+        assert_eq!(x, y);
+    }
+
+    #[test]
+    fn switching_rigs_stays_finite_and_back_to_guitar_is_the_same_voice() {
+        let mut t = Tone::new(FS);
+        let mut y = sine(82.4, 0.3, 0.3);
+        t.process(&mut y);
+        t.set(PARAM_RIG, 1.0);
+        t.set(PARAM_COMP, 0.7);
+        let mut z = sine(82.4, 0.3, 0.3);
+        t.process(&mut z);
+        t.set(PARAM_RIG, 0.0);
+        let mut w = sine(82.4, 0.3, 0.3);
+        t.process(&mut w);
+        assert!(y.iter().chain(&z).chain(&w).all(|v| v.is_finite() && v.abs() < 4.0));
+        assert_eq!(t.rig, RIG_GUITAR);
     }
 
     #[test]

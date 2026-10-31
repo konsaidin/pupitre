@@ -1,6 +1,7 @@
 // ELECTRON + нативный движок (этап 41): аддон packages/engine через мост preload (--pupitre-engine), JACK этой машины
 // (у PipeWire — pipewire-jack); production-сборка веба, file://. Мониторинг выключен — на выходе тишина.
-// 1) Самопроверка без устройств: петля внутри графа — задержка щелчков ровно один квант при 64, 128 и 256 кадрах.
+// 1) Самопроверка без устройств: петля внутри графа — задержка щелчков ровно один квант при 64, 128 и 256 кадрах;
+//    открытие со всеми параметрами процессора (их больше 32 пар) и запись дубля — сухой сигнал кусками в onAudio.
 // 2) «Вход и звук» на движке: бэкенд engine, устройства — клиенты JACK; выбранный вход открыт; задержка — отчёт драйвера
 //    (при 128 кадрах — меньше 20 мс туда-обратно); буфер 64 переоткрывает движок с квантом 64; 0 срывов.
 // 3) Игра с оценкой на движке: демо-песня, кадры анализа движка идут в страницу, судья выносит вердикты (вход молчит —
@@ -57,6 +58,33 @@ const OPEN = `['ok', 'no-signal', 'clipping'].includes(document.querySelector('[
       if (r.quantum !== buffer) throw new Error(`квант ${r.quantum}, запрошен ${buffer}`);
       if (r.rtl.misses || r.rtl.delaysFrames.length !== 6 || r.rtl.delaysFrames.some((d) => d !== buffer)) throw new Error(`задержка петли не равна кванту: ${JSON.stringify(r.rtl)}`);
     }
+
+    // 1b. Все параметры процессора при открытии и запись дубля: куски сухого сигнала ≈ 100 мс, частота сессии.
+    const rec = await g.run(`(async () => {
+      const tone = [];
+      for (let id = 0; id < 41; id++) tone.push(id, id === 0 ? 1 : 0.5);
+      const info = await window.pupitreEngine.open({ capture: null, playback: null, channel: 0, bufferFrames: 128, monitorGain: 0, loopback: true, tone });
+      if (!window.pupitreEngine.onAudio) return { missing: true };
+      const caps = await window.pupitreEngine.capabilities();
+      const chunks = [];
+      const off = window.pupitreEngine.onAudio((a) => chunks.push({ rate: a.sampleRate, n: a.samples.length, typed: a.samples instanceof Float32Array }));
+      window.pupitreEngine.set({ record: true });
+      await new Promise((resolve) => setTimeout(resolve, 800));
+      window.pupitreEngine.set({ record: false });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      const after = chunks.length;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      off();
+      await window.pupitreEngine.close();
+      return { rate: info.sampleRate, chunks, after, later: chunks.length, caps };
+    })()`);
+    if (rec.missing) throw new Error('у моста движка нет onAudio — аддон старой сборки');
+    if (rec.caps?.record !== true) throw new Error(`процесс движка не знает про отвод записи: ${JSON.stringify(rec.caps)}`);
+    const got = rec.chunks.reduce((n, c) => n + c.n, 0);
+    console.log(`запись на движке: ${rec.chunks.length} кусков, ${got} сэмплов (${(got / rec.rate).toFixed(2)} с при ${rec.rate} Гц)`);
+    if (!rec.chunks.length || rec.chunks.some((c) => c.rate !== rec.rate || !c.typed)) throw new Error(`куски записи: ${JSON.stringify(rec.chunks.slice(0, 3))}`);
+    if (got / rec.rate < 0.5 || got / rec.rate > 1.3) throw new Error(`записано ${got / rec.rate} с за 0.8 с`);
+    if (rec.later !== rec.after) throw new Error('после record: false куски продолжают идти');
 
     // 2. Экран входа на движке.
     await g.run(`location.hash = '#/guitar/input'`);

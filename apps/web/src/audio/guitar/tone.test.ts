@@ -1,9 +1,11 @@
 // Процессор на настоящем tone.wasm: номера параметров TS совпадают с ядром (обход — бит в бит, чистый без гейна —
-// почти линеен, хай-гейн — гармоники); изменения уходят парами только для изменившихся параметров.
+// почти линеен, хай-гейн — гармоники, бас-комплект держит низ); изменения уходят парами только для изменившихся
+// параметров; тон из чужих данных (импорт пресета) — в пределах ручек.
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
-  boardOf, changedToneParams, DEFAULT_TONE, DELAY_MIX_ON, GATE_OFF_DB, toggleUtility, TONE_PARAM, TONE_PARAM_COUNT, toneParams, utilitiesOn, type ToneShape,
+  boardOf, changedToneParams, DEFAULT_TONE, DELAY_MIX_ON, GATE_OFF_DB, toggleUtility, toneKey, toneOf, TONE_PARAM, TONE_PARAM_COUNT, toneParams,
+  toneWith, utilitiesOn, type ToneShape,
 } from './tone';
 
 interface ToneDsp {
@@ -108,6 +110,38 @@ describe('процессор на tone.wasm', () => {
     const on = (await run({ ...quiet, screamer: { on: true, drive: 1, tone: 1, level: 0.5 } }, sine(440, 0.5, 0.05))).subarray(6000, 18000);
     expect(bin(off, 1320) / bin(off, 440)).toBeLessThan(0.01);
     expect(bin(on, 1320) / bin(on, 440)).toBeGreaterThan(0.03);
+  });
+
+  it('бас-комплект: ручки басовой головы — по общим номерам, нижнее E баса проходит, громкость — как у гитары', async () => {
+    const bass = toneWith({ rig: 'bass', room: 0, gateOn: false, bassAmp: { model: 'modern', gain: 0.3, treble: 0.8, midFreq: 4, comp: 0.4 } });
+    const p = toneParams(bass);
+    expect([p[TONE_PARAM.rig], p[TONE_PARAM.model], p[TONE_PARAM.gain], p[TONE_PARAM.treble], p[TONE_PARAM.midFreq], p[TONE_PARAM.comp]])
+      .toEqual([1, 1, 0.3, 0.8, 4, 0.4]);
+    // ручки гитарной головы в басе не участвуют, но хранятся
+    expect(bass.treble).toBe(DEFAULT_TONE.treble);
+    // наклон спектра (41 Гц против 164 Гц того же комплекта) не зависит от громкости голоса: гитарный низ режет
+    const guitar = toneWith({ room: 0, gateOn: false, model: 'clean', gain: 0.3 });
+    const at = async (tone: ToneShape, hz: number) => bin((await run(tone, sine(hz, 0.6, 0.05))).subarray(14400), hz);
+    const tilt = async (tone: ToneShape) => (await at(tone, 41.2)) / (await at(tone, 164.8));
+    expect(await tilt(bass)).toBeGreaterThan(2.5 * (await tilt(guitar)));
+    // ламповый бас на ре струне — та же громкость, что гитарный кранч, ± 9 дБ
+    const rms = (x: Float32Array) => Math.sqrt(x.reduce((s, v) => s + v * v, 0) / x.length);
+    const loud = async (tone: ToneShape) => rms((await run(tone, sine(73.4, 0.6, 0.2))).subarray(14400));
+    const db = 20 * Math.log10((await loud(toneWith({ rig: 'bass', room: 0, gateOn: false }))) / (await loud(toneWith({ model: 'crunch', room: 0, gateOn: false }))));
+    expect(Math.abs(db)).toBeLessThan(9);
+  });
+
+  it('тон из чужих данных: поля своего типа и в пределах ручек, мусор — по умолчанию; ключ звучания без питания', () => {
+    const t = toneOf({ rig: 'drums', model: 'high-gain', gain: 7, levelDb: -99, delay: { ms: 5, mix: 'x' }, boost: { levels: [2, -1] },
+      bassAmp: { model: 'grit', midFreq: 9.4, horn: 'yes' }, extra: { evil: true } });
+    expect(t.rig).toBe('guitar');
+    expect([t.gain, t.levelDb, t.delay.ms, t.delay.mix]).toEqual([1, -24, 20, DEFAULT_TONE.delay.mix]);
+    expect(t.boost.levels).toEqual([1, 0, 0.5, 0.5]);
+    expect([t.bassAmp.model, t.bassAmp.midFreq, t.bassAmp.horn]).toEqual(['grit', 4, true]);
+    expect('extra' in t).toBe(false);
+    expect(toneOf(null)).toEqual(DEFAULT_TONE);
+    expect(toneKey({ ...DEFAULT_TONE, on: false })).toBe(toneKey(DEFAULT_TONE));
+    expect(toneKey({ ...DEFAULT_TONE, gain: 0.51 })).not.toBe(toneKey(DEFAULT_TONE));
   });
 
   it('параметры по номерам; изменения — только изменившиеся пары', () => {

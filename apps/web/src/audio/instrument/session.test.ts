@@ -8,15 +8,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../audioSession', () => ({ stopMic: vi.fn() }));
 
 import { changedToneParams, DEFAULT_TONE, TONE_PARAM, toneParams } from '../guitar/tone';
-import type { EngineApi, EngineEvent, EngineFrames, EngineMeters, EngineOpenOptions } from '../engine/EngineBridge';
+import type { EngineApi, EngineEvent, EngineFrames, EngineMeters, EngineOpenOptions, EngineAudio } from '../engine/EngineBridge';
 import {
   acquireInput,
   configureInput,
   getInputSnapshot,
+  inputRecordable,
   listInputDevices,
   measureNoise,
   onDevicesChange,
   readLatency,
+  onInputAudio,
   onInputFrames,
   readLevel,
   requestInput,
@@ -25,6 +27,7 @@ import {
   type InputFrame,
   type InputPlatform,
 } from './session';
+import { startRecording } from '../guitar/recorder';
 
 class FakeNode {
   channelCount = 2;
@@ -115,6 +118,7 @@ function fakeEngine() {
   const meters = new Set<(m: EngineMeters) => void>();
   const events = new Set<(e: EngineEvent) => void>();
   const frames = new Set<(f: EngineFrames) => void>();
+  const audio = new Set<(a: EngineAudio) => void>();
   const e = {
     devices: {
       capture: [{ id: 'USB AUDIO CODEC', label: 'USB AUDIO CODEC', channels: 2 }],
@@ -153,6 +157,17 @@ function fakeEngine() {
       frames.add(fn);
       return () => void frames.delete(fn);
     },
+    onAudio(fn: (a: EngineAudio) => void) {
+      audio.add(fn);
+      return () => void audio.delete(fn);
+    },
+    /** Аддон умеет отвод записи (false — старый .node при новом preload). */
+    canRecord: true,
+    capabilities: async () => ({ record: e.canRecord }),
+    /** Кусок сухого сигнала записи. */
+    audio(samples: number[], sampleRate = 48000) {
+      for (const fn of [...audio]) fn({ sampleRate, samples: Float32Array.from(samples) });
+    },
     /** Пакет кадров: [время мкс, midi, чистота, уровень, атака] по каждому. */
     frames(nowUs: number, rows: number[][]) {
       for (const fn of [...frames]) fn({ nowUs, frames: Float64Array.from(rows.flat()) });
@@ -165,7 +180,7 @@ function fakeEngine() {
       for (const fn of [...events]) fn(ev);
     },
     get listeners() {
-      return meters.size + events.size + frames.size;
+      return meters.size + events.size + frames.size + audio.size;
     },
   };
   return e satisfies EngineApi;
@@ -718,6 +733,63 @@ describe('нативный движок', () => {
     expect(got[1]).toMatchObject({ onset: false, midi: 52.1, clarity: 0.9, levelDb: -24 });
     expect(got[1].atMs).toBeCloseTo(1010 + 5000.5, 6);
     off();
+    release();
+  });
+
+  it('запись дубля: подписка включает отвод движка, куски идут слушателям, отписка выключает; переоткрытие — снова включён', async () => {
+    const engine = (p.engineApi = fakeEngine());
+    configureInput(engineInput());
+    const release = acquireInput();
+    await task();
+    expect(inputRecordable()).toBe(true);
+    const rec = startRecording();
+    expect(engine.sets.at(-1)).toEqual({ record: true });
+    engine.audio([0.1, -0.5, 0.25]);
+    engine.audio([0.2, 0.2], 48000);
+    // чужая частота посреди записи (переоткрытие на другой) — мимо
+    engine.audio([0.9, 0.9, 0.9], 44100);
+    expect(rec.seconds()).toBeCloseTo(5 / 48000, 9);
+    const take = rec.stop();
+    expect(engine.sets.at(-1)).toEqual({ record: false });
+    expect(take?.sampleRate).toBe(48000);
+    expect(Array.from(take?.samples ?? [])).toEqual([0.1, -0.5, 0.25, 0.2, 0.2].map(Math.fround));
+    expect(take?.peak).toBe(0.5);
+    // подписка до переоткрытия: открытие само включает отвод
+    const off = onInputAudio(() => {});
+    configureInput(engineInput({ bufferFrames: 256 }));
+    await task();
+    expect(engine.opened).toHaveLength(2);
+    expect(engine.sets.filter((o) => 'record' in o).at(-1)).toEqual({ record: true });
+    off();
+    release();
+    await task();
+    expect(engine.listeners).toBe(0);
+  });
+
+  it('десктоп старой сборки (нет отвода в мосте) и старый аддон при новом мосте — запись недоступна, вход работает', async () => {
+    const old = fakeEngine() as Partial<ReturnType<typeof fakeEngine>>;
+    delete old.onAudio;
+    delete old.capabilities;
+    p.engineApi = old as ReturnType<typeof fakeEngine>;
+    configureInput(engineInput());
+    let release = acquireInput();
+    await task();
+    expect(getInputSnapshot().backend).toBe('engine');
+    expect(inputRecordable()).toBe(false);
+    expect(startRecording().stop()).toBeNull();
+    release();
+    await task();
+    const stale = (p.engineApi = fakeEngine());
+    stale.canRecord = false;
+    configureInput(engineInput());
+    release = acquireInput();
+    await task();
+    expect(inputRecordable()).toBe(false);
+    const rec = startRecording();
+    // чужой кусок с нулевой частотой (хвост после остановки сервера) — мимо
+    stale.audio([0.5], 0);
+    expect(rec.stop()).toBeNull();
+    expect(stale.sets.some((o) => 'record' in o)).toBe(false);
     release();
   });
 

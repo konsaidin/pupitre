@@ -10,6 +10,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProp
 import { onInputFrames } from '../../../audio/instrument/session';
 import { currentLang, t } from '../../../lib/i18n';
 import { HashLink } from '../../HashLink';
+import { useInGameSheet } from '../../play/inGame';
 import { count } from '../../i18n';
 import { inputOpen, noiseKeyOf, pillView } from '../../input/inputView';
 import { useInputSnapshot } from '../../input/useInput';
@@ -354,6 +355,7 @@ function TunerBody({ opening }: { opening: boolean }) {
 export function TunerScreen() {
   const [settings] = useGuitarSettings();
   const snap = useInputSnapshot();
+  const inGame = useInGameSheet();
   const chosen = settings.input.deviceId !== null;
   // выбранный вход открывается (off — до первого открытия) или открыт — тюнер; не открылся — почему и куда идти
   const working = chosen && (inputOpen(snap.state) || snap.state === 'opening' || snap.state === 'off');
@@ -372,10 +374,12 @@ export function TunerScreen() {
         <h1 className="rp-h1">{t('Tuner')}</h1>
         {chosen && <span className="rp-chip rp-chip--warn rp-chip--dot">{pill.name}</span>}
         <p>{chosen ? pill.title : t('The tuner listens to the instrument input. Choose it in Input and sound.')}</p>
-        <HashLink className="rp-btn rp-btn--light" to="/guitar/input" data-ui="tuner-to-input">
-          <GuitarIcon name="plug-connected" size="sm" />
-          {t('Input and sound')}
-        </HashLink>
+        {!inGame && (
+          <HashLink className="rp-btn rp-btn--light" to="/guitar/input" data-ui="tuner-to-input">
+            <GuitarIcon name="plug-connected" size="sm" />
+            {t('Input and sound')}
+          </HashLink>
+        )}
       </div>
     </div>
   );

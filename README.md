@@ -30,8 +30,14 @@ interface is available in English and Russian.
   engine (JACK/PipeWire, ≈ 7 ms round trip).
 - Tuner: chromatic or by string, tuning presets (Standard, Drop D, D Standard, E♭, Drop C, 7-string, 4- and 5-string
   bass), adjustable A4; the measured tuning is saved.
-- "Tone": a processor for hearing yourself — amp (clean, crunch, high gain), tone stack, 4×12 cabinet, noise gate,
-  delay and room. One Rust core (`packages/dsp`) runs in the native engine and in the browser (WebAssembly).
+- "Tone": a processor for hearing yourself — a guitar rig (clean, crunch and high-gain amp, tone stack, 4×12 cabinet)
+  or a bass rig (vintage, modern and grit voicings, compressor, DI blend, mid-frequency switch, Ultra Lo/Hi, 4×10
+  cabinet with a horn), and a pedalboard you can rearrange: fuzz, overdrive, boost, noise gate, delay, room, with an
+  effects loop. One Rust core (`packages/dsp`) runs in the native engine and in the browser (WebAssembly).
+- Tone presets: built-in ones for guitar and bass, your own (save, rename, delete), export and import as JSON.
+- Recorder: records the clean guitar signal; listen to a take with the current tone (turn the knobs while it plays —
+  re-amping), with the tone it was recorded with, or dry; export to WAV (24-bit).
+- Tone and Tuner open on top of a paused song — the song keeps its place and score.
 
 ## Download
 

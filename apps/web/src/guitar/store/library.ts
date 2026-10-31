@@ -17,6 +17,7 @@ export const renderBacking = async (req: RenderRequest) => {
 let library: Promise<GuitarRepo> | null = null;
 
 export function guitarLibrary(): Promise<GuitarRepo> {
-  library ??= openGuitarDB().then((db) => createRepo(db, parser));
+  // соединение закрыто ради обновления схемы в другой вкладке — следующее обращение откроет новое
+  library ??= openGuitarDB(undefined, () => (library = null)).then((db) => createRepo(db, parser));
   return library;
 }

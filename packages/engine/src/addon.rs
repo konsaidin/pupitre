@@ -7,12 +7,12 @@
 use std::sync::{Arc, Mutex, OnceLock};
 use std::time::Duration;
 
-use napi::bindgen_prelude::{AsyncTask, Float64Array};
+use napi::bindgen_prelude::{AsyncTask, Float32Array, Float64Array};
 use napi::threadsafe_function::{ErrorStrategy, ThreadsafeFunction, ThreadsafeFunctionCallMode};
 use napi::{Env, Error, JsFunction, Result, Task};
 use napi_derive::napi;
 
-use crate::engine::{DeviceList, Engine, EventOut, FramesOut, MeterOut, OpenInfo, Pending, RtlOut, SetOptions, Sink, Status};
+use crate::engine::{AudioOut, DeviceList, Engine, EventOut, FramesOut, MeterOut, OpenInfo, Pending, RtlOut, SetOptions, Sink, Status};
 use crate::io::jack::{self, EngineError, OpenOptions};
 
 #[napi(object)]
@@ -63,6 +63,8 @@ pub struct JsSetOptions {
     pub mute: Option<bool>,
     /// Изменённые параметры процессора плоскими парами: номер, значение…
     pub tone: Option<Vec<f64>>,
+    /// Запись дубля: сухой сигнал кусками в onAudio.
+    pub record: Option<bool>,
 }
 
 /// Плоские пары «номер, значение» → пары; нечётный хвост и нечисла отбрасываются.
@@ -119,6 +121,13 @@ pub struct JsFrames {
     pub frames: Float64Array,
 }
 
+/// Кусок сухого сигнала записи дубля.
+#[napi(object)]
+pub struct JsAudio {
+    pub sample_rate: u32,
+    pub samples: Float32Array,
+}
+
 #[napi(object)]
 pub struct JsAvailable {
     pub ok: bool,
@@ -132,6 +141,7 @@ struct TsfnSink {
     meters: Mutex<Option<Tsfn<MeterOut>>>,
     events: Mutex<Option<Tsfn<EventOut>>>,
     frames: Mutex<Option<Tsfn<FramesOut>>>,
+    audio: Mutex<Option<Tsfn<AudioOut>>>,
 }
 
 impl Sink for TsfnSink {
@@ -150,6 +160,12 @@ impl Sink for TsfnSink {
     fn frames(&self, frames: FramesOut) {
         if let Some(f) = self.frames.lock().unwrap().as_ref() {
             f.call(frames, ThreadsafeFunctionCallMode::NonBlocking);
+        }
+    }
+
+    fn audio(&self, audio: AudioOut) {
+        if let Some(f) = self.audio.lock().unwrap().as_ref() {
+            f.call(audio, ThreadsafeFunctionCallMode::NonBlocking);
         }
     }
 }
@@ -309,6 +325,7 @@ pub fn set(options: JsSetOptions) {
         monitor_gain: options.monitor_gain.map(|g| g as f32),
         mute: options.mute,
         tone: tone_pairs(options.tone),
+        record: options.record,
     });
 }
 
@@ -350,6 +367,17 @@ pub fn on_frames(callback: JsFunction) -> Result<()> {
         Ok(vec![JsFrames { now_us: batch.now_us, frames: Float64Array::new(flat) }])
     })?;
     *sink().frames.lock().unwrap() = Some(tsfn);
+    Ok(())
+}
+
+#[napi(ts_args_type = "onAudio: (audio: JsAudio) => void")]
+pub fn on_audio(callback: JsFunction) -> Result<()> {
+    // очередь — ≈ 6 с записи кусками по 100 мс: рендерер занят — куски ждут, а не теряются
+    let tsfn: Tsfn<AudioOut> = callback.create_threadsafe_function(64, |ctx| {
+        let audio: AudioOut = ctx.value;
+        Ok(vec![JsAudio { sample_rate: audio.sample_rate, samples: Float32Array::new(audio.samples) }])
+    })?;
+    *sink().audio.lock().unwrap() = Some(tsfn);
     Ok(())
 }
 

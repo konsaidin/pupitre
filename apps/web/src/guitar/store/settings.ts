@@ -113,6 +113,11 @@ export function reloadGuitarSettings(): GuitarSettings {
 function onStorage(e: StorageEvent) {
   if (e.key === SETTINGS_KEY) reloadGuitarSettings();
 }
+/** Подписка на запись настроек вне React (дека записи следит за тоном при прослушивании). */
+export function subscribeGuitarSettings(listener: () => void): () => void {
+  return subscribe(listener);
+}
+
 function subscribe(listener: () => void) {
   listeners.add(listener);
   if (listeners.size === 1) globalThis.addEventListener?.('storage', onStorage);

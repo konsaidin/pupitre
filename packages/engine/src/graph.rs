@@ -273,9 +273,10 @@ impl Graph {
     }
 }
 
-/// Граф с очередями: (граф, вход команд, выход событий, сухой сигнал анализу — до 2 с).
+/// Граф с очередями: (граф, вход команд, выход событий, сухой сигнал анализу — до 2 с). Команд — с запасом на смену
+/// пресета целиком (все параметры процессора разом) поверх открытия.
 pub fn graph(sample_rate: f32) -> (Graph, Producer<Command>, Consumer<Event>, Consumer<f32>) {
-    let (commands_tx, commands_rx) = rtrb::RingBuffer::new(64);
+    let (commands_tx, commands_rx) = rtrb::RingBuffer::new(512);
     let (events_tx, events_rx) = rtrb::RingBuffer::new(1024);
     let (tap_tx, tap_rx) = rtrb::RingBuffer::new((sample_rate as usize) * 2);
     (Graph::new(sample_rate, commands_rx, events_tx, tap_tx), commands_tx, events_rx, tap_rx)
